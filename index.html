@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IGCSE 0478 Pseudocode Skills Practice</title>
+<style>
+:root{--bg:#f6f8fb;--text:#1f2937;--line:#e5e7eb;--blue:#dbeafe;--green:#dcfce7;--yellow:#fef3c7;--purple:#ede9fe;--red:#fee2e2;--orange:#ffedd5;--dark:#101827;--top:#1f2740;--kw:#4da3ff;--type:#ff9f3f;--str:#bf5cff;--num:#9cdcfe}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}header{background:linear-gradient(135deg,#1d4ed8,#6d28d9);color:white;text-align:center;padding:42px 20px}header h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3.2rem)}header p{max-width:950px;margin:auto;color:#e0e7ff}nav{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:12px 18px;z-index:10;overflow-x:auto;white-space:nowrap}nav a{display:inline-block;margin-right:8px;padding:8px 12px;border-radius:999px;background:#eef2ff;color:#3730a3;text-decoration:none;font-weight:800}.container{max-width:1180px;margin:auto;padding:26px 18px 60px}.section-title{font-size:1.85rem;margin:42px 0 16px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:18px}.card,.quiz,.answers,.project{background:white;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px rgba(15,23,42,.07);overflow:hidden}.head{padding:16px 18px;font-weight:900;font-size:1.12rem}.blue .head{background:var(--blue);color:#1d4ed8}.green .head{background:var(--green);color:#15803d}.yellow .head{background:var(--yellow);color:#b45309}.purple .head{background:var(--purple);color:#6d28d9}.red .head{background:var(--red);color:#b91c1c}.orange .head{background:var(--orange);color:#c2410c}.body{padding:18px}.step{display:flex;align-items:center;gap:8px;margin:16px 0 7px;font-weight:900}.step:first-child{margin-top:0}.step span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#111827;color:white;font-size:.85rem}pre{margin:0;background:var(--dark);color:white;border-top:8px solid var(--top);border-radius:16px;padding:16px;overflow-x:auto;font-size:.95rem;line-height:1.55}code{font-family:Consolas,Monaco,'Courier New',monospace}.kw{color:var(--kw);font-weight:900}.type{color:var(--type);font-weight:900}.str{color:var(--str);font-weight:800}.num{color:var(--num)}.task{border:1px dashed #cbd5e1;background:#f9fafb;border-radius:14px;padding:12px 14px}.quiz{padding:24px;margin:28px 0 36px}.quiz h2{margin-top:0}.quiz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:14px}.q{border:1px solid var(--line);border-radius:18px;background:#f9fafb;padding:14px}.q p{margin:0 0 10px;font-weight:900}.q label{display:block;margin:7px 0;padding:9px 10px;border:1px solid #e5e7eb;background:white;border-radius:10px;cursor:pointer}.q.correct{border-color:#86efac;background:#f0fdf4}.q.wrong{border-color:#fecaca;background:#fff1f2}.feedback{font-weight:900;margin-top:8px}.good{color:#15803d}.bad{color:#b91c1c}.score{margin-top:14px;padding:12px 14px;background:#eef2ff;color:#3730a3;border-radius:14px;font-weight:900}.answers,.project{padding:24px;margin-top:34px}details{border:1px solid var(--line);border-radius:14px;background:#f9fafb;padding:12px 14px;margin:12px 0}summary{font-weight:900;cursor:pointer}.answer-space{min-height:110px;border:2px dashed #cbd5e1;border-radius:16px;padding:14px;color:#6b7280;background:white}footer{text-align:center;color:#6b7280;padding:32px}
+</style>
+</head>
+<body>
+<header><h1>IGCSE 0478 Pseudocode Skills</h1><p>Colored skill boxes, coding-format answers, and 5 auto-graded MCQs after each section. Click any MCQ answer to get immediate feedback.</p></header>
+<nav><a href="#basics">Basics</a><a href="#selection">Selection</a><a href="#loops">Loops</a><a href="#methods">Standard Methods</a><a href="#validation">Validation</a><a href="#testing">Testing</a><a href="#answers">Answers</a></nav>
+<main class="container">
+<h2 id="basics" class="section-title">1. Basics</h2>
+<section class="grid">
+<article class="card blue"><div class="head">1. Assignment</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Cost, Price, Tax, SellingPrice : <span class="type">REAL</span>
+
+Cost &lt;- <span class="num">10</span>
+Price &lt;- Cost * <span class="num">2</span>
+Tax &lt;- Price * <span class="num">0.12</span>
+SellingPrice &lt;- Price + Tax
+
+<span class="kw">OUTPUT</span> <span class="str">"Selling price is "</span>, SellingPrice</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
+
+Amount &lt;- <span class="num">100</span>
+TotalPrice &lt;- Amount * ____
+Discount &lt;- ____
+FinalPrice &lt;- TotalPrice - TotalPrice * ____
+
+<span class="kw">OUTPUT</span> <span class="str">"Final price is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Declare StudentName as STRING and Mark as INTEGER. Output both.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A pencil costs $2. Calculate the cost of buying 6 pencils.</div></div></article>
+<article class="card blue"><div class="head">2. INPUT / OUTPUT</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Name : <span class="type">STRING</span>
+
+<span class="kw">OUTPUT</span> <span class="str">"Please enter your name"</span>
+<span class="kw">INPUT</span> Name
+<span class="kw">OUTPUT</span> <span class="str">"Hello "</span>, Name</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Age : <span class="type">INTEGER</span>
+
+<span class="kw">OUTPUT</span> <span class="str">"Please enter your age"</span>
+<span class="kw">INPUT</span> ____
+
+<span class="kw">OUTPUT</span> <span class="str">"You are "</span>, ____, <span class="str">" years old"</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input first name and class name. Output both.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Input the number of books borrowed and display it.</div></div></article>
+<article class="card blue"><div class="head">3. Sequence</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Length, Width, Area : <span class="type">REAL</span>
+
+Length &lt;- <span class="num">10</span>
+Width &lt;- <span class="num">5</span>
+Area &lt;- Length * Width
+
+<span class="kw">OUTPUT</span> <span class="str">"Area is "</span>, Area</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Base, Height, TriangleArea : <span class="type">REAL</span>
+
+Base &lt;- <span class="num">12</span>
+Height &lt;- <span class="num">8</span>
+TriangleArea &lt;- Base * Height / ____
+
+<span class="kw">OUTPUT</span> <span class="str">"Triangle area is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Store 3 marks, calculate total, then output total.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Calculate the average of 3 quiz scores in the correct order.</div></div></article>
+</section>
+<section class="quiz" data-quiz="basics"><h2>Basics MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="selection" class="section-title">2. Selection</h2>
+<section class="grid">
+<article class="card green"><div class="head">4. IF THEN ELSE</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Age : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Age
+
+<span class="kw">IF</span> Age &lt; <span class="num">18</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Child"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Adult"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Mark
+
+<span class="kw">IF</span> Mark &gt;= ____
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Output Hot if Temperature is 30 or more; otherwise output Not hot.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Ticket system: under 12 = Child ticket, otherwise Standard ticket.</div></div></article>
+<article class="card green"><div class="head">5. Nested IF</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Mark
+
+<span class="kw">IF</span> Mark &lt; <span class="num">0</span> <span class="kw">OR</span> Mark &gt; <span class="num">100</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">IF</span> Mark &gt;= <span class="num">50</span>
+      <span class="kw">THEN</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+      <span class="kw">ELSE</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Score : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Score
+
+<span class="kw">IF</span> Score &lt; ____ <span class="kw">OR</span> Score &gt; ____
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">IF</span> Score &gt;= ____
+      <span class="kw">THEN</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+      <span class="kw">ELSE</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Validate a mark from 0 to 50. Pass mark is 25 or above.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Ride condition: age over 7 and under 12; height over 110 and under 150.</div></div></article>
+<article class="card green"><div class="head">6. CASE OF</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Grade : <span class="type">CHAR</span>
+
+<span class="kw">INPUT</span> Grade
+
+<span class="kw">CASE OF</span> Grade
+  <span class="str">"A"</span> : <span class="kw">OUTPUT</span> <span class="str">"Excellent"</span>
+  <span class="str">"B"</span> : <span class="kw">OUTPUT</span> <span class="str">"Good"</span>
+  <span class="str">"C"</span> : <span class="kw">OUTPUT</span> <span class="str">"Average"</span>
+  <span class="kw">OTHERWISE</span> <span class="kw">OUTPUT</span> <span class="str">"Improvement is needed"</span>
+<span class="kw">ENDCASE</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Choice : <span class="type">INTEGER</span>
+
+<span class="kw">CASE OF</span> Choice
+  <span class="num">1</span> : <span class="kw">OUTPUT</span> <span class="str">"Start game"</span>
+  <span class="num">2</span> : <span class="kw">OUTPUT</span> <span class="str">"Load game"</span>
+  <span class="num">3</span> : <span class="kw">OUTPUT</span> <span class="str">"Quit"</span>
+  ____ <span class="kw">OUTPUT</span> <span class="str">"Invalid choice"</span>
+____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Use CASE OF to output day name for numbers 1 to 7.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Calculator menu: 1 Add, 2 Subtract, 3 Multiply, 4 Divide.</div></div></article>
+</section>
+<section class="quiz" data-quiz="selection"><h2>Selection MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="loops" class="section-title">3. Loops</h2>
+<section class="grid"><article class="card yellow"><div class="head">7. FOR Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">10</span>
+  <span class="kw">OUTPUT</span> <span class="str">"*"</span>
+<span class="kw">NEXT</span> Counter</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> ____
+  <span class="kw">OUTPUT</span> Counter
+<span class="kw">NEXT</span> ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Output your name 5 times using a FOR loop.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Input 10 student marks using a FOR loop.</div></div></article><article class="card yellow"><div class="head">8. REPEAT UNTIL</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
+
+Total &lt;- <span class="num">0</span>
+Mark &lt;- <span class="num">0</span>
+
+<span class="kw">REPEAT</span>
+  Total &lt;- Total + Mark
+  <span class="kw">INPUT</span> Mark
+<span class="kw">UNTIL</span> Mark = -<span class="num">1</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">REPEAT</span>
+  <span class="kw">INPUT</span> Item
+  Count &lt;- Count + ____
+<span class="kw">UNTIL</span> Item = <span class="str">"____"</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Ask for numbers until 999.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Enter prices until -1 and keep a running total.</div></div></article><article class="card yellow"><div class="head">9. WHILE Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
+
+Total &lt;- <span class="num">0</span>
+<span class="kw">INPUT</span> Mark
+
+<span class="kw">WHILE</span> Mark &lt;&gt; -<span class="num">1</span> <span class="kw">DO</span>
+  Total &lt;- Total + Mark
+  <span class="kw">INPUT</span> Mark
+<span class="kw">ENDWHILE</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">WHILE</span> Name &lt;&gt; <span class="str">"____"</span> <span class="kw">DO</span>
+  Count &lt;- Count + ____
+<span class="kw">ENDWHILE</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Ask for scores until -1 and count valid scores.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Enter sack weights until -1 and output number of sacks.</div></div></article></section>
+<section class="quiz" data-quiz="loops"><h2>Loops MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="methods" class="section-title">4. Standard Methods</h2>
+<section class="grid"><article class="card purple"><div class="head">10. Totalling / Counting / Average</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Mark, Total : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Average : <span class="type">REAL</span>
+
+Total &lt;- <span class="num">0</span>
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">5</span>
+  <span class="kw">INPUT</span> Mark
+  Total &lt;- Total + Mark
+<span class="kw">NEXT</span> Counter
+
+Average &lt;- Total / <span class="num">5</span>
+<span class="kw">OUTPUT</span> Average</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Total &lt;- ____
+Total &lt;- Total + ____
+Average &lt;- Total / ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 4 prices and output total.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Record 6 lap times and calculate the average.</div></div></article><article class="card purple"><div class="head">11. Max / Min / Search</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">INPUT</span> Number
+Highest &lt;- Number
+Lowest &lt;- Number
+
+<span class="kw">IF</span> Number &gt; Highest
+  <span class="kw">THEN</span>
+    Highest &lt;- Number
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Found &lt;- ____
+Counter &lt;- ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Search for a book title in a list.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Explain what bubble sort does.</div></div></article></section>
+<section class="quiz" data-quiz="methods"><h2>Standard Methods MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="validation" class="section-title">5. Validation and Verification</h2>
+<section class="grid"><article class="card red"><div class="head">12. Range Check</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
+
+<span class="kw">REPEAT</span>
+  <span class="kw">INPUT</span> Mark
+  <span class="kw">IF</span> Mark &lt; <span class="num">0</span> <span class="kw">OR</span> Mark &gt; <span class="num">100</span>
+    <span class="kw">THEN</span>
+      <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">UNTIL</span> Mark &gt;= <span class="num">0</span> <span class="kw">AND</span> Mark &lt;= <span class="num">100</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">IF</span> Age &lt; ____ <span class="kw">OR</span> Age &gt; ____
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Validate score 0–20.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Height must be 110–150.</div></div></article><article class="card red"><div class="head">13. Length / Presence / Double Entry</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Password : <span class="type">STRING</span>
+
+<span class="kw">IF</span> LENGTH(Password) &lt;&gt; <span class="num">8</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid length"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">IF</span> Name = ____
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Required"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Check password length is 8–12 characters.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">User enters a PIN twice. Check if both match.</div></div></article></section>
+<section class="quiz" data-quiz="validation"><h2>Validation MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="testing" class="section-title">6. Testing and Debugging</h2>
+<section class="grid"><article class="card orange"><div class="head">14. Test Data</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Mark must be 0 to 100 inclusive</span>
+
+Normal data: <span class="num">50</span>
+Extreme data: <span class="num">0</span>, <span class="num">100</span>
+Boundary data: -<span class="num">1</span>, <span class="num">0</span>, <span class="num">100</span>, <span class="num">101</span>
+Abnormal data: -<span class="num">12</span>, <span class="num">150</span>, <span class="str">"eleven"</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Normal data: ____
+Extreme data: ____, ____
+Boundary data: ____, ____, ____, ____</code></pre><div class="step"><span>3</span>Own Task</div><div class="task">Create test data for password length 8–12.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Height 110–150: give normal, extreme, boundary and abnormal data.</div></div></article><article class="card orange"><div class="head">15. Trace Tables / Errors</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Count, Number : <span class="type">INTEGER</span>
+
+Total &lt;- <span class="num">0</span>
+Count &lt;- <span class="num">0</span>
+<span class="kw">INPUT</span> Number
+
+<span class="kw">WHILE</span> Number &lt;&gt; -<span class="num">1</span> <span class="kw">DO</span>
+  Total &lt;- Total + Number
+  Count &lt;- Count + <span class="num">1</span>
+  <span class="kw">INPUT</span> Number
+<span class="kw">ENDWHILE</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Trace table columns:
+____ | ____ | ____ | OUTPUT</code></pre><div class="step"><span>3</span>Own Task</div><div class="task">Dry run with test data: 5, 10, -1.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Why is a trace table useful?</div></div></article></section>
+<section class="quiz" data-quiz="testing"><h2>Testing MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<section id="answers" class="answers"><h2>Answer Page — Coding Format</h2><details open><summary>Basics Answers</summary><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
+
+Amount &lt;- <span class="num">100</span>
+TotalPrice &lt;- Amount * <span class="num">3.5</span>
+Discount &lt;- <span class="num">0.2</span>
+FinalPrice &lt;- TotalPrice - TotalPrice * Discount
+
+<span class="kw">OUTPUT</span> <span class="str">"Final price is "</span>, FinalPrice</code></pre><pre><code>TriangleArea &lt;- Base * Height / <span class="num">2</span>
+<span class="kw">OUTPUT</span> <span class="str">"Triangle area is "</span>, TriangleArea</code></pre></details><details><summary>Selection Answers</summary><pre><code><span class="kw">IF</span> Mark &gt;= <span class="num">50</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+<span class="kw">ENDIF</span></code></pre><pre><code><span class="kw">OTHERWISE OUTPUT</span> <span class="str">"Invalid choice"</span>
+<span class="kw">ENDCASE</span></code></pre></details><details><summary>Loops Answers</summary><pre><code><span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">10</span>
+  <span class="kw">OUTPUT</span> Counter
+<span class="kw">NEXT</span> Counter</code></pre><pre><code>Count &lt;- Count + <span class="num">1</span>
+<span class="kw">UNTIL</span> Item = <span class="str">"STOP"</span></code></pre></details><details><summary>Validation / Testing Answers</summary><pre><code><span class="kw">IF</span> Age &lt; <span class="num">7</span> <span class="kw">OR</span> Age &gt; <span class="num">12</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+<span class="kw">ENDIF</span></code></pre><pre><code>Boundary data for 110 to 150:
+<span class="num">109</span>, <span class="num">110</span>, <span class="num">150</span>, <span class="num">151</span></code></pre></details></section>
+<section id="project" class="project"><h2>Final Mini Project</h2><p><strong>Scenario:</strong> A teacher wants an algorithm to process marks for a small class.</p><div class="task"><ul><li>Declare all variables with suitable data types.</li><li>Input name and mark for each student.</li><li>Validate each mark is 0–100.</li><li>Calculate total, average, highest, lowest, and number of passes.</li></ul></div><div class="answer-space">Write pseudocode here...</div></section>
+</main>
+<footer>IGCSE 0478 Pseudocode Practice Website</footer>
+<script>
+const quizData={basics:[['Which keyword declares a variable?',['INPUT','DECLARE','OUTPUT','NEXT'],1,'DECLARE states variables and data types.'],['Best data type for a name?',['INTEGER','REAL','STRING','BOOLEAN'],2,'Names are text, so use STRING.'],['What does <- mean?',['Equal to','Assignment','Not equal','End'],1,'<- assigns a value.'],['Best data type for whole-number age?',['INTEGER','REAL','STRING','CHAR'],0,'Whole numbers use INTEGER.'],['Why does sequence matter?',['It changes names','It removes declarations','It avoids loops','Order affects result'],3,'Algorithms run in order.']],selection:[['Which keyword ends IF?',['NEXT','ENDWHILE','ENDIF','STOP'],2,'ENDIF closes IF.'],['Both conditions true?',['OR','AND','NOT','OTHERWISE'],1,'AND requires both.'],['Best for menu choices?',['CASE OF','DECLARE','OUTPUT','LENGTH'],0,'CASE OF handles fixed choices.'],['Not equal operator?',['=','<=','>=','<>'],3,'<> means not equal.'],['Invalid CASE choice?',['NEXT','THEN','OTHERWISE','INPUT'],2,'OTHERWISE handles other values.']],loops:[['Exactly 10 repetitions?',['FOR','CASE','IF','DECLARE'],0,'FOR is count-controlled.'],['Always runs once?',['FOR','WHILE','REPEAT UNTIL','CASE'],2,'REPEAT UNTIL tests at the end.'],['May run zero times?',['REPEAT','WHILE','OUTPUT','CASE'],1,'WHILE tests at the start.'],['Closes FOR loop?',['ENDIF','ENDCASE','UNTIL','NEXT Counter'],3,'NEXT closes FOR.'],['Sentinel value?',['Stop value','Data type','Declaration','Trace column'],0,'A sentinel stops input.']],methods:[['Total starts at?',['0','1','100','TRUE'],0,'Totals usually start at 0.'],['Increment counter?',['Count <- Count - 1','Count <- Count + 1','Count <- 0','Count <- Total'],1,'Add 1 to Count.'],['Average formula?',['Total * Count','Count / Total','Total + Count','Total / Count'],3,'Average is total divided by count.'],['Found starts as?',['TRUE','FALSE','1','100'],1,'Found starts FALSE.'],['Bubble sort does what?',['Checks length','Outputs one item','Compares adjacent items and swaps','Declares variables'],2,'Bubble sort swaps adjacent items.']],validation:[['Value between limits?',['Presence','Range','Length','Double entry'],1,'Range check tests lower and upper limits.'],['Blank input check?',['Presence','Range','Length','Bubble'],0,'Presence check prevents blanks.'],['Exactly 8 chars?',['Range','Length','Double entry','Trace'],1,'Length check counts characters.'],['Data entered twice?',['Range','Length','Double entry','CASE'],2,'Double entry verifies matching inputs.'],['Valid mark 0-100 rejects?',['50','0','101','100'],2,'101 is outside the range.']],testing:[['Normal data means?',['Expected valid data','Invalid data','Boundary outside','No data'],0,'Normal data should be accepted.'],['Extreme values for 0-100?',['-1 and 101','0 and 100','50 and 60','0 and 101'],1,'Extreme values are valid ends.'],['Boundary for lower end 0?',['-1 and 0','0 and 1','99 and 100','100 and 101'],0,'Boundary checks just outside and just inside.'],['Trace table records?',['Variable changes','Only headings','Only code','Only comments'],0,'Trace tables record changing values.'],['Missing keyword after IF?',['NEXT','ENDIF','ENDCASE','DECLARE'],1,'IF blocks end with ENDIF.']]};
+function renderQuizzes(){document.querySelectorAll('[data-quiz]').forEach(function(sec){var key=sec.getAttribute('data-quiz');var grid=sec.querySelector('.quiz-grid');grid.innerHTML=quizData[key].map(function(q,i){return '<div class="q" data-correct="'+q[2]+'" data-explain="'+q[3]+'"><p>'+(i+1)+'. '+q[0]+'</p>'+q[1].map(function(a,j){return '<label><input type="radio" name="'+key+i+'" value="'+j+'"> '+a+'</label>';}).join('')+'<div class="feedback"></div></div>';}).join('');});}
+function updateScore(sec){var qs=sec.querySelectorAll('.q');var score=0;qs.forEach(function(q){if(q.classList.contains('correct'))score++;});sec.querySelector('.score').textContent='Score: '+score+' / '+qs.length;}
+document.addEventListener('change',function(e){if(!e.target.matches('.q input'))return;var q=e.target.closest('.q');var sec=e.target.closest('.quiz');var correct=q.getAttribute('data-correct');var fb=q.querySelector('.feedback');q.classList.remove('correct','wrong');if(e.target.value===correct){q.classList.add('correct');fb.innerHTML='<span class="good">Correct.</span> '+q.getAttribute('data-explain');}else{q.classList.add('wrong');var right=q.querySelector('input[value="'+correct+'"]').parentElement.textContent.trim();fb.innerHTML='<span class="bad">Incorrect.</span> Correct answer: <strong>'+right+'</strong>. '+q.getAttribute('data-explain');}updateScore(sec);});
+renderQuizzes();
+</script>
+</body>
+</html>
