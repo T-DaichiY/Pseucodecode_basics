@@ -9,16 +9,16 @@
 <title>IGCSE 0478 Pseudocode Skills Practice — Daichi Yamamoto</title>
 <style>
 :root{--bg:#f6f8fb;--text:#1f2937;--line:#e5e7eb;--blue:#dbeafe;--green:#dcfce7;--yellow:#fef3c7;--purple:#ede9fe;--red:#fee2e2;--orange:#ffedd5;--teal:#99f6e4;--dark:#101827;--top:#1f2740;--kw:#4da3ff;--type:#ff9f3f;--str:#bf5cff;--num:#9cdcfe}
-*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}header{background:linear-gradient(135deg,#1d4ed8,#6d28d9);color:white;text-align:center;padding:42px 20px}header h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3.2rem)}header p{max-width:950px;margin:auto;color:#e0e7ff}nav{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:12px 18px;z-index:10;overflow-x:auto;white-space:nowrap}nav a{display:inline-block;margin-right:8px;padding:8px 12px;border-radius:999px;background:#eef2ff;color:#3730a3;text-decoration:none;font-weight:800}.container{max-width:1180px;margin:auto;padding:26px 18px 60px}.section-title{font-size:1.85rem;margin:42px 0 16px}.grid{display:grid;grid-template-columns:1fr;gap:18px}.card,.quiz,.answers,.project{background:white;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px rgba(15,23,42,.07);overflow:hidden}.head{padding:16px 18px;font-weight:900;font-size:1.12rem}.blue .head{background:var(--blue);color:#1d4ed8}.green .head{background:var(--green);color:#15803d}.yellow .head{background:var(--yellow);color:#b45309}.purple .head{background:var(--purple);color:#6d28d9}.red .head{background:var(--red);color:#b91c1c}.orange .head{background:var(--orange);color:#c2410c}.teal .head{background:var(--teal);color:#0f766e}.body{padding:18px}.step{display:flex;align-items:center;gap:8px;margin:16px 0 7px;font-weight:900}.step:first-child{margin-top:0}.step span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#111827;color:white;font-size:.85rem}pre{margin:0;background:var(--dark);color:white;border-top:8px solid var(--top);border-radius:16px;padding:16px;overflow-x:visible;font-size:.95rem;line-height:1.55;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}code{font-family:Consolas,Monaco,'Courier New',monospace;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}.kw{color:var(--kw);font-weight:900}.type{color:var(--type);font-weight:900}.str{color:var(--str);font-weight:800}.num{color:var(--num)}.comment{color:#7f9a72;font-style:italic}.task{border:1px dashed #cbd5e1;background:#f9fafb;border-radius:14px;padding:12px 14px}.quiz{padding:24px;margin:28px 0 36px}.quiz h2{margin-top:0}.quiz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}.q{border:1px solid var(--line);border-radius:18px;background:#f9fafb;padding:14px}.q p{margin:0 0 10px;font-weight:900}.q label{display:block;margin:7px 0;padding:9px 10px;border:1px solid #e5e7eb;background:white;border-radius:10px;cursor:pointer}.q.correct{border-color:#86efac;background:#f0fdf4}.q.wrong{border-color:#fecaca;background:#fff1f2}.feedback{font-weight:900;margin-top:8px}.good{color:#15803d}.bad{color:#b91c1c}.score{margin-top:14px;padding:12px 14px;background:#eef2ff;color:#3730a3;border-radius:14px;font-weight:900}.answers,.project{padding:24px;margin-top:34px}details{border:1px solid var(--line);border-radius:14px;background:#f9fafb;padding:12px 14px;margin:12px 0}summary{font-weight:900;cursor:pointer}.answer-space{min-height:110px;border:2px dashed #cbd5e1;border-radius:16px;padding:14px;color:#6b7280;background:white}footer{text-align:center;color:#6b7280;padding:32px}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}header{background:linear-gradient(135deg,#1d4ed8,#6d28d9);color:white;text-align:center;padding:42px 20px}header h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3.2rem)}header p{max-width:950px;margin:auto;color:#e0e7ff}nav{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:10px 14px;z-index:10;display:flex;flex-wrap:wrap;gap:6px 8px;max-height:96px;overflow-y:auto}nav a{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3;text-decoration:none;font-weight:800;font-size:.82rem;white-space:nowrap}@media (max-width:600px){nav{max-height:130px}nav a{font-size:.72rem;padding:5px 8px}}.card{scroll-margin-top:76px}.card:target{box-shadow:0 0 0 4px #6d28d9}.container{max-width:1180px;margin:auto;padding:26px 18px 60px}.section-title{font-size:1.85rem;margin:42px 0 16px}.grid{display:grid;grid-template-columns:1fr;gap:18px}.card,.quiz,.answers,.project{background:white;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px rgba(15,23,42,.07);overflow:hidden}.head{padding:16px 18px;font-weight:900;font-size:1.12rem}.blue .head{background:var(--blue);color:#1d4ed8}.green .head{background:var(--green);color:#15803d}.yellow .head{background:var(--yellow);color:#b45309}.purple .head{background:var(--purple);color:#6d28d9}.red .head{background:var(--red);color:#b91c1c}.orange .head{background:var(--orange);color:#c2410c}.teal .head{background:var(--teal);color:#0f766e}.body{padding:18px}.step{display:flex;align-items:center;gap:8px;margin:16px 0 7px;font-weight:900}.step:first-child{margin-top:0}.step span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#111827;color:white;font-size:.85rem}pre{margin:0;background:var(--dark);color:white;border-top:8px solid var(--top);border-radius:16px;padding:16px;overflow-x:visible;font-size:.95rem;line-height:1.55;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}code{font-family:Consolas,Monaco,'Courier New',monospace;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}.kw{color:var(--kw);font-weight:900}.type{color:var(--type);font-weight:900}.str{color:var(--str);font-weight:800}.num{color:var(--num)}.comment{color:#7f9a72;font-style:italic}.task{border:1px dashed #cbd5e1;background:#f9fafb;border-radius:14px;padding:12px 14px}.quiz{padding:24px;margin:28px 0 36px}.quiz h2{margin-top:0}.quiz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}.q{border:1px solid var(--line);border-radius:18px;background:#f9fafb;padding:14px}.q p{margin:0 0 10px;font-weight:900}.q label{display:block;margin:7px 0;padding:9px 10px;border:1px solid #e5e7eb;background:white;border-radius:10px;cursor:pointer}.q.correct{border-color:#86efac;background:#f0fdf4}.q.wrong{border-color:#fecaca;background:#fff1f2}.feedback{font-weight:900;margin-top:8px}.good{color:#15803d}.bad{color:#b91c1c}.score{margin-top:14px;padding:12px 14px;background:#eef2ff;color:#3730a3;border-radius:14px;font-weight:900}.answers,.project{padding:24px;margin-top:34px}details{border:1px solid var(--line);border-radius:14px;background:#f9fafb;padding:12px 14px;margin:12px 0}summary{font-weight:900;cursor:pointer}.answer-space{min-height:110px;border:2px dashed #cbd5e1;border-radius:16px;padding:14px;color:#6b7280;background:white}footer{text-align:center;color:#6b7280;padding:32px}
 </style>
 </head>
 <body>
 <header><h1>IGCSE 0478 Pseudocode Skills</h1><p><strong>Created by Daichi Yamamoto</strong><br>Colored skill boxes, coding-format answers, and 5 auto-graded MCQs after each section. Click any MCQ answer to get immediate feedback.</p></header>
-<nav><a href="#basics">Basics</a><a href="#selection">Selection</a><a href="#loops">Loops</a><a href="#methods">Standard Methods</a><a href="#validation">Validation</a><a href="#testing">Testing</a><a href="#functions">Functions and Procedures</a><a href="#answers">Answers</a></nav>
+<nav><a href="#topic1">1. Assignment</a><a href="#topic2">2. INPUT / OUTPUT</a><a href="#topic3">3. Sequence</a><a href="#topic4">4. IF THEN ELSE</a><a href="#topic5">5. Nested IF</a><a href="#topic6">6. CASE OF</a><a href="#topic7">7. FOR Loop</a><a href="#topic8">8. REPEAT UNTIL</a><a href="#topic9">9. WHILE Loop</a><a href="#topic10">10. Totalling / Counting / Average</a><a href="#topic11">11. Finding the Maximum</a><a href="#topic12">12. Finding the Minimum</a><a href="#topic13">13. Linear Search</a><a href="#topic14">14. Bubble Sort</a><a href="#topic15">15. Range Check</a><a href="#topic16">16. Length / Presence / Double Entry</a><a href="#topic17">17. Test Data</a><a href="#topic18">18. Trace Tables / Errors</a><a href="#topic19">19. Procedures</a><a href="#topic20">20. Functions</a><a href="#answers">Answers</a><a href="Answers.pdf" target="_blank" rel="noopener">Answer Key (PDF)</a></nav>
 <main class="container">
 <h2 id="basics" class="section-title">1. Basics</h2>
 <section class="grid">
-<article class="card blue"><div class="head">1. Assignment</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Cost, Price, Tax, SellingPrice : <span class="type">REAL</span>
+<article id="topic1" class="card blue"><div class="head">1. Assignment</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Cost, Price, Tax, SellingPrice : <span class="type">REAL</span>
 
 Cost &lt;- <span class="num">10</span>
 Price &lt;- Cost * <span class="num">2</span>
@@ -33,7 +33,7 @@ Discount &lt;- ____
 FinalPrice &lt;- TotalPrice - TotalPrice * ____
 
 <span class="kw">OUTPUT</span> <span class="str">"Final price is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Declare StudentName as STRING and Mark as INTEGER. Output both.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A pencil costs $2. Calculate the cost of buying 6 pencils.</div></div></article>
-<article class="card blue"><div class="head">2. INPUT / OUTPUT</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Name : <span class="type">STRING</span>
+<article id="topic2" class="card blue"><div class="head">2. INPUT / OUTPUT</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Name : <span class="type">STRING</span>
 
 <span class="kw">OUTPUT</span> <span class="str">"Please enter your name"</span>
 <span class="kw">INPUT</span> Name
@@ -43,7 +43,7 @@ FinalPrice &lt;- TotalPrice - TotalPrice * ____
 <span class="kw">INPUT</span> ____
 
 <span class="kw">OUTPUT</span> <span class="str">"You are "</span>, ____, <span class="str">" years old"</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input first name and class name. Output both.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Input the number of books borrowed and display it.</div></div></article>
-<article class="card blue"><div class="head">3. Sequence</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Length, Width, Area : <span class="type">REAL</span>
+<article id="topic3" class="card blue"><div class="head">3. Sequence</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Length, Width, Area : <span class="type">REAL</span>
 
 Length &lt;- <span class="num">10</span>
 Width &lt;- <span class="num">5</span>
@@ -61,7 +61,7 @@ TriangleArea &lt;- Base * Height / ____
 
 <h2 id="selection" class="section-title">2. Selection</h2>
 <section class="grid">
-<article class="card green"><div class="head">4. IF THEN ELSE</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Age : <span class="type">INTEGER</span>
+<article id="topic4" class="card green"><div class="head">4. IF THEN ELSE</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Age : <span class="type">INTEGER</span>
 
 <span class="kw">INPUT</span> Age
 
@@ -80,7 +80,7 @@ TriangleArea &lt;- Base * Height / ____
   <span class="kw">ELSE</span>
     <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
 <span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Output Hot if Temperature is 30 or more; otherwise output Not hot.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Ticket system: under 12 = Child ticket, otherwise Standard ticket.</div></div></article>
-<article class="card green"><div class="head">5. Nested IF</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
+<article id="topic5" class="card green"><div class="head">5. Nested IF</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
 
 <span class="kw">INPUT</span> Mark
 
@@ -109,7 +109,7 @@ TriangleArea &lt;- Base * Height / ____
         <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
     <span class="kw">ENDIF</span>
 <span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Validate a mark from 0 to 50. Pass mark is 25 or above.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Ride condition: age over 7 and under 12; height over 110 and under 150.</div></div></article>
-<article class="card green"><div class="head">6. CASE OF</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Grade : <span class="type">CHAR</span>
+<article id="topic6" class="card green"><div class="head">6. CASE OF</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Grade : <span class="type">CHAR</span>
 
 <span class="kw">INPUT</span> Grade
 
@@ -132,7 +132,7 @@ ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class=
 <section class="quiz" data-quiz="selection"><h2>Selection MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
 
 <h2 id="loops" class="section-title">3. Loops</h2>
-<section class="grid"><article class="card yellow"><div class="head">7. FOR Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<section class="grid"><article id="topic7" class="card yellow"><div class="head">7. FOR Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
 
 <span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">10</span>
   <span class="kw">OUTPUT</span> <span class="str">"*"</span>
@@ -140,7 +140,7 @@ ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class=
 
 <span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> ____
   <span class="kw">OUTPUT</span> Counter
-<span class="kw">NEXT</span> ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Output your name 5 times using a FOR loop.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Input 10 student marks using a FOR loop.</div></div></article><article class="card yellow"><div class="head">8. REPEAT UNTIL</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
+<span class="kw">NEXT</span> ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Output your name 5 times using a FOR loop.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Input 10 student marks using a FOR loop.</div></div></article><article id="topic8" class="card yellow"><div class="head">8. REPEAT UNTIL</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
 
 Total &lt;- <span class="num">0</span>
 Mark &lt;- <span class="num">0</span>
@@ -156,7 +156,7 @@ Count &lt;- ____
 <span class="kw">REPEAT</span>
   <span class="kw">INPUT</span> Item
   Count &lt;- Count + ____
-<span class="kw">UNTIL</span> Item = <span class="str">"____"</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Ask for numbers until 999.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Enter prices until -1 and keep a running total.</div></div></article><article class="card yellow"><div class="head">9. WHILE Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
+<span class="kw">UNTIL</span> Item = <span class="str">"____"</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Ask for numbers until 999.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Enter prices until -1 and keep a running total.</div></div></article><article id="topic9" class="card yellow"><div class="head">9. WHILE Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
 
 Total &lt;- <span class="num">0</span>
 <span class="kw">INPUT</span> Mark
@@ -177,7 +177,7 @@ Count &lt;- ____
 <section class="quiz" data-quiz="loops"><h2>Loops MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
 
 <h2 id="methods" class="section-title">4. Standard Methods</h2>
-<section class="grid"><article class="card purple"><div class="head">10. Totalling / Counting / Average</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Mark, Total : <span class="type">INTEGER</span>
+<section class="grid"><article id="topic10" class="card purple"><div class="head">10. Totalling / Counting / Average</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Mark, Total : <span class="type">INTEGER</span>
 <span class="kw">DECLARE</span> Average : <span class="type">REAL</span>
 
 Total &lt;- <span class="num">0</span>
@@ -190,7 +190,7 @@ Total &lt;- <span class="num">0</span>
 Average &lt;- Total / <span class="num">5</span>
 <span class="kw">OUTPUT</span> Average</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Total &lt;- ____
 Total &lt;- Total + ____
-Average &lt;- Total / ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 4 prices and output total.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Record 6 lap times and calculate the average.</div></div></article><article class="card purple"><div class="head">11. Finding the Maximum</div><div class="body"><div class="task"><strong>Key idea:</strong> Set <strong>Highest</strong> to the <strong>first</strong> value, then compare every later value against it. Never start at 0 — a list of negative numbers would break.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Number, Highest : <span class="type">INTEGER</span>
+Average &lt;- Total / ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 4 prices and output total.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Record 6 lap times and calculate the average.</div></div></article><article id="topic11" class="card purple"><div class="head">11. Finding the Maximum</div><div class="body"><div class="task"><strong>Key idea:</strong> Set <strong>Highest</strong> to the <strong>first</strong> value, then compare every later value against it. Never start at 0 — a list of negative numbers would break.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Number, Highest : <span class="type">INTEGER</span>
 
 <span class="kw">INPUT</span> Number
 Highest &lt;- Number
@@ -217,7 +217,7 @@ Highest &lt;- ____
 <span class="kw">NEXT</span> Counter
 
 <span class="kw">OUTPUT</span> <span class="str">"Highest mark is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 8 temperatures and output the highest one.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A shop records the sales for each of the 7 days of a week. Output the highest daily sales figure and the day number it happened on.</div></div></article>
-<article class="card purple"><div class="head">12. Finding the Minimum</div><div class="body"><div class="task"><strong>Key idea:</strong> Identical method, but <strong>Lowest</strong> starts at the first value and the comparison uses <strong>&lt;</strong> instead of <strong>&gt;</strong>.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Number, Lowest : <span class="type">INTEGER</span>
+<article id="topic12" class="card purple"><div class="head">12. Finding the Minimum</div><div class="body"><div class="task"><strong>Key idea:</strong> Identical method, but <strong>Lowest</strong> starts at the first value and the comparison uses <strong>&lt;</strong> instead of <strong>&gt;</strong>.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Number, Lowest : <span class="type">INTEGER</span>
 
 <span class="kw">INPUT</span> Number
 Lowest &lt;- Number
@@ -245,7 +245,7 @@ Lowest &lt;- ____
 <span class="kw">NEXT</span> Counter
 
 <span class="kw">OUTPUT</span> <span class="str">"Cheapest price is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 6 lap times and output the fastest (lowest) time.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A class of 30 students sit a test. Input every mark and output both the highest and the lowest mark using one loop.</div></div></article>
-<article class="card purple"><div class="head">13. Linear Search</div><div class="body"><div class="task"><strong>Key idea:</strong> Use a <strong>BOOLEAN flag</strong> called Found. Start it as FALSE and stop as soon as it becomes TRUE, so you do not keep searching a list you have already finished with.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Titles : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">20</span>] <span class="kw">OF</span> <span class="type">STRING</span>
+<article id="topic13" class="card purple"><div class="head">13. Linear Search</div><div class="body"><div class="task"><strong>Key idea:</strong> Use a <strong>BOOLEAN flag</strong> called Found. Start it as FALSE and stop as soon as it becomes TRUE, so you do not keep searching a list you have already finished with.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Titles : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">20</span>] <span class="kw">OF</span> <span class="type">STRING</span>
 <span class="kw">DECLARE</span> SearchTitle : <span class="type">STRING</span>
 <span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
 <span class="kw">DECLARE</span> Found : <span class="type">BOOLEAN</span>
@@ -284,11 +284,52 @@ Counter &lt;- ____
     <span class="kw">ELSE</span>
       Counter &lt;- Counter ____ <span class="num">1</span>
   <span class="kw">ENDIF</span>
-<span class="kw">ENDWHILE</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">An array Marks[1:10] holds ten marks. Search for a mark equal to 100 and output whether one was found.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A library stores 500 book titles in an array. Explain why a linear search may need up to 500 comparisons, and why the Found flag is used to stop the loop early.</div></div></article></section>
+<span class="kw">ENDWHILE</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">An array Marks[1:10] holds ten marks. Search for a mark equal to 100 and output whether one was found.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A library stores 500 book titles in an array. Explain why a linear search may need up to 500 comparisons, and why the Found flag is used to stop the loop early.</div></div></article>
+<article id="topic14" class="card purple"><div class="head">14. Bubble Sort</div><div class="body"><div class="task"><strong>Key idea:</strong> Compare each pair of neighbouring elements and <strong>swap</strong> them if they are in the wrong order. Repeat passes through the list until a full pass makes <strong>no swaps</strong> — the list is then sorted.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Temperature : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">10</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Index, First, Last, Temp : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Swap : <span class="type">BOOLEAN</span>
+
+First &lt;- <span class="num">1</span>
+Last &lt;- <span class="num">10</span>
+
+<span class="kw">REPEAT</span>
+  Swap &lt;- <span class="kw">FALSE</span>
+  <span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
+    <span class="kw">IF</span> Temperature[Index] &gt; Temperature[Index + <span class="num">1</span>]
+      <span class="kw">THEN</span>
+        Temp &lt;- Temperature[Index]
+        Temperature[Index] &lt;- Temperature[Index + <span class="num">1</span>]
+        Temperature[Index + <span class="num">1</span>] &lt;- Temp
+        Swap &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ENDIF</span>
+  <span class="kw">NEXT</span> Index
+  Last &lt;- Last - <span class="num">1</span>
+<span class="kw">UNTIL</span> (<span class="kw">NOT</span> Swap) <span class="kw">OR</span> Last = <span class="num">1</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Marks : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">8</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Index, First, Last, Temp : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Swap : <span class="type">BOOLEAN</span>
+
+First &lt;- <span class="num">1</span>
+Last &lt;- <span class="num">8</span>
+
+<span class="kw">REPEAT</span>
+  Swap &lt;- ____
+  <span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
+    <span class="kw">IF</span> Marks[Index] ____ Marks[Index + <span class="num">1</span>]
+      <span class="kw">THEN</span>
+        Temp &lt;- Marks[Index]
+        Marks[Index] &lt;- Marks[Index + <span class="num">1</span>]
+        Marks[Index + <span class="num">1</span>] &lt;- ____
+        Swap &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ENDIF</span>
+  <span class="kw">NEXT</span> Index
+  Last &lt;- ____
+<span class="kw">UNTIL</span> (____ Swap) <span class="kw">OR</span> Last = ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">An array Marks[1:8] holds eight integers. Write a bubble sort algorithm to sort Marks into ascending order.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A teacher stores the heights of 12 students in an array. Explain how a bubble sort would sort the heights into descending order, including what condition would trigger a swap and how many passes might be needed in the worst case.</div></div></article></section>
+<section class="quiz" data-quiz="linearsearch"><h2>Linear Search MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 3</div></section>
+<section class="quiz" data-quiz="bubblesort"><h2>Bubble Sort MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 3</div></section>
 <section class="quiz" data-quiz="methods"><h2>Standard Methods MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
 
 <h2 id="validation" class="section-title">5. Validation and Verification</h2>
-<section class="grid"><article class="card red"><div class="head">14. Range Check</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
+<section class="grid"><article id="topic15" class="card red"><div class="head">15. Range Check</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
 
 <span class="kw">REPEAT</span>
   <span class="kw">INPUT</span> Mark
@@ -299,7 +340,7 @@ Counter &lt;- ____
 <span class="kw">UNTIL</span> Mark &gt;= <span class="num">0</span> <span class="kw">AND</span> Mark &lt;= <span class="num">100</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">IF</span> Age &lt; ____ <span class="kw">OR</span> Age &gt; ____
   <span class="kw">THEN</span>
     <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
-<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Validate score 0–20.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Height must be 110–150.</div></div></article><article class="card red"><div class="head">15. Length / Presence / Double Entry</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Password : <span class="type">STRING</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Validate score 0–20.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Height must be 110–150.</div></div></article><article id="topic16" class="card red"><div class="head">16. Length / Presence / Double Entry</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Password : <span class="type">STRING</span>
 
 <span class="kw">IF</span> LENGTH(Password) &lt;&gt; <span class="num">8</span>
   <span class="kw">THEN</span>
@@ -311,14 +352,14 @@ Counter &lt;- ____
 <section class="quiz" data-quiz="validation"><h2>Validation MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
 
 <h2 id="testing" class="section-title">6. Testing and Debugging</h2>
-<section class="grid"><article class="card orange"><div class="head">16. Test Data</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Mark must be 0 to 100 inclusive</span>
+<section class="grid"><article id="topic17" class="card orange"><div class="head">17. Test Data</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Mark must be 0 to 100 inclusive</span>
 
 Normal data: <span class="num">50</span>
 Extreme data: <span class="num">0</span>, <span class="num">100</span>
 Boundary data: -<span class="num">1</span>, <span class="num">0</span>, <span class="num">100</span>, <span class="num">101</span>
 Abnormal data: -<span class="num">12</span>, <span class="num">150</span>, <span class="str">"eleven"</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Normal data: ____
 Extreme data: ____, ____
-Boundary data: ____, ____, ____, ____</code></pre><div class="step"><span>3</span>Own Task</div><div class="task">Create test data for password length 8–12.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Height 110–150: give normal, extreme, boundary and abnormal data.</div></div></article><article class="card orange"><div class="head">17. Trace Tables / Errors</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Count, Number : <span class="type">INTEGER</span>
+Boundary data: ____, ____, ____, ____</code></pre><div class="step"><span>3</span>Own Task</div><div class="task">Create test data for password length 8–12.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Height 110–150: give normal, extreme, boundary and abnormal data.</div></div></article><article id="topic18" class="card orange"><div class="head">18. Trace Tables / Errors</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Count, Number : <span class="type">INTEGER</span>
 
 Total &lt;- <span class="num">0</span>
 Count &lt;- <span class="num">0</span>
@@ -333,7 +374,7 @@ ____ | ____ | ____ | OUTPUT</code></pre><div class="step"><span>3</span>Own Task
 <section class="quiz" data-quiz="testing"><h2>Testing MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
 
 <h2 id="functions" class="section-title">7. Functions and Procedures</h2>
-<section class="grid"><article class="card teal"><div class="head">18. Procedures</div><div class="body"><div class="task"><strong>Key idea:</strong> A PROCEDURE performs a task and does <strong>not</strong> return a value. It is invoked with the <span class="kw" style="color:#0f766e">CALL</span> command.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">PROCEDURE</span> DisplayMessage(Name : <span class="type">STRING</span>)
+<section class="grid"><article id="topic19" class="card teal"><div class="head">19. Procedures</div><div class="body"><div class="task"><strong>Key idea:</strong> A PROCEDURE performs a task and does <strong>not</strong> return a value. It is invoked with the <span class="kw" style="color:#0f766e">CALL</span> command.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">PROCEDURE</span> DisplayMessage(Name : <span class="type">STRING</span>)
   <span class="kw">OUTPUT</span> <span class="str">"Hello "</span>, Name
 <span class="kw">ENDPROCEDURE</span>
 
@@ -341,7 +382,7 @@ ____ | ____ | ____ | OUTPUT</code></pre><div class="step"><span>3</span>Own Task
   <span class="kw">OUTPUT</span> Num1 + Num2
 ____
 
-<span class="kw">CALL</span> ____(____, ____)</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Write a PROCEDURE called ShowSquare that receives an INTEGER parameter and outputs its square. Then CALL it.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Write a PROCEDURE that receives a student's name and mark, and outputs them as "Name: mark".</div></div></article><article class="card teal"><div class="head">19. Functions</div><div class="body"><div class="task"><strong>Key idea:</strong> A FUNCTION always <span class="kw" style="color:#0f766e">RETURNS</span> a value and is used inside an expression (e.g. an assignment or OUTPUT) — it is never invoked with CALL.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">FUNCTION</span> Square(Num : <span class="type">INTEGER</span>) <span class="kw">RETURNS</span> <span class="type">INTEGER</span>
+<span class="kw">CALL</span> ____(____, ____)</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Write a PROCEDURE called ShowSquare that receives an INTEGER parameter and outputs its square. Then CALL it.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Write a PROCEDURE that receives a student's name and mark, and outputs them as "Name: mark".</div></div></article><article id="topic20" class="card teal"><div class="head">20. Functions</div><div class="body"><div class="task"><strong>Key idea:</strong> A FUNCTION always <span class="kw" style="color:#0f766e">RETURNS</span> a value and is used inside an expression (e.g. an assignment or OUTPUT) — it is never invoked with CALL.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">FUNCTION</span> Square(Num : <span class="type">INTEGER</span>) <span class="kw">RETURNS</span> <span class="type">INTEGER</span>
   <span class="kw">RETURN</span> Num * Num
 <span class="kw">ENDFUNCTION</span>
 
@@ -354,7 +395,7 @@ ____
 Total &lt;- ____(<span class="num">3</span>, <span class="num">4</span>)</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Write a FUNCTION called IsEven that receives an INTEGER and RETURNS a BOOLEAN.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Write a FUNCTION called CalculateArea that receives Length and Width and returns the area.</div></div></article></section>
 <section class="quiz" data-quiz="functions"><h2>Functions and Procedures MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
 
-<section id="answers" class="answers"><h2>Answer Page — Coding Format</h2><details open><summary>Basics Answers</summary><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
+<section id="answers" class="answers"><h2>Answer Page — Coding Format</h2><p style="margin:-6px 0 18px"><a href="Answers.pdf" target="_blank" rel="noopener" style="font-weight:900;color:#1d4ed8">Download the full Answer Key (coding answers + MCQ answers) as a PDF →</a></p><details open><summary>Basics Answers</summary><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
 
 Amount &lt;- <span class="num">100</span>
 TotalPrice &lt;- Amount * <span class="num">3.5</span>
@@ -428,7 +469,19 @@ Counter &lt;- <span class="num">1</span>
     <span class="kw">ELSE</span>
       Counter &lt;- Counter + <span class="num">1</span>
   <span class="kw">ENDIF</span>
-<span class="kw">ENDWHILE</span></code></pre></details><details><summary>Validation / Testing Answers</summary><pre><code><span class="kw">IF</span> Age &lt; <span class="num">7</span> <span class="kw">OR</span> Age &gt; <span class="num">12</span>
+<span class="kw">ENDWHILE</span></code></pre><pre><code><span class="comment">// 14. Bubble Sort</span>
+Swap &lt;- <span class="kw">FALSE</span>
+<span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
+  <span class="kw">IF</span> Marks[Index] &gt; Marks[Index + <span class="num">1</span>]
+    <span class="kw">THEN</span>
+      Temp &lt;- Marks[Index]
+      Marks[Index] &lt;- Marks[Index + <span class="num">1</span>]
+      Marks[Index + <span class="num">1</span>] &lt;- Temp
+      Swap &lt;- <span class="kw">TRUE</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Index
+Last &lt;- Last - <span class="num">1</span>
+<span class="kw">UNTIL</span> (<span class="kw">NOT</span> Swap) <span class="kw">OR</span> Last = <span class="num">1</span></code></pre></details><details><summary>Validation / Testing Answers</summary><pre><code><span class="kw">IF</span> Age &lt; <span class="num">7</span> <span class="kw">OR</span> Age &gt; <span class="num">12</span>
   <span class="kw">THEN</span>
     <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
 <span class="kw">ENDIF</span></code></pre><pre><code>Boundary data for 110 to 150:
@@ -450,7 +503,7 @@ Total &lt;- AddNumbers(<span class="num">3</span>, <span class="num">4</span>)</
   Educational use permitted with attribution to Daichi Yamamoto.
 </footer>
 <script>
-const quizData={basics:[['Which keyword declares a variable?',['INPUT','DECLARE','OUTPUT','NEXT'],1,'DECLARE states variables and data types.'],['Best data type for a name?',['INTEGER','REAL','STRING','BOOLEAN'],2,'Names are text, so use STRING.'],['What does <- mean?',['Equal to','Assignment','Not equal','End'],1,'<- assigns a value.'],['Best data type for whole-number age?',['INTEGER','REAL','STRING','CHAR'],0,'Whole numbers use INTEGER.'],['Why does sequence matter?',['It changes names','It removes declarations','It avoids loops','Order affects result'],3,'Algorithms run in order.']],selection:[['Which keyword ends IF?',['NEXT','ENDWHILE','ENDIF','STOP'],2,'ENDIF closes IF.'],['Both conditions true?',['OR','AND','NOT','OTHERWISE'],1,'AND requires both.'],['Best for menu choices?',['CASE OF','DECLARE','OUTPUT','LENGTH'],0,'CASE OF handles fixed choices.'],['Not equal operator?',['=','<=','>=','<>'],3,'<> means not equal.'],['Invalid CASE choice?',['NEXT','THEN','OTHERWISE','INPUT'],2,'OTHERWISE handles other values.']],loops:[['Exactly 10 repetitions?',['FOR','CASE','IF','DECLARE'],0,'FOR is count-controlled.'],['Always runs once?',['FOR','WHILE','REPEAT UNTIL','CASE'],2,'REPEAT UNTIL tests at the end.'],['May run zero times?',['REPEAT','WHILE','OUTPUT','CASE'],1,'WHILE tests at the start.'],['Closes FOR loop?',['ENDIF','ENDCASE','UNTIL','NEXT Counter'],3,'NEXT closes FOR.'],['Sentinel value?',['Stop value','Data type','Declaration','Trace column'],0,'A sentinel stops input.']],methods:[['Total starts at?',['0','1','100','TRUE'],0,'Totals usually start at 0.'],['Increment counter?',['Count <- Count - 1','Count <- Count + 1','Count <- 0','Count <- Total'],1,'Add 1 to Count.'],['Average formula?',['Total * Count','Count / Total','Total + Count','Total / Count'],3,'Average is total divided by count.'],['In a linear search, the flag Found starts as?',['TRUE','FALSE','1','100'],1,'Found starts FALSE and only becomes TRUE when the item is located.'],['To find the highest value in a list, Highest should be set to...?',['0','The first value in the list','1000','The last value in the list'],1,'Starting at the first value works for every list, including one made only of negative numbers.'],['Which comparison is used when finding the LOWEST value?',['IF Number > Lowest','IF Number = Lowest','IF Number < Lowest','IF Number <> Lowest'],2,'Finding the minimum uses < ; finding the maximum uses > .']],validation:[['Value between limits?',['Presence','Range','Length','Double entry'],1,'Range check tests lower and upper limits.'],['Blank input check?',['Presence','Range','Length','Bubble'],0,'Presence check prevents blanks.'],['Exactly 8 chars?',['Range','Length','Double entry','Trace'],1,'Length check counts characters.'],['Data entered twice?',['Range','Length','Double entry','CASE'],2,'Double entry verifies matching inputs.'],['Valid mark 0-100 rejects?',['50','0','101','100'],2,'101 is outside the range.']],testing:[['Normal data means?',['Expected valid data','Invalid data','Boundary outside','No data'],0,'Normal data should be accepted.'],['Extreme values for 0-100?',['-1 and 101','0 and 100','50 and 60','0 and 101'],1,'Extreme values are valid ends.'],['Boundary for lower end 0?',['-1 and 0','0 and 1','99 and 100','100 and 101'],0,'Boundary checks just outside and just inside.'],['Trace table records?',['Variable changes','Only headings','Only code','Only comments'],0,'Trace tables record changing values.'],['Missing keyword after IF?',['NEXT','ENDIF','ENDCASE','DECLARE'],1,'IF blocks end with ENDIF.']],functions:[['What is the key difference between a FUNCTION and a PROCEDURE?',['A FUNCTION always returns a value; a PROCEDURE does not','A PROCEDURE always returns a value; a FUNCTION does not','They are exactly the same','A FUNCTION cannot take parameters'],0,'A FUNCTION always RETURNS a value; a PROCEDURE performs a task without returning one.'],['How do you invoke a PROCEDURE named PrintReport?',['PrintReport()','CALL PrintReport()','RETURN PrintReport()','OUTPUT PrintReport()'],1,'PROCEDUREs are invoked with the CALL command.'],['Which keyword must appear in a FUNCTION header but never in a PROCEDURE header?',['CALL','RETURNS','DECLARE','ENDFUNCTION'],1,'RETURNS specifies the data type of the value a FUNCTION sends back.'],['Which statement sends a value back to the calling code inside a FUNCTION?',['OUTPUT','CALL','RETURN','INPUT'],2,'RETURN passes the result back and ends the FUNCTION.'],['A parameter declared BYREF instead of BYVAL means...?',['The parameter is optional','Changes made inside the subroutine also change the original argument','The parameter must be a STRING','The subroutine cannot use the parameter'],1,'BYREF passes a reference so changes affect the original variable; BYVAL passes a copy.']]};
+const quizData={basics:[['Which keyword declares a variable?',['INPUT','DECLARE','OUTPUT','NEXT'],1,'DECLARE states variables and data types.'],['Best data type for a name?',['INTEGER','REAL','STRING','BOOLEAN'],2,'Names are text, so use STRING.'],['What does <- mean?',['Equal to','Assignment','Not equal','End'],1,'<- assigns a value.'],['Best data type for whole-number age?',['INTEGER','REAL','STRING','CHAR'],0,'Whole numbers use INTEGER.'],['Why does sequence matter?',['It changes names','It removes declarations','It avoids loops','Order affects result'],3,'Algorithms run in order.']],selection:[['Which keyword ends IF?',['NEXT','ENDWHILE','ENDIF','STOP'],2,'ENDIF closes IF.'],['Both conditions true?',['OR','AND','NOT','OTHERWISE'],1,'AND requires both.'],['Best for menu choices?',['CASE OF','DECLARE','OUTPUT','LENGTH'],0,'CASE OF handles fixed choices.'],['Not equal operator?',['=','<=','>=','<>'],3,'<> means not equal.'],['Invalid CASE choice?',['NEXT','THEN','OTHERWISE','INPUT'],2,'OTHERWISE handles other values.']],loops:[['Exactly 10 repetitions?',['FOR','CASE','IF','DECLARE'],0,'FOR is count-controlled.'],['Always runs once?',['FOR','WHILE','REPEAT UNTIL','CASE'],2,'REPEAT UNTIL tests at the end.'],['May run zero times?',['REPEAT','WHILE','OUTPUT','CASE'],1,'WHILE tests at the start.'],['Closes FOR loop?',['ENDIF','ENDCASE','UNTIL','NEXT Counter'],3,'NEXT closes FOR.'],['Sentinel value?',['Stop value','Data type','Declaration','Trace column'],0,'A sentinel stops input.']],methods:[['Total starts at?',['0','1','100','TRUE'],0,'Totals usually start at 0.'],['Increment counter?',['Count <- Count - 1','Count <- Count + 1','Count <- 0','Count <- Total'],1,'Add 1 to Count.'],['Average formula?',['Total * Count','Count / Total','Total + Count','Total / Count'],3,'Average is total divided by count.'],['In a linear search, the flag Found starts as?',['TRUE','FALSE','1','100'],1,'Found starts FALSE and only becomes TRUE when the item is located.'],['To find the highest value in a list, Highest should be set to...?',['0','The first value in the list','1000','The last value in the list'],1,'Starting at the first value works for every list, including one made only of negative numbers.'],['Which comparison is used when finding the LOWEST value?',['IF Number > Lowest','IF Number = Lowest','IF Number < Lowest','IF Number <> Lowest'],2,'Finding the minimum uses < ; finding the maximum uses > .']],linearsearch:[['What causes the search loop to stop early, before reaching the end of the list?',['The counter reaches zero','The Found flag becomes TRUE','The array runs out of memory','The list is sorted first'],1,'Found is set to TRUE as soon as a match is located, which ends the loop immediately.'],['What data type must Found be declared as?',['INTEGER','STRING','BOOLEAN','CHAR'],2,'Found can only hold TRUE or FALSE, so it is a BOOLEAN.'],['In the worst case, how many comparisons does a linear search need for a 40-item list?',['1 comparison','20 comparisons','0 comparisons','40 comparisons'],3,'If the item is last or missing, every one of the 40 items must be checked.']],bubblesort:[['What happens to Last after each complete pass through the list?',['It decreases by one','It increases by one','It resets back to one','It stays exactly the same'],0,'Each pass places the next-largest value correctly, so Last is reduced by one to skip it next time.'],['What condition ends the REPEAT...UNTIL loop in the sample bubble sort?',['Index reaches First','The array becomes empty','No swap was made or Last equals one','Temperature exceeds one hundred'],2,'The loop stops once a full pass makes no swaps, or Last has been reduced to one.'],['Why are two neighbouring elements swapped during a pass?',['Because they are exactly equal','Because they are out of the correct order','Because the loop has just finished','Because Last has reached zero'],1,'A swap happens whenever an element is greater than the one next to it, fixing the order.']],validation:[['Value between limits?',['Presence','Range','Length','Double entry'],1,'Range check tests lower and upper limits.'],['Blank input check?',['Presence','Range','Length','Bubble'],0,'Presence check prevents blanks.'],['Exactly 8 chars?',['Range','Length','Double entry','Trace'],1,'Length check counts characters.'],['Data entered twice?',['Range','Length','Double entry','CASE'],2,'Double entry verifies matching inputs.'],['Valid mark 0-100 rejects?',['50','0','101','100'],2,'101 is outside the range.']],testing:[['Normal data means?',['Expected valid data','Invalid data','Boundary outside','No data'],0,'Normal data should be accepted.'],['Extreme values for 0-100?',['-1 and 101','0 and 100','50 and 60','0 and 101'],1,'Extreme values are valid ends.'],['Boundary for lower end 0?',['-1 and 0','0 and 1','99 and 100','100 and 101'],0,'Boundary checks just outside and just inside.'],['Trace table records?',['Variable changes','Only headings','Only code','Only comments'],0,'Trace tables record changing values.'],['Missing keyword after IF?',['NEXT','ENDIF','ENDCASE','DECLARE'],1,'IF blocks end with ENDIF.']],functions:[['What is the key difference between a FUNCTION and a PROCEDURE?',['A FUNCTION always returns a value; a PROCEDURE does not','A PROCEDURE always returns a value; a FUNCTION does not','They are exactly the same','A FUNCTION cannot take parameters'],0,'A FUNCTION always RETURNS a value; a PROCEDURE performs a task without returning one.'],['How do you invoke a PROCEDURE named PrintReport?',['PrintReport()','CALL PrintReport()','RETURN PrintReport()','OUTPUT PrintReport()'],1,'PROCEDUREs are invoked with the CALL command.'],['Which keyword must appear in a FUNCTION header but never in a PROCEDURE header?',['CALL','RETURNS','DECLARE','ENDFUNCTION'],1,'RETURNS specifies the data type of the value a FUNCTION sends back.'],['Which statement sends a value back to the calling code inside a FUNCTION?',['OUTPUT','CALL','RETURN','INPUT'],2,'RETURN passes the result back and ends the FUNCTION.'],['A parameter declared BYREF instead of BYVAL means...?',['The parameter is optional','Changes made inside the subroutine also change the original argument','The parameter must be a STRING','The subroutine cannot use the parameter'],1,'BYREF passes a reference so changes affect the original variable; BYVAL passes a copy.']]};
 function renderQuizzes(){document.querySelectorAll('[data-quiz]').forEach(function(sec){var key=sec.getAttribute('data-quiz');var grid=sec.querySelector('.quiz-grid');grid.innerHTML=quizData[key].map(function(q,i){return '<div class="q" data-correct="'+q[2]+'" data-explain="'+q[3]+'"><p>'+(i+1)+'. '+q[0]+'</p>'+q[1].map(function(a,j){return '<label><input type="radio" name="'+key+i+'" value="'+j+'"> '+a+'</label>';}).join('')+'<div class="feedback"></div></div>';}).join('');sec.querySelector('.score').textContent='Score: 0 / '+quizData[key].length;});}
 function updateScore(sec){var qs=sec.querySelectorAll('.q');var score=0;qs.forEach(function(q){if(q.classList.contains('correct'))score++;});sec.querySelector('.score').textContent='Score: '+score+' / '+qs.length;}
 document.addEventListener('change',function(e){if(!e.target.matches('.q input'))return;var q=e.target.closest('.q');var sec=e.target.closest('.quiz');var correct=q.getAttribute('data-correct');var fb=q.querySelector('.feedback');q.classList.remove('correct','wrong');if(e.target.value===correct){q.classList.add('correct');fb.innerHTML='<span class="good">Correct.</span> '+q.getAttribute('data-explain');}else{q.classList.add('wrong');var right=q.querySelector('input[value="'+correct+'"]').parentElement.textContent.trim();fb.innerHTML='<span class="bad">Incorrect.</span> Correct answer: <strong>'+right+'</strong>. '+q.getAttribute('data-explain');}updateScore(sec);});
