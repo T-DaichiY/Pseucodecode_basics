@@ -18,13 +18,19 @@
 <main class="container">
 <h2 id="basics" class="section-title">1. Basics</h2>
 <section class="grid">
-<article id="topic1" class="card blue"><div class="head">1. Assignment</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Cost, Price, Tax, SellingPrice : <span class="type">REAL</span>
+<article id="topic1" class="card blue"><div class="head">1. Assignment</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Declare 4 REAL (decimal) variables</span>
+<span class="kw">DECLARE</span> Cost, Price, Tax, SellingPrice : <span class="type">REAL</span>
 
+<span class="comment">// Set the starting cost</span>
 Cost &lt;- <span class="num">10</span>
+<span class="comment">// Price is double the cost</span>
 Price &lt;- Cost * <span class="num">2</span>
+<span class="comment">// Tax is 12% of the price</span>
 Tax &lt;- Price * <span class="num">0.12</span>
+<span class="comment">// Add tax on top of the price</span>
 SellingPrice &lt;- Price + Tax
 
+<span class="comment">// Display the final result</span>
 <span class="kw">OUTPUT</span> <span class="str">"Selling price is "</span>, SellingPrice</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
 
 Amount &lt;- <span class="num">100</span>
@@ -33,22 +39,31 @@ Discount &lt;- ____
 FinalPrice &lt;- TotalPrice - TotalPrice * ____
 
 <span class="kw">OUTPUT</span> <span class="str">"Final price is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Declare StudentName as STRING and Mark as INTEGER. Output both.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A pencil costs $2. Calculate the cost of buying 6 pencils.</div></div></article>
-<article id="topic2" class="card blue"><div class="head">2. INPUT / OUTPUT</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Name : <span class="type">STRING</span>
+<article id="topic2" class="card blue"><div class="head">2. INPUT / OUTPUT</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Declare a STRING variable to hold the name</span>
+<span class="kw">DECLARE</span> Name : <span class="type">STRING</span>
 
+<span class="comment">// Ask the user a question</span>
 <span class="kw">OUTPUT</span> <span class="str">"Please enter your name"</span>
+<span class="comment">// Store what they type in Name</span>
 <span class="kw">INPUT</span> Name
+<span class="comment">// Greet them using the value just entered</span>
 <span class="kw">OUTPUT</span> <span class="str">"Hello "</span>, Name</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Age : <span class="type">INTEGER</span>
 
 <span class="kw">OUTPUT</span> <span class="str">"Please enter your age"</span>
 <span class="kw">INPUT</span> ____
 
 <span class="kw">OUTPUT</span> <span class="str">"You are "</span>, ____, <span class="str">" years old"</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input first name and class name. Output both.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Input the number of books borrowed and display it.</div></div></article>
-<article id="topic3" class="card blue"><div class="head">3. Sequence</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Length, Width, Area : <span class="type">REAL</span>
+<article id="topic3" class="card blue"><div class="head">3. Sequence</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Declare the 3 variables needed</span>
+<span class="kw">DECLARE</span> Length, Width, Area : <span class="type">REAL</span>
 
+<span class="comment">// Step 1: set the length</span>
 Length &lt;- <span class="num">10</span>
+<span class="comment">// Step 2: set the width</span>
 Width &lt;- <span class="num">5</span>
+<span class="comment">// Step 3: calculate area from length and width, in that order</span>
 Area &lt;- Length * Width
 
+<span class="comment">// Step 4: display the result</span>
 <span class="kw">OUTPUT</span> <span class="str">"Area is "</span>, Area</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Base, Height, TriangleArea : <span class="type">REAL</span>
 
 Base &lt;- <span class="num">12</span>
@@ -63,12 +78,16 @@ TriangleArea &lt;- Base * Height / ____
 <section class="grid">
 <article id="topic4" class="card green"><div class="head">4. IF THEN ELSE</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Age : <span class="type">INTEGER</span>
 
+<span class="comment">// Get the age to test</span>
 <span class="kw">INPUT</span> Age
 
+<span class="comment">// Check the condition</span>
 <span class="kw">IF</span> Age &lt; <span class="num">18</span>
   <span class="kw">THEN</span>
+    <span class="comment">// Runs only if the condition is TRUE</span>
     <span class="kw">OUTPUT</span> <span class="str">"Child"</span>
   <span class="kw">ELSE</span>
+    <span class="comment">// Runs only if the condition is FALSE</span>
     <span class="kw">OUTPUT</span> <span class="str">"Adult"</span>
 <span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
 
@@ -84,10 +103,12 @@ TriangleArea &lt;- Base * Height / ____
 
 <span class="kw">INPUT</span> Mark
 
+<span class="comment">// Outer IF: reject anything outside the valid range first</span>
 <span class="kw">IF</span> Mark &lt; <span class="num">0</span> <span class="kw">OR</span> Mark &gt; <span class="num">100</span>
   <span class="kw">THEN</span>
     <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
   <span class="kw">ELSE</span>
+    <span class="comment">// Inner IF: only reached when Mark is a valid 0-100 value</span>
     <span class="kw">IF</span> Mark &gt;= <span class="num">50</span>
       <span class="kw">THEN</span>
         <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
@@ -113,10 +134,12 @@ TriangleArea &lt;- Base * Height / ____
 
 <span class="kw">INPUT</span> Grade
 
+<span class="comment">// Compare Grade against each listed value in turn</span>
 <span class="kw">CASE OF</span> Grade
   <span class="str">"A"</span> : <span class="kw">OUTPUT</span> <span class="str">"Excellent"</span>
   <span class="str">"B"</span> : <span class="kw">OUTPUT</span> <span class="str">"Good"</span>
   <span class="str">"C"</span> : <span class="kw">OUTPUT</span> <span class="str">"Average"</span>
+  <span class="comment">// Runs for any value not listed above</span>
   <span class="kw">OTHERWISE</span> <span class="kw">OUTPUT</span> <span class="str">"Improvement is needed"</span>
 <span class="kw">ENDCASE</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Choice : <span class="type">INTEGER</span>
 
@@ -134,6 +157,7 @@ ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class=
 <h2 id="loops" class="section-title">3. Loops</h2>
 <section class="grid"><article id="topic7" class="card yellow"><div class="head">7. FOR Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
 
+<span class="comment">// Repeat exactly 10 times, Counter goes 1, 2, 3 ... 10</span>
 <span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">10</span>
   <span class="kw">OUTPUT</span> <span class="str">"*"</span>
 <span class="kw">NEXT</span> Counter</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
@@ -142,12 +166,15 @@ ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class=
   <span class="kw">OUTPUT</span> Counter
 <span class="kw">NEXT</span> ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Output your name 5 times using a FOR loop.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Input 10 student marks using a FOR loop.</div></div></article><article id="topic8" class="card yellow"><div class="head">8. REPEAT UNTIL</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
 
+<span class="comment">// Start both counters at zero</span>
 Total &lt;- <span class="num">0</span>
 Mark &lt;- <span class="num">0</span>
 
+<span class="comment">// Body always runs at least once before the test</span>
 <span class="kw">REPEAT</span>
   Total &lt;- Total + Mark
   <span class="kw">INPUT</span> Mark
+<span class="comment">// Stop once the user enters the sentinel value -1</span>
 <span class="kw">UNTIL</span> Mark = -<span class="num">1</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Item : <span class="type">STRING</span>
 <span class="kw">DECLARE</span> Count : <span class="type">INTEGER</span>
 
@@ -158,9 +185,11 @@ Count &lt;- ____
   Count &lt;- Count + ____
 <span class="kw">UNTIL</span> Item = <span class="str">"____"</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Ask for numbers until 999.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Enter prices until -1 and keep a running total.</div></div></article><article id="topic9" class="card yellow"><div class="head">9. WHILE Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
 
+<span class="comment">// Get the first value before testing the condition</span>
 Total &lt;- <span class="num">0</span>
 <span class="kw">INPUT</span> Mark
 
+<span class="comment">// Condition tested BEFORE the body, so it may run zero times</span>
 <span class="kw">WHILE</span> Mark &lt;&gt; -<span class="num">1</span> <span class="kw">DO</span>
   Total &lt;- Total + Mark
   <span class="kw">INPUT</span> Mark
@@ -180,23 +209,29 @@ Count &lt;- ____
 <section class="grid"><article id="topic10" class="card purple"><div class="head">10. Totalling / Counting / Average</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Mark, Total : <span class="type">INTEGER</span>
 <span class="kw">DECLARE</span> Average : <span class="type">REAL</span>
 
+<span class="comment">// Total must start at 0 before anything is added to it</span>
 Total &lt;- <span class="num">0</span>
 
+<span class="comment">// Add each of the 5 marks onto the running total</span>
 <span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">5</span>
   <span class="kw">INPUT</span> Mark
   Total &lt;- Total + Mark
 <span class="kw">NEXT</span> Counter
 
+<span class="comment">// Average = total divided by how many values were added</span>
 Average &lt;- Total / <span class="num">5</span>
 <span class="kw">OUTPUT</span> Average</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Total &lt;- ____
 Total &lt;- Total + ____
 Average &lt;- Total / ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 4 prices and output total.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Record 6 lap times and calculate the average.</div></div></article><article id="topic11" class="card purple"><div class="head">11. Finding the Maximum</div><div class="body"><div class="task"><strong>Key idea:</strong> Set <strong>Highest</strong> to the <strong>first</strong> value, then compare every later value against it. Never start at 0 — a list of negative numbers would break.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Number, Highest : <span class="type">INTEGER</span>
 
+<span class="comment">// Use the first number as the starting "best guess"</span>
 <span class="kw">INPUT</span> Number
 Highest &lt;- Number
 
+<span class="comment">// Start from the 2nd number since the 1st is already stored</span>
 <span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">10</span>
   <span class="kw">INPUT</span> Number
+  <span class="comment">// Replace Highest only when a bigger number turns up</span>
   <span class="kw">IF</span> Number &gt; Highest
     <span class="kw">THEN</span>
       Highest &lt;- Number
@@ -219,11 +254,14 @@ Highest &lt;- ____
 <span class="kw">OUTPUT</span> <span class="str">"Highest mark is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 8 temperatures and output the highest one.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A shop records the sales for each of the 7 days of a week. Output the highest daily sales figure and the day number it happened on.</div></div></article>
 <article id="topic12" class="card purple"><div class="head">12. Finding the Minimum</div><div class="body"><div class="task"><strong>Key idea:</strong> Identical method, but <strong>Lowest</strong> starts at the first value and the comparison uses <strong>&lt;</strong> instead of <strong>&gt;</strong>.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Number, Lowest : <span class="type">INTEGER</span>
 
+<span class="comment">// Use the first number as the starting "best guess"</span>
 <span class="kw">INPUT</span> Number
 Lowest &lt;- Number
 
+<span class="comment">// Start from the 2nd number since the 1st is already stored</span>
 <span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">10</span>
   <span class="kw">INPUT</span> Number
+  <span class="comment">// Replace Lowest only when a smaller number turns up</span>
   <span class="kw">IF</span> Number &lt; Lowest
     <span class="kw">THEN</span>
       Lowest &lt;- Number
@@ -245,83 +283,136 @@ Lowest &lt;- ____
 <span class="kw">NEXT</span> Counter
 
 <span class="kw">OUTPUT</span> <span class="str">"Cheapest price is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 6 lap times and output the fastest (lowest) time.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A class of 30 students sit a test. Input every mark and output both the highest and the lowest mark using one loop.</div></div></article>
-<article id="topic13" class="card purple"><div class="head">13. Linear Search</div><div class="body"><div class="task"><strong>Key idea:</strong> Use a <strong>BOOLEAN flag</strong> called Found. Start it as FALSE and stop as soon as it becomes TRUE, so you do not keep searching a list you have already finished with.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Titles : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">20</span>] <span class="kw">OF</span> <span class="type">STRING</span>
+<article id="topic13" class="card purple"><div class="head">13. Linear Search</div><div class="body"><div class="task"><strong>Key idea:</strong> Use a <strong>BOOLEAN flag</strong> called Found. Start it as FALSE and stop as soon as it becomes TRUE, so you do not keep searching a list you have already finished with.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Titles : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">5</span>] <span class="kw">OF</span> <span class="type">STRING</span>
 <span class="kw">DECLARE</span> SearchTitle : <span class="type">STRING</span>
 <span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
 <span class="kw">DECLARE</span> Found : <span class="type">BOOLEAN</span>
 
+<span class="comment">// Hardcode the 5 titles into the array (no INPUT yet)</span>
+Titles[<span class="num">1</span>] &lt;- <span class="str">"Comedy Night"</span>
+Titles[<span class="num">2</span>] &lt;- <span class="str">"Drama Files"</span>
+Titles[<span class="num">3</span>] &lt;- <span class="str">"Mystery Manor"</span>
+Titles[<span class="num">4</span>] &lt;- <span class="str">"Action Zone"</span>
+Titles[<span class="num">5</span>] &lt;- <span class="str">"Sci-Fi World"</span>
+
+<span class="comment">// Found starts FALSE, Counter starts at the first position</span>
 Found &lt;- <span class="kw">FALSE</span>
 Counter &lt;- <span class="num">1</span>
 <span class="kw">INPUT</span> SearchTitle
 
-<span class="kw">WHILE</span> Counter &lt;= <span class="num">20</span> <span class="kw">AND</span> Found = <span class="kw">FALSE</span> <span class="kw">DO</span>
+<span class="comment">// Keep checking one position at a time until found or list ends</span>
+<span class="kw">WHILE</span> Counter &lt;= <span class="num">5</span> <span class="kw">AND</span> Found = <span class="kw">FALSE</span> <span class="kw">DO</span>
   <span class="kw">IF</span> Titles[Counter] = SearchTitle
     <span class="kw">THEN</span>
+      <span class="comment">// Match! Set Found to TRUE so the loop stops</span>
       Found &lt;- <span class="kw">TRUE</span>
     <span class="kw">ELSE</span>
+      <span class="comment">// No match yet, move on to the next position</span>
       Counter &lt;- Counter + <span class="num">1</span>
   <span class="kw">ENDIF</span>
 <span class="kw">ENDWHILE</span>
 
+<span class="comment">// Report the result once the loop has stopped</span>
 <span class="kw">IF</span> Found = <span class="kw">TRUE</span>
   <span class="kw">THEN</span>
     <span class="kw">OUTPUT</span> <span class="str">"Found at position "</span>, Counter
   <span class="kw">ELSE</span>
     <span class="kw">OUTPUT</span> <span class="str">"Title not found"</span>
-<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Names : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">30</span>] <span class="kw">OF</span> <span class="type">STRING</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Names : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">5</span>] <span class="kw">OF</span> <span class="type">STRING</span>
 <span class="kw">DECLARE</span> SearchName : <span class="type">STRING</span>
 <span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
 <span class="kw">DECLARE</span> Found : ____
 
+<span class="comment">// Hardcode the 5 names into the array</span>
+Names[<span class="num">1</span>] &lt;- <span class="str">"Amy"</span>
+Names[<span class="num">2</span>] &lt;- <span class="str">"Ben"</span>
+Names[____] &lt;- <span class="str">"Cara"</span>
+Names[<span class="num">4</span>] &lt;- ____
+Names[<span class="num">5</span>] &lt;- <span class="str">"Eve"</span>
+
+<span class="comment">// Found starts FALSE, Counter starts at the first position</span>
 Found &lt;- ____
 Counter &lt;- ____
 <span class="kw">INPUT</span> SearchName
 
-<span class="kw">WHILE</span> Counter &lt;= <span class="num">30</span> <span class="kw">AND</span> Found = ____ <span class="kw">DO</span>
+<span class="comment">// Keep checking one position at a time until found or list ends</span>
+<span class="kw">WHILE</span> Counter &lt;= <span class="num">5</span> <span class="kw">AND</span> Found = ____ <span class="kw">DO</span>
   <span class="kw">IF</span> Names[Counter] = SearchName
     <span class="kw">THEN</span>
+      <span class="comment">// Match! Stop the loop</span>
       Found &lt;- ____
     <span class="kw">ELSE</span>
+      <span class="comment">// No match yet, move to the next position</span>
       Counter &lt;- Counter ____ <span class="num">1</span>
   <span class="kw">ENDIF</span>
 <span class="kw">ENDWHILE</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">An array Marks[1:10] holds ten marks. Search for a mark equal to 100 and output whether one was found.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A library stores 500 book titles in an array. Explain why a linear search may need up to 500 comparisons, and why the Found flag is used to stop the loop early.</div></div></article>
-<article id="topic14" class="card purple"><div class="head">14. Bubble Sort</div><div class="body"><div class="task"><strong>Key idea:</strong> Compare each pair of neighbouring elements and <strong>swap</strong> them if they are in the wrong order. Repeat passes through the list until a full pass makes <strong>no swaps</strong> — the list is then sorted.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Temperature : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">10</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
+<article id="topic14" class="card purple"><div class="head">14. Bubble Sort</div><div class="body"><div class="task"><strong>Key idea:</strong> Compare each pair of neighbouring elements and <strong>swap</strong> them if they are in the wrong order. Repeat passes through the list until a full pass makes <strong>no swaps</strong> — the list is then sorted.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Temperature : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">6</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
 <span class="kw">DECLARE</span> Index, First, Last, Temp : <span class="type">INTEGER</span>
 <span class="kw">DECLARE</span> Swap : <span class="type">BOOLEAN</span>
 
-First &lt;- <span class="num">1</span>
-Last &lt;- <span class="num">10</span>
+<span class="comment">// Hardcode the 6 temperatures into the array (out of order)</span>
+Temperature[<span class="num">1</span>] &lt;- <span class="num">18</span>
+Temperature[<span class="num">2</span>] &lt;- <span class="num">25</span>
+Temperature[<span class="num">3</span>] &lt;- <span class="num">14</span>
+Temperature[<span class="num">4</span>] &lt;- <span class="num">30</span>
+Temperature[<span class="num">5</span>] &lt;- <span class="num">21</span>
+Temperature[<span class="num">6</span>] &lt;- <span class="num">17</span>
 
+<span class="comment">// First and Last mark the part of the array still being sorted</span>
+First &lt;- <span class="num">1</span>
+Last &lt;- <span class="num">6</span>
+
+<span class="comment">// Keep making passes until a full pass makes no swaps</span>
 <span class="kw">REPEAT</span>
+  <span class="comment">// Assume this pass is sorted until a swap proves otherwise</span>
   Swap &lt;- <span class="kw">FALSE</span>
+  <span class="comment">// Compare every neighbouring pair in the unsorted part</span>
   <span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
     <span class="kw">IF</span> Temperature[Index] &gt; Temperature[Index + <span class="num">1</span>]
       <span class="kw">THEN</span>
+        <span class="comment">// Swap the two values using Temp as a holding space</span>
         Temp &lt;- Temperature[Index]
         Temperature[Index] &lt;- Temperature[Index + <span class="num">1</span>]
         Temperature[Index + <span class="num">1</span>] &lt;- Temp
         Swap &lt;- <span class="kw">TRUE</span>
     <span class="kw">ENDIF</span>
   <span class="kw">NEXT</span> Index
+  <span class="comment">// The largest remaining value is now in place, so shrink the range</span>
   Last &lt;- Last - <span class="num">1</span>
 <span class="kw">UNTIL</span> (<span class="kw">NOT</span> Swap) <span class="kw">OR</span> Last = <span class="num">1</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Marks : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">8</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
 <span class="kw">DECLARE</span> Index, First, Last, Temp : <span class="type">INTEGER</span>
 <span class="kw">DECLARE</span> Swap : <span class="type">BOOLEAN</span>
 
+<span class="comment">// Hardcode the 8 marks into the array (out of order)</span>
+Marks[<span class="num">1</span>] &lt;- <span class="num">67</span>
+Marks[<span class="num">2</span>] &lt;- <span class="num">45</span>
+Marks[____] &lt;- <span class="num">72</span>
+Marks[<span class="num">4</span>] &lt;- ____
+Marks[<span class="num">5</span>] &lt;- <span class="num">58</span>
+Marks[<span class="num">6</span>] &lt;- <span class="num">90</span>
+Marks[<span class="num">7</span>] &lt;- <span class="num">63</span>
+Marks[<span class="num">8</span>] &lt;- <span class="num">39</span>
+
+<span class="comment">// First and Last mark the part of the array still being sorted</span>
 First &lt;- <span class="num">1</span>
 Last &lt;- <span class="num">8</span>
 
+<span class="comment">// Keep making passes until a full pass makes no swaps</span>
 <span class="kw">REPEAT</span>
+  <span class="comment">// Assume this pass is sorted until a swap proves otherwise</span>
   Swap &lt;- ____
+  <span class="comment">// Compare every neighbouring pair in the unsorted part</span>
   <span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
     <span class="kw">IF</span> Marks[Index] ____ Marks[Index + <span class="num">1</span>]
       <span class="kw">THEN</span>
+        <span class="comment">// Swap the two values using Temp as a holding space</span>
         Temp &lt;- Marks[Index]
         Marks[Index] &lt;- Marks[Index + <span class="num">1</span>]
         Marks[Index + <span class="num">1</span>] &lt;- ____
         Swap &lt;- <span class="kw">TRUE</span>
     <span class="kw">ENDIF</span>
   <span class="kw">NEXT</span> Index
+  <span class="comment">// The largest remaining value is now in place, so shrink the range</span>
   Last &lt;- ____
 <span class="kw">UNTIL</span> (____ Swap) <span class="kw">OR</span> Last = ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">An array Marks[1:8] holds eight integers. Write a bubble sort algorithm to sort Marks into ascending order.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">A teacher stores the heights of 12 students in an array. Explain how a bubble sort would sort the heights into descending order, including what condition would trigger a swap and how many passes might be needed in the worst case.</div></div></article></section>
 <section class="quiz" data-quiz="linearsearch"><h2>Linear Search MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 3</div></section>
@@ -331,17 +422,20 @@ Last &lt;- <span class="num">8</span>
 <h2 id="validation" class="section-title">5. Validation and Verification</h2>
 <section class="grid"><article id="topic15" class="card red"><div class="head">15. Range Check</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
 
+<span class="comment">// Keep asking until a value inside 0-100 is entered</span>
 <span class="kw">REPEAT</span>
   <span class="kw">INPUT</span> Mark
   <span class="kw">IF</span> Mark &lt; <span class="num">0</span> <span class="kw">OR</span> Mark &gt; <span class="num">100</span>
     <span class="kw">THEN</span>
       <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
   <span class="kw">ENDIF</span>
+<span class="comment">// Loop only ends once Mark is within range</span>
 <span class="kw">UNTIL</span> Mark &gt;= <span class="num">0</span> <span class="kw">AND</span> Mark &lt;= <span class="num">100</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">IF</span> Age &lt; ____ <span class="kw">OR</span> Age &gt; ____
   <span class="kw">THEN</span>
     <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
 <span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Validate score 0–20.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Height must be 110–150.</div></div></article><article id="topic16" class="card red"><div class="head">16. Length / Presence / Double Entry</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Password : <span class="type">STRING</span>
 
+<span class="comment">// LENGTH() counts the characters typed into Password</span>
 <span class="kw">IF</span> LENGTH(Password) &lt;&gt; <span class="num">8</span>
   <span class="kw">THEN</span>
     <span class="kw">OUTPUT</span> <span class="str">"Invalid length"</span>
@@ -361,10 +455,12 @@ Abnormal data: -<span class="num">12</span>, <span class="num">150</span>, <span
 Extreme data: ____, ____
 Boundary data: ____, ____, ____, ____</code></pre><div class="step"><span>3</span>Own Task</div><div class="task">Create test data for password length 8–12.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Height 110–150: give normal, extreme, boundary and abnormal data.</div></div></article><article id="topic18" class="card orange"><div class="head">18. Trace Tables / Errors</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Count, Number : <span class="type">INTEGER</span>
 
+<span class="comment">// Reset the totals before the loop starts</span>
 Total &lt;- <span class="num">0</span>
 Count &lt;- <span class="num">0</span>
 <span class="kw">INPUT</span> Number
 
+<span class="comment">// -1 is the sentinel value that ends data entry</span>
 <span class="kw">WHILE</span> Number &lt;&gt; -<span class="num">1</span> <span class="kw">DO</span>
   Total &lt;- Total + Number
   Count &lt;- Count + <span class="num">1</span>
@@ -374,18 +470,22 @@ ____ | ____ | ____ | OUTPUT</code></pre><div class="step"><span>3</span>Own Task
 <section class="quiz" data-quiz="testing"><h2>Testing MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
 
 <h2 id="functions" class="section-title">7. Functions and Procedures</h2>
-<section class="grid"><article id="topic19" class="card teal"><div class="head">19. Procedures</div><div class="body"><div class="task"><strong>Key idea:</strong> A PROCEDURE performs a task and does <strong>not</strong> return a value. It is invoked with the <span class="kw" style="color:#0f766e">CALL</span> command.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">PROCEDURE</span> DisplayMessage(Name : <span class="type">STRING</span>)
+<section class="grid"><article id="topic19" class="card teal"><div class="head">19. Procedures</div><div class="body"><div class="task"><strong>Key idea:</strong> A PROCEDURE performs a task and does <strong>not</strong> return a value. It is invoked with the <span class="kw" style="color:#0f766e">CALL</span> command.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Define the procedure and its parameter</span>
+<span class="kw">PROCEDURE</span> DisplayMessage(Name : <span class="type">STRING</span>)
   <span class="kw">OUTPUT</span> <span class="str">"Hello "</span>, Name
 <span class="kw">ENDPROCEDURE</span>
 
+<span class="comment">// Run the procedure, passing in "Amy" as the argument</span>
 <span class="kw">CALL</span> DisplayMessage(<span class="str">"Amy"</span>)</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>____ AddNumbers(Num1 : <span class="type">INTEGER</span>, Num2 : <span class="type">INTEGER</span>)
   <span class="kw">OUTPUT</span> Num1 + Num2
 ____
 
-<span class="kw">CALL</span> ____(____, ____)</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Write a PROCEDURE called ShowSquare that receives an INTEGER parameter and outputs its square. Then CALL it.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Write a PROCEDURE that receives a student's name and mark, and outputs them as "Name: mark".</div></div></article><article id="topic20" class="card teal"><div class="head">20. Functions</div><div class="body"><div class="task"><strong>Key idea:</strong> A FUNCTION always <span class="kw" style="color:#0f766e">RETURNS</span> a value and is used inside an expression (e.g. an assignment or OUTPUT) — it is never invoked with CALL.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">FUNCTION</span> Square(Num : <span class="type">INTEGER</span>) <span class="kw">RETURNS</span> <span class="type">INTEGER</span>
+<span class="kw">CALL</span> ____(____, ____)</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Write a PROCEDURE called ShowSquare that receives an INTEGER parameter and outputs its square. Then CALL it.</div><div class="step"><span>4</span>Scenario Question</div><div class="task">Write a PROCEDURE that receives a student's name and mark, and outputs them as "Name: mark".</div></div></article><article id="topic20" class="card teal"><div class="head">20. Functions</div><div class="body"><div class="task"><strong>Key idea:</strong> A FUNCTION always <span class="kw" style="color:#0f766e">RETURNS</span> a value and is used inside an expression (e.g. an assignment or OUTPUT) — it is never invoked with CALL.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Define the function: it takes a number and RETURNS a number</span>
+<span class="kw">FUNCTION</span> Square(Num : <span class="type">INTEGER</span>) <span class="kw">RETURNS</span> <span class="type">INTEGER</span>
   <span class="kw">RETURN</span> Num * Num
 <span class="kw">ENDFUNCTION</span>
 
+<span class="comment">// Call it inside an assignment, not with CALL</span>
 <span class="kw">DECLARE</span> Result : <span class="type">INTEGER</span>
 Result &lt;- Square(<span class="num">5</span>)
 <span class="kw">OUTPUT</span> Result</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>____ AddNumbers(Num1 : <span class="type">INTEGER</span>, Num2 : <span class="type">INTEGER</span>) ____ <span class="type">INTEGER</span>
@@ -459,10 +559,13 @@ Lowest &lt;- Price
 <span class="kw">OUTPUT</span> <span class="str">"Cheapest price is "</span>, Lowest</code></pre><pre><code><span class="comment">// 13. Linear Search</span>
 <span class="kw">DECLARE</span> Found : <span class="type">BOOLEAN</span>
 
+Names[<span class="num">3</span>] &lt;- <span class="str">"Cara"</span>
+Names[<span class="num">4</span>] &lt;- <span class="str">"Dan"</span>
+
 Found &lt;- <span class="kw">FALSE</span>
 Counter &lt;- <span class="num">1</span>
 
-<span class="kw">WHILE</span> Counter &lt;= <span class="num">30</span> <span class="kw">AND</span> Found = <span class="kw">FALSE</span> <span class="kw">DO</span>
+<span class="kw">WHILE</span> Counter &lt;= <span class="num">5</span> <span class="kw">AND</span> Found = <span class="kw">FALSE</span> <span class="kw">DO</span>
   <span class="kw">IF</span> Names[Counter] = SearchName
     <span class="kw">THEN</span>
       Found &lt;- <span class="kw">TRUE</span>
@@ -470,6 +573,9 @@ Counter &lt;- <span class="num">1</span>
       Counter &lt;- Counter + <span class="num">1</span>
   <span class="kw">ENDIF</span>
 <span class="kw">ENDWHILE</span></code></pre><pre><code><span class="comment">// 14. Bubble Sort</span>
+Marks[<span class="num">3</span>] &lt;- <span class="num">72</span>
+Marks[<span class="num">4</span>] &lt;- <span class="num">51</span>
+
 Swap &lt;- <span class="kw">FALSE</span>
 <span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
   <span class="kw">IF</span> Marks[Index] &gt; Marks[Index + <span class="num">1</span>]
