@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Daichi Yamamoto">
+<meta name="copyright" content="© 2026 Daichi Yamamoto. All rights reserved.">
+<title>IGCSE 0478 Pseudocode Skills Practice — Answer Key — Daichi Yamamoto</title>
+<style>
+:root{--bg:#f6f8fb;--text:#1f2937;--line:#e5e7eb;--blue:#dbeafe;--green:#dcfce7;--yellow:#fef3c7;--purple:#ede9fe;--red:#fee2e2;--orange:#ffedd5;--teal:#99f6e4;--dark:#101827;--top:#1f2740;--kw:#4da3ff;--type:#ff9f3f;--str:#bf5cff;--num:#9cdcfe}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}header{background:linear-gradient(135deg,#1d4ed8,#6d28d9);color:white;text-align:center;padding:36px 20px}header h1{margin:0 0 8px;font-size:clamp(1.7rem,4vw,2.6rem)}header p{max-width:900px;margin:auto;color:#e0e7ff}.container{max-width:1000px;margin:auto;padding:26px 18px 60px}.section-title{font-size:1.6rem;margin:38px 0 14px;padding-bottom:6px;border-bottom:3px solid var(--line)}.answers,.mcq-section{background:white;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px rgba(15,23,42,.07);padding:22px 24px;margin-top:18px}pre{margin:0 0 14px;background:var(--dark);color:white;border-top:8px solid var(--top);border-radius:16px;padding:16px;overflow-x:visible;font-size:.92rem;line-height:1.55;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}code{font-family:Consolas,Monaco,'Courier New',monospace;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}.kw{color:var(--kw);font-weight:900}.type{color:var(--type);font-weight:900}.str{color:var(--str);font-weight:800}.num{color:var(--num)}.comment{color:#7f9a72;font-style:italic}details{border:1px solid var(--line);border-radius:14px;background:#f9fafb;padding:12px 14px;margin:12px 0;page-break-inside:avoid}summary{font-weight:900;cursor:pointer;font-size:1.05rem}.mcq-list{list-style:none;margin:0;padding:0}.mcq-item{border:1px solid var(--line);border-radius:14px;background:#f9fafb;padding:12px 14px;margin:10px 0;page-break-inside:avoid}.mcq-item p.q{font-weight:900;margin:0 0 8px}.mcq-item ul{margin:0 0 8px;padding-left:20px}.mcq-item li{margin:3px 0}.mcq-item li.correct{color:#15803d;font-weight:800}.mcq-item li.correct::before{content:"✔ "}.explain{color:#3730a3;background:#eef2ff;border-radius:10px;padding:8px 10px;font-size:.92rem;font-weight:700}footer{text-align:center;color:#6b7280;padding:32px}
+@media print{header{background:#1d4ed8 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}.answers,.mcq-section{box-shadow:none;border:1px solid #ccc}}
+</style>
+</head>
+<body>
+<header><h1>IGCSE 0478 Pseudocode Skills — Answer Key</h1><p><strong>Created by Daichi Yamamoto</strong><br>Full coding-format answers and the complete MCQ answer key for every quiz on the practice site.<br>Companion file to <strong>index.html</strong>.</p></header>
+<main class="container">
+
+<h2 class="section-title">Part 1 — Coding Format Answers</h2>
+<section class="answers">
+<details open><summary>Basics Answers</summary><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
+
+Amount &lt;- <span class="num">100</span>
+TotalPrice &lt;- Amount * <span class="num">3.5</span>
+Discount &lt;- <span class="num">0.2</span>
+FinalPrice &lt;- TotalPrice - TotalPrice * Discount
+
+<span class="kw">OUTPUT</span> <span class="str">"Final price is "</span>, FinalPrice</code></pre><pre><code>TriangleArea &lt;- Base * Height / <span class="num">2</span>
+<span class="kw">OUTPUT</span> <span class="str">"Triangle area is "</span>, TriangleArea</code></pre></details>
+
+<details><summary>Selection Answers</summary><pre><code><span class="kw">IF</span> Mark &gt;= <span class="num">50</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+<span class="kw">ENDIF</span></code></pre><pre><code><span class="kw">OTHERWISE OUTPUT</span> <span class="str">"Invalid choice"</span>
+<span class="kw">ENDCASE</span></code></pre></details>
+
+<details><summary>Loops Answers</summary><pre><code><span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">10</span>
+  <span class="kw">OUTPUT</span> Counter
+<span class="kw">NEXT</span> Counter</code></pre><pre><code><span class="comment">// 8. REPEAT UNTIL</span>
+Count &lt;- <span class="num">0</span>
+
+<span class="kw">REPEAT</span>
+  <span class="kw">INPUT</span> Item
+  Count &lt;- Count + <span class="num">1</span>
+<span class="kw">UNTIL</span> Item = <span class="str">"STOP"</span></code></pre><pre><code><span class="comment">// 9. WHILE</span>
+Count &lt;- <span class="num">0</span>
+<span class="kw">INPUT</span> Name
+
+<span class="kw">WHILE</span> Name &lt;&gt; <span class="str">"STOP"</span> <span class="kw">DO</span>
+  Count &lt;- Count + <span class="num">1</span>
+  <span class="kw">INPUT</span> Name
+<span class="kw">ENDWHILE</span></code></pre></details>
+
+<details><summary>Standard Methods Answers (Totalling, Max, Min, Linear Search, Bubble Sort)</summary><pre><code><span class="comment">// 10. Totalling / Counting / Average</span>
+Total &lt;- <span class="num">0</span>
+Total &lt;- Total + Mark
+Average &lt;- Total / <span class="num">5</span></code></pre><pre><code><span class="comment">// 11. Finding the Maximum</span>
+<span class="kw">DECLARE</span> Counter, Mark, Highest : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Mark
+Highest &lt;- Mark
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">20</span>
+  <span class="kw">INPUT</span> Mark
+  <span class="kw">IF</span> Mark &gt; Highest
+    <span class="kw">THEN</span>
+      Highest &lt;- Mark
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Highest mark is "</span>, Highest</code></pre><pre><code><span class="comment">// 12. Finding the Minimum</span>
+<span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Price, Lowest : <span class="type">REAL</span>
+
+<span class="kw">INPUT</span> Price
+Lowest &lt;- Price
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">12</span>
+  <span class="kw">INPUT</span> Price
+  <span class="kw">IF</span> Price &lt; Lowest
+    <span class="kw">THEN</span>
+      Lowest &lt;- Price
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Cheapest price is "</span>, Lowest</code></pre><pre><code><span class="comment">// 13. Linear Search</span>
+<span class="kw">DECLARE</span> Found : <span class="type">BOOLEAN</span>
+
+Names[<span class="num">3</span>] &lt;- <span class="str">"Cara"</span>
+Names[<span class="num">4</span>] &lt;- <span class="str">"Dan"</span>
+
+Found &lt;- <span class="kw">FALSE</span>
+Counter &lt;- <span class="num">1</span>
+
+<span class="kw">WHILE</span> Counter &lt;= <span class="num">5</span> <span class="kw">AND</span> Found = <span class="kw">FALSE</span> <span class="kw">DO</span>
+  <span class="kw">IF</span> Names[Counter] = SearchName
+    <span class="kw">THEN</span>
+      Found &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ELSE</span>
+      Counter &lt;- Counter + <span class="num">1</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">ENDWHILE</span></code></pre><pre><code><span class="comment">// 14. Bubble Sort</span>
+Marks[<span class="num">3</span>] &lt;- <span class="num">72</span>
+Marks[<span class="num">4</span>] &lt;- <span class="num">51</span>
+
+Swap &lt;- <span class="kw">FALSE</span>
+<span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
+  <span class="kw">IF</span> Marks[Index] &gt; Marks[Index + <span class="num">1</span>]
+    <span class="kw">THEN</span>
+      Temp &lt;- Marks[Index]
+      Marks[Index] &lt;- Marks[Index + <span class="num">1</span>]
+      Marks[Index + <span class="num">1</span>] &lt;- Temp
+      Swap &lt;- <span class="kw">TRUE</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Index
+Last &lt;- Last - <span class="num">1</span>
+<span class="kw">UNTIL</span> (<span class="kw">NOT</span> Swap) <span class="kw">OR</span> Last = <span class="num">1</span>
+
+<span class="kw">FOR</span> Index &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">8</span>
+  <span class="kw">OUTPUT</span> Marks[Index]
+<span class="kw">NEXT</span> Index</code></pre></details>
+
+<details><summary>Validation / Testing Answers</summary><pre><code><span class="kw">IF</span> Age &lt; <span class="num">7</span> <span class="kw">OR</span> Age &gt; <span class="num">12</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+<span class="kw">ENDIF</span></code></pre><pre><code>Boundary data for 110 to 150:
+<span class="num">109</span>, <span class="num">110</span>, <span class="num">150</span>, <span class="num">151</span></code></pre></details>
+
+<details><summary>Functions and Procedures Answers</summary><pre><code><span class="kw">PROCEDURE</span> AddNumbers(Num1 : <span class="type">INTEGER</span>, Num2 : <span class="type">INTEGER</span>)
+  <span class="kw">OUTPUT</span> Num1 + Num2
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">CALL</span> AddNumbers(<span class="num">3</span>, <span class="num">4</span>)</code></pre><pre><code><span class="kw">FUNCTION</span> AddNumbers(Num1 : <span class="type">INTEGER</span>, Num2 : <span class="type">INTEGER</span>) <span class="kw">RETURNS</span> <span class="type">INTEGER</span>
+  <span class="kw">RETURN</span> Num1 + Num2
+<span class="kw">ENDFUNCTION</span>
+
+Total &lt;- AddNumbers(<span class="num">3</span>, <span class="num">4</span>)</code></pre></details>
+</section>
+
+<h2 class="section-title">Part 2 — MCQ Answer Key</h2>
+
+<section class="mcq-section"><h3>1. Basics</h3><ol class="mcq-list">
+<li class="mcq-item"><p class="q">Which keyword declares a variable?</p><ul><li>INPUT</li><li class="correct">DECLARE</li><li>OUTPUT</li><li>NEXT</li></ul><div class="explain">DECLARE states variables and data types.</div></li>
+<li class="mcq-item"><p class="q">Best data type for a name?</p><ul><li>INTEGER</li><li>REAL</li><li class="correct">STRING</li><li>BOOLEAN</li></ul><div class="explain">Names are text, so use STRING.</div></li>
+<li class="mcq-item"><p class="q">What does &lt;- mean?</p><ul><li>Equal to</li><li class="correct">Assignment</li><li>Not equal</li><li>End</li></ul><div class="explain">&lt;- assigns a value.</div></li>
+<li class="mcq-item"><p class="q">Best data type for whole-number age?</p><ul><li class="correct">INTEGER</li><li>REAL</li><li>STRING</li><li>CHAR</li></ul><div class="explain">Whole numbers use INTEGER.</div></li>
+<li class="mcq-item"><p class="q">Why does sequence matter?</p><ul><li>It changes names</li><li>It removes declarations</li><li>It avoids loops</li><li class="correct">Order affects result</li></ul><div class="explain">Algorithms run in order.</div></li>
+</ol></section>
+
+<section class="mcq-section"><h3>2. Selection</h3><ol class="mcq-list">
+<li class="mcq-item"><p class="q">Which keyword ends IF?</p><ul><li>NEXT</li><li>ENDWHILE</li><li class="correct">ENDIF</li><li>STOP</li></ul><div class="explain">ENDIF closes IF.</div></li>
+<li class="mcq-item"><p class="q">Both conditions true?</p><ul><li>OR</li><li class="correct">AND</li><li>NOT</li><li>OTHERWISE</li></ul><div class="explain">AND requires both.</div></li>
+<li class="mcq-item"><p class="q">Best for menu choices?</p><ul><li class="correct">CASE OF</li><li>DECLARE</li><li>OUTPUT</li><li>LENGTH</li></ul><div class="explain">CASE OF handles fixed choices.</div></li>
+<li class="mcq-item"><p class="q">Not equal operator?</p><ul><li>=</li><li>&lt;=</li><li>&gt;=</li><li class="correct">&lt;&gt;</li></ul><div class="explain">&lt;&gt; means not equal.</div></li>
+<li class="mcq-item"><p class="q">Invalid CASE choice?</p><ul><li>NEXT</li><li>THEN</li><li class="correct">OTHERWISE</li><li>INPUT</li></ul><div class="explain">OTHERWISE handles other values.</div></li>
+</ol></section>
+
+<section class="mcq-section"><h3>3. Loops</h3><ol class="mcq-list">
+<li class="mcq-item"><p class="q">Exactly 10 repetitions?</p><ul><li class="correct">FOR</li><li>CASE</li><li>IF</li><li>DECLARE</li></ul><div class="explain">FOR is count-controlled.</div></li>
+<li class="mcq-item"><p class="q">Always runs once?</p><ul><li>FOR</li><li>WHILE</li><li class="correct">REPEAT UNTIL</li><li>CASE</li></ul><div class="explain">REPEAT UNTIL tests at the end.</div></li>
+<li class="mcq-item"><p class="q">May run zero times?</p><ul><li>REPEAT</li><li class="correct">WHILE</li><li>OUTPUT</li><li>CASE</li></ul><div class="explain">WHILE tests at the start.</div></li>
+<li class="mcq-item"><p class="q">Closes FOR loop?</p><ul><li>ENDIF</li><li>ENDCASE</li><li>UNTIL</li><li class="correct">NEXT Counter</li></ul><div class="explain">NEXT closes FOR.</div></li>
+<li class="mcq-item"><p class="q">Sentinel value?</p><ul><li class="correct">Stop value</li><li>Data type</li><li>Declaration</li><li>Trace column</li></ul><div class="explain">A sentinel stops input.</div></li>
+</ol></section>
+
+<section class="mcq-section"><h3>4. Standard Methods</h3><ol class="mcq-list">
+<li class="mcq-item"><p class="q">Total starts at?</p><ul><li class="correct">0</li><li>1</li><li>100</li><li>TRUE</li></ul><div class="explain">Totals usually start at 0.</div></li>
+<li class="mcq-item"><p class="q">Increment counter?</p><ul><li>Count &lt;- Count - 1</li><li class="correct">Count &lt;- Count + 1</li><li>Count &lt;- 0</li><li>Count &lt;- Total</li></ul><div class="explain">Add 1 to Count.</div></li>
+<li class="mcq-item"><p class="q">Average formula?</p><ul><li>Total * Count</li><li>Count / Total</li><li>Total + Count</li><li class="correct">Total / Count</li></ul><div class="explain">Average is total divided by count.</div></li>
+<li class="mcq-item"><p class="q">In a linear search, the flag Found starts as?</p><ul><li>TRUE</li><li class="correct">FALSE</li><li>1</li><li>100</li></ul><div class="explain">Found starts FALSE and only becomes TRUE when the item is located.</div></li>
+<li class="mcq-item"><p class="q">To find the highest value in a list, Highest should be set to...?</p><ul><li>0</li><li class="correct">The first value in the list</li><li>1000</li><li>The last value in the list</li></ul><div class="explain">Starting at the first value works for every list, including one made only of negative numbers.</div></li>
+<li class="mcq-item"><p class="q">Which comparison is used when finding the LOWEST value?</p><ul><li>IF Number &gt; Lowest</li><li>IF Number = Lowest</li><li class="correct">IF Number &lt; Lowest</li><li>IF Number &lt;&gt; Lowest</li></ul><div class="explain">Finding the minimum uses &lt; ; finding the maximum uses &gt; .</div></li>
+</ol></section>
+
+<section class="mcq-section"><h3>4a. Linear Search (dedicated quiz)</h3><ol class="mcq-list">
+<li class="mcq-item"><p class="q">What causes the search loop to stop early, before reaching the end of the list?</p><ul><li>The counter reaches zero</li><li class="correct">The Found flag becomes TRUE</li><li>The array runs out of memory</li><li>The list is sorted first</li></ul><div class="explain">Found is set to TRUE as soon as a match is located, which ends the loop immediately.</div></li>
+<li class="mcq-item"><p class="q">What data type must Found be declared as?</p><ul><li>INTEGER</li><li>STRING</li><li class="correct">BOOLEAN</li><li>CHAR</li></ul><div class="explain">Found can only hold TRUE or FALSE, so it is a BOOLEAN.</div></li>
+<li class="mcq-item"><p class="q">In the worst case, how many comparisons does a linear search need for a 40-item list?</p><ul><li>1 comparison</li><li>20 comparisons</li><li>0 comparisons</li><li class="correct">40 comparisons</li></ul><div class="explain">If the item is last or missing, every one of the 40 items must be checked.</div></li>
+</ol></section>
+
+<section class="mcq-section"><h3>4b. Bubble Sort (dedicated quiz)</h3><ol class="mcq-list">
+<li class="mcq-item"><p class="q">What happens to Last after each complete pass through the list?</p><ul><li class="correct">It decreases by one</li><li>It increases by one</li><li>It resets back to one</li><li>It stays exactly the same</li></ul><div class="explain">Each pass places the next-largest value correctly, so Last is reduced by one to skip it next time.</div></li>
+<li class="mcq-item"><p class="q">What condition ends the REPEAT...UNTIL loop in the sample bubble sort?</p><ul><li>Index reaches First</li><li>The array becomes empty</li><li class="correct">No swap was made or Last equals one</li><li>Temperature exceeds one hundred</li></ul><div class="explain">The loop stops once a full pass makes no swaps, or Last has been reduced to one.</div></li>
+<li class="mcq-item"><p class="q">Why are two neighbouring elements swapped during a pass?</p><ul><li>Because they are exactly equal</li><li class="correct">Because they are out of the correct order</li><li>Because the loop has just finished</li><li>Because Last has reached zero</li></ul><div class="explain">A swap happens whenever an element is greater than the one next to it, fixing the order.</div></li>
+</ol></section>
+
+<section class="mcq-section"><h3>5. Validation and Verification</h3><ol class="mcq-list">
+<li class="mcq-item"><p class="q">Value between limits?</p><ul><li>Presence</li><li class="correct">Range</li><li>Length</li><li>Double entry</li></ul><div class="explain">Range check tests lower and upper limits.</div></li>
+<li class="mcq-item"><p class="q">Blank input check?</p><ul><li class="correct">Presence</li><li>Range</li><li>Length</li><li>Bubble</li></ul><div class="explain">Presence check prevents blanks.</div></li>
+<li class="mcq-item"><p class="q">Exactly 8 chars?</p><ul><li>Range</li><li class="correct">Length</li><li>Double entry</li><li>Trace</li></ul><div class="explain">Length check counts characters.</div></li>
+<li class="mcq-item"><p class="q">Data entered twice?</p><ul><li>Range</li><li>Length</li><li class="correct">Double entry</li><li>CASE</li></ul><div class="explain">Double entry verifies matching inputs.</div></li>
+<li class="mcq-item"><p class="q">Valid mark 0-100 rejects?</p><ul><li>50</li><li>0</li><li class="correct">101</li><li>100</li></ul><div class="explain">101 is outside the range.</div></li>
+</ol></section>
+
+<section class="mcq-section"><h3>6. Testing and Debugging</h3><ol class="mcq-list">
+<li class="mcq-item"><p class="q">Normal data means?</p><ul><li class="correct">Expected valid data</li><li>Invalid data</li><li>Boundary outside</li><li>No data</li></ul><div class="explain">Normal data should be accepted.</div></li>
+<li class="mcq-item"><p class="q">Extreme values for 0-100?</p><ul><li>-1 and 101</li><li class="correct">0 and 100</li><li>50 and 60</li><li>0 and 101</li></ul><div class="explain">Extreme values are valid ends.</div></li>
+<li class="mcq-item"><p class="q">Boundary for lower end 0?</p><ul><li class="correct">-1 and 0</li><li>0 and 1</li><li>99 and 100</li><li>100 and 101</li></ul><div class="explain">Boundary checks just outside and just inside.</div></li>
+<li class="mcq-item"><p class="q">Trace table records?</p><ul><li class="correct">Variable changes</li><li>Only headings</li><li>Only code</li><li>Only comments</li></ul><div class="explain">Trace tables record changing values.</div></li>
+<li class="mcq-item"><p class="q">Missing keyword after IF?</p><ul><li>NEXT</li><li class="correct">ENDIF</li><li>ENDCASE</li><li>DECLARE</li></ul><div class="explain">IF blocks end with ENDIF.</div></li>
+</ol></section>
+
+<section class="mcq-section"><h3>7. Functions and Procedures</h3><ol class="mcq-list">
+<li class="mcq-item"><p class="q">What is the key difference between a FUNCTION and a PROCEDURE?</p><ul><li class="correct">A FUNCTION always returns a value; a PROCEDURE does not</li><li>A PROCEDURE always returns a value; a FUNCTION does not</li><li>They are exactly the same</li><li>A FUNCTION cannot take parameters</li></ul><div class="explain">A FUNCTION always RETURNS a value; a PROCEDURE performs a task without returning one.</div></li>
+<li class="mcq-item"><p class="q">How do you invoke a PROCEDURE named PrintReport?</p><ul><li>PrintReport()</li><li class="correct">CALL PrintReport()</li><li>RETURN PrintReport()</li><li>OUTPUT PrintReport()</li></ul><div class="explain">PROCEDUREs are invoked with the CALL command.</div></li>
+<li class="mcq-item"><p class="q">Which keyword must appear in a FUNCTION header but never in a PROCEDURE header?</p><ul><li>CALL</li><li class="correct">RETURNS</li><li>DECLARE</li><li>ENDFUNCTION</li></ul><div class="explain">RETURNS specifies the data type of the value a FUNCTION sends back.</div></li>
+<li class="mcq-item"><p class="q">Which statement sends a value back to the calling code inside a FUNCTION?</p><ul><li>OUTPUT</li><li>CALL</li><li class="correct">RETURN</li><li>INPUT</li></ul><div class="explain">RETURN passes the result back and ends the FUNCTION.</div></li>
+<li class="mcq-item"><p class="q">A parameter declared BYREF instead of BYVAL means...?</p><ul><li>The parameter is optional</li><li class="correct">Changes made inside the subroutine also change the original argument</li><li>The parameter must be a STRING</li><li>The subroutine cannot use the parameter</li></ul><div class="explain">BYREF passes a reference so changes affect the original variable; BYVAL passes a copy.</div></li>
+</ol></section>
+
+</main>
+<footer>
+  <strong>IGCSE 0478 Pseudocode Practice Website — Answer Key</strong><br>
+  Created by Daichi Yamamoto<br>
+  © 2026 Daichi Yamamoto. All rights reserved.<br>
+  Educational use permitted with attribution to Daichi Yamamoto.
+</footer>
+</body>
+</html>
