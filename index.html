@@ -1,1668 +1,1018 @@
-<!--
-  ═══════════════════════════════════════════════════════════════════════════
-  PseudoLab — Cambridge Pseudocode Notebook
-  Copyright © 2026 Daichi Yamamoto. All Rights Reserved.
-
-  This is PROPRIETARY AND CONFIDENTIAL software. No part of this file — source
-  code, structure, design, or content — may be copied, reproduced, modified,
-  merged, published, distributed, sublicensed, sold, or used to create
-  derivative works, in whole or in part, in any form or by any means,
-  without the prior written permission of the copyright holder.
-
-  Unauthorized use, reproduction, or distribution (including resale, or
-  rehosting under a different name) is a violation of copyright law and may
-  result in civil and criminal penalties.
-
-  Authorship fingerprint (do not remove): PSEUDOLAB-DY-2026-f250276d70de2464
-  ═══════════════════════════════════════════════════════════════════════════
--->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-
-<!-- ═══ SECURITY: Content Security Policy ═══════════════════════════════════
-     Locks the page down to a minimal allow-list of origins. The critical
-     directive is connect-src: even if markup injection ever occurred, stolen
-     data could not be sent anywhere outside Google/esm.sh.
-     'unsafe-inline' is required because this app is a single self-contained
-     file (inline script blocks + onclick attributes).
-     Note: frame-ancestors is ignored in a <meta> CSP and GitHub Pages cannot
-     set HTTP headers, so clickjacking protection is not available here.     -->
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://www.gstatic.com https://esm.sh https://apis.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://*.googleusercontent.com; connect-src 'self' https://esm.sh https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://pseudocode-notebook.firebaseapp.com https://pseudocode-notebook.web.app https://www.gstatic.com; frame-src 'self' https://pseudocode-notebook.firebaseapp.com https://pseudocode-notebook.web.app https://accounts.google.com; base-uri 'none'; form-action 'none'; object-src 'none'"/>
-<meta name="referrer" content="strict-origin-when-cross-origin"/>
-<title>PseudoLab — Cambridge Pseudocode Notebook</title>
-<script>
-(function(){
-  var saved = localStorage.getItem('pseudolab-theme');
-  var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-  if (dark) document.documentElement.setAttribute('data-theme', 'dark');
-})();
-</script>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
-
-<!-- Firebase SDKs -->
-<script type="module">
-import { initializeApp }          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithRedirect, getRedirectResult, signOut, onAuthStateChanged }
-                                   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDoc, collection, getDocs, deleteDoc, serverTimestamp }
-                                   from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-// ── YOUR FIREBASE CONFIG ──────────────────────────────
-const firebaseConfig = {
-  apiKey:            "AIzaSyAKlKKCeF4tWATnWDAWXID7I7B4ECp6zyI",
-  authDomain:        "pseudocode-notebook.web.app",
-  projectId:         "pseudocode-notebook",
-  storageBucket:     "pseudocode-notebook.firebasestorage.app",
-  messagingSenderId: "852117846947",
-  appId:             "1:852117846947:web:f56796bfca047ed0c5b816"
-};
-// ─────────────────────────────────────────────────────
-
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db   = getFirestore(app);
-
-// ── Auth state → expose to global scope ──────────────
-window._fbAuth = auth;
-window._fbDb   = db;
-window._fbUser = null;
-
-onAuthStateChanged(auth, user => {
-  window._fbUser = user;
-  updateAuthUI(user);
-  if (user) loadNotebookList();
-});
-
-// signInWithRedirect leaves an error here (rather than throwing at the call
-// site) for us to pick up after the page reloads and comes back signed in.
-getRedirectResult(auth).catch(e => {
-  if (e && e.code && e.code !== 'auth/no-auth-event') {
-    alert('Sign-in failed: ' + e.message);
-  }
-});
-
-// ── Google Sign-In ───────────────────────────────────
-// Try the popup first (no full-page navigation, so it works the same way
-// regardless of which domain authDomain points at). Only fall back to a
-// full-page redirect for failures that mean the popup itself couldn't be
-// used (blocked, or the pre-popup storage-access check failing) — not for
-// e.g. the user closing the popup on purpose, which shouldn't force them
-// into a redirect they didn't ask for.
-const POPUP_FALLBACK_CODES = ['auth/popup-blocked', 'auth/internal-error', 'auth/operation-not-supported-in-this-environment'];
-window.fbSignIn = async () => {
-  const provider = new GoogleAuthProvider();
-  try {
-    await signInWithPopup(auth, provider);
-  } catch(e) {
-    if (POPUP_FALLBACK_CODES.includes(e.code)) {
-      try { await signInWithRedirect(auth, provider); } catch(e2) { alert('Sign-in failed: ' + e2.message); }
-    } else if (e.code !== 'auth/popup-closed-by-user' && e.code !== 'auth/cancelled-popup-request') {
-      alert('Sign-in failed: ' + e.message);
-    }
-  }
-};
-
-window.fbSignOut = async () => {
-  if (!confirm('Sign out?')) return;
-  await signOut(auth);
-  window._fbUser = null;
-  updateAuthUI(null);
-};
-
-// ── Save notebook to Firestore ───────────────────────
-async function doSave(silent) {
-  const user = window._fbUser;
-  if (!user) { if (!silent) alert('Please sign in first.'); return false; }
-  if (silent && !window._currentNotebookId) return false;
-
-  // Limits mirror firestore.rules so a rejected write is explained, not silent.
-  const MAX_TITLE = 200, MAX_CELLS = 300, MAX_CHARS = 400000;
-  const title    = (document.getElementById('nb-title')?.value || 'Untitled').slice(0, MAX_TITLE);
-  if (window._cells.length > MAX_CELLS) {
-    if (!silent) alert('Too many cells to save (limit ' + MAX_CELLS + ').');
-    return false;
-  }
-  const cellData = window._cells.map(c => ({
-    id: c.id, code: window._getCode(c.id),
-    output: (document.getElementById('out-'+c.id)?.textContent || '').slice(0, 20000),
-    hasOutput: document.getElementById('out-'+c.id)?.classList.contains('on') || false
-  }));
-  const totalChars = cellData.reduce((n, c) => n + c.code.length + c.output.length, 0);
-  if (totalChars > MAX_CHARS) {
-    if (!silent) alert('Notebook is too large to save (limit ' + MAX_CHARS + ' characters).');
-    return false;
-  }
-
-  const notebookId = window._currentNotebookId || ('nb_' + Date.now());
-  window._currentNotebookId = notebookId;
-
-  const ref = doc(db, 'notebooks', user.uid, 'saved', notebookId);
-  await setDoc(ref, {
-    title, updatedAt: serverTimestamp(),
-    cells: cellData, sharedState: window._notebookState
-  });
-  return true;
-}
-
-window.fbSave = async () => {
-  const ok = await doSave(false);
-  if (!ok) return;
-  showToast('☁️ Saved to your account!', '#10b981');
-  loadNotebookList();
-};
-
-window._autoSave = async () => {
-  const ok = await doSave(true);
-  if (ok) window._lastAutoSaveAt = new Date();
-};
-
-// ── Load notebook list from Firestore ────────────────
-window.loadNotebookList = async () => {
-  const user = window._fbUser;
-  if (!user) return;
-  const col   = collection(db, 'notebooks', user.uid, 'saved');
-  const snap  = await getDocs(col);
-  const list  = document.getElementById('nb-list');
-  if (!list) return;
-  list.innerHTML = '';
-  if (snap.empty) { list.innerHTML = '<div class="nb-list-empty">No saved notebooks yet.</div>'; return; }
-  snap.forEach(docSnap => {
-    const data = docSnap.data();
-    const div  = document.createElement('div');
-    div.className = 'nb-list-item';
-    const d = data.updatedAt?.toDate ? data.updatedAt.toDate().toLocaleDateString() : '—';
-
-    // Titles are stored data: set them as text, never as markup, or a title
-    // like <img src=x onerror=...> would execute every time this list opens.
-    const titleEl = document.createElement('div');
-    titleEl.className = 'nb-list-title';
-    titleEl.textContent = typeof data.title === 'string' && data.title ? data.title : 'Untitled';
-
-    const dateEl = document.createElement('div');
-    dateEl.className = 'nb-list-date';
-    dateEl.textContent = d;
-
-    const actions = document.createElement('div');
-    actions.className = 'nb-list-actions';
-    const openBtn = document.createElement('button');
-    openBtn.className = 'btn-nb-open';
-    openBtn.textContent = 'Open';
-    openBtn.addEventListener('click', () => fbOpen(docSnap.id));
-    const delBtn = document.createElement('button');
-    delBtn.className = 'btn-nb-del';
-    delBtn.textContent = '✕';
-    delBtn.addEventListener('click', () => fbDelete(docSnap.id));
-    actions.appendChild(openBtn); actions.appendChild(delBtn);
-
-    div.appendChild(titleEl); div.appendChild(dateEl); div.appendChild(actions);
-    list.appendChild(div);
-  });
-};
-
-// ── Open a saved notebook ────────────────────────────
-window.fbOpen = async (notebookId) => {
-  const user = window._fbUser;
-  if (!user) return;
-  const ref  = doc(db, 'notebooks', user.uid, 'saved', notebookId);
-  const snap = await getDoc(ref);
-  if (!snap.exists()) { alert('Notebook not found.'); return; }
-  const data = snap.data() || {};
-  const safeTitle = typeof data.title === 'string' ? data.title.slice(0, 200) : 'Untitled';
-  if (!confirm('Open "' + safeTitle + '"? This replaces the current notebook.')) return;
-
-  window._notebookState = sanitizeSharedState(data.sharedState);
-  window._executionCounter = 0;
-  window._globalProcs = {}; window._globalFuncs = {}; window._globalFiles = {}; window._globalClasses = {};
-  window._currentNotebookId = notebookId;
-
-  document.getElementById('cells-container').innerHTML = '';
-  window._cells.length = 0; window._cellIdCounter = 0;
-  const titleEl = document.getElementById('nb-title');
-  if (titleEl) titleEl.value = safeTitle;
-
-  const cellList = Array.isArray(data.cells) ? data.cells.slice(0, 300) : [];
-  for (const cd of cellList) {
-    if (!cd || typeof cd !== 'object') continue;
-    const code   = typeof cd.code   === 'string' ? cd.code   : '';
-    const output = typeof cd.output === 'string' ? cd.output : '';
-    window._addCell(code);
-    const newId = window._cellIdCounter;
-    if (cd.hasOutput && output) {
-      setTimeout(() => {
-        const el = document.getElementById('out-'+newId);
-        if (el) { el.textContent = output; el.className = 'output-panel on'; window._executionCounter++; const t = document.getElementById('tag-'+newId); if(t) t.textContent='run #'+window._executionCounter; }
-      }, 300);
-    }
-  }
-  window._refreshStatePanel();
-  if (window._saveLocalNotebook) window._saveLocalNotebook();
-  document.getElementById('nb-drawer').classList.remove('open');
-  showToast('📂 Opened "' + safeTitle + '"', '#3b6fce');
-};
-
-// ── Validate stored variable state before trusting it ────────────────
-// Rebuilds the object from scratch, dropping prototype-polluting keys and
-// any entry that is not the {type, value, cellId} shape the app expects.
-function sanitizeSharedState(raw) {
-  const clean = {};
-  if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return clean;
-  const BAD = ['__proto__', 'constructor', 'prototype'];
-  for (const key of Object.keys(raw)) {
-    if (BAD.includes(key) || key.length > 100) continue;
-    const info = raw[key];
-    if (!info || typeof info !== 'object' || Array.isArray(info)) continue;
-    const v = info.value;
-    const ok = v === null || ['string', 'number', 'boolean', 'object'].includes(typeof v);
-    if (!ok) continue;
-    clean[key] = {
-      type:   typeof info.type === 'string' ? info.type : 'UNKNOWN',
-      value:  v,
-      cellId: typeof info.cellId === 'number' ? info.cellId : 0
-    };
-  }
-  return clean;
-}
-
-// ── Delete a saved notebook ──────────────────────────
-window.fbDelete = async (notebookId) => {
-  const user = window._fbUser;
-  if (!user) { alert('Please sign in first.'); return; }
-  if (!confirm('Delete this notebook? Cannot be undone.')) return;
-  await deleteDoc(doc(db, 'notebooks', user.uid, 'saved', notebookId));
-  loadNotebookList();
-  showToast('🗑 Deleted', '#e11d48');
-};
-
-// ── Auth UI helper ───────────────────────────────────
-function updateAuthUI(user) {
-  const signedOut = document.getElementById('auth-signed-out');
-  const signedIn  = document.getElementById('auth-signed-in');
-  const avatar    = document.getElementById('auth-avatar');
-  const name      = document.getElementById('auth-name');
-  if (!signedOut || !signedIn) return;
-  if (user) {
-    signedOut.style.display = 'none';
-    signedIn.style.display  = 'flex';
-    if (avatar) avatar.src = user.photoURL || '';
-    if (name)   name.textContent = user.displayName || user.email;
-  } else {
-    signedOut.style.display = 'flex';
-    signedIn.style.display  = 'none';
-  }
-}
-
-function showToast(msg, color) {
-  const t = document.getElementById('toast');
-  if (!t) return;
-  t.textContent = msg; t.style.background = color; t.style.opacity = '1';
-  setTimeout(() => t.style.opacity = '0', 2500);
-}
-window.showToast = showToast;
-</script>
-
-<!-- CodeMirror 6 via ESM -->
-<script type="module" id="cm-loader">
-// Every import below is pinned to an exact version (supply-chain hardening),
-// AND every package's transitive dependencies are forced to those same exact
-// versions via esm.sh's `?deps=` param. Without the second part, pinning only
-// the top-level imports still breaks: each package also carries its own
-// semver-range import of @codemirror/state/view/language internally, and the
-// moment upstream publishes a new patch, esm.sh resolves that internal range
-// to a *different* module instance than the one we pinned directly — two
-// copies of @codemirror/state loaded at once — which fails CodeMirror's
-// internal instanceof/identity checks and made the editor box vanish
-// entirely with no visible error path. `?deps=` collapses everyone back onto
-// one shared instance per package, verified by comparing esm.sh's resolved
-// backing-file paths for every combination below.
-import { EditorView, keymap, highlightActiveLine, lineNumbers, highlightActiveLineGutter, drawSelection }
-  from 'https://esm.sh/@codemirror/view@6.43.11?deps=@codemirror/state@6.7.2';
-import { EditorState } from 'https://esm.sh/@codemirror/state@6.7.2';
-import { defaultKeymap, indentWithTab, history, historyKeymap } from 'https://esm.sh/@codemirror/commands@6.11.0?deps=@codemirror/state@6.7.2,@codemirror/view@6.43.11,@codemirror/language@6.12.4,@lezer/common@1.5.2';
-import { syntaxHighlighting, HighlightStyle, StreamLanguage } from 'https://esm.sh/@codemirror/language@6.12.4?deps=@codemirror/state@6.7.2,@codemirror/view@6.43.11,@lezer/common@1.5.2';
-import { tags } from 'https://esm.sh/@lezer/highlight@1.2.3?deps=@lezer/common@1.5.2';
-import { autocompletion, completionKeymap } from 'https://esm.sh/@codemirror/autocomplete@6.20.3?deps=@codemirror/state@6.7.2,@codemirror/view@6.43.11,@codemirror/language@6.12.4,@lezer/common@1.5.2';
-
-const KEYWORDS = ['DECLARE','CONSTANT','INPUT','OUTPUT','RETURN','RETURNS','CALL',
-  'IF','THEN','ELSE','ENDIF','CASE','OF','OTHERWISE','ENDCASE',
-  'FOR','TO','STEP','NEXT','WHILE','DO','ENDWHILE','REPEAT','UNTIL',
-  'PROCEDURE','ENDPROCEDURE','FUNCTION','ENDFUNCTION',
-  'AND','OR','NOT','MOD','DIV','TRUE','FALSE','NULL',
-  'ARRAY','OPENFILE','READFILE','WRITEFILE','CLOSEFILE','READ','WRITE','APPEND',
-  'CLASS','ENDCLASS','NEW','INHERITS','PRIVATE','PUBLIC','SUPER',
-  'TYPE_CHECK','TYPEOF','ISINTEGER','ISREAL','ISSTRING','ISBOOLEAN','ISARRAY','ISNUMERIC'];
-const TYPES = ['INTEGER','REAL','STRING','BOOLEAN','CHAR','DATE'];
-
-const pseudoLang = StreamLanguage.define({
-  name: 'pseudo',
-  token(stream) {
-    if (stream.match('//'))              { stream.skipToEnd(); return 'comment'; }
-    if (stream.match(/"[^"]*"/))         return 'string';
-    if (stream.match(/'[^']*'/))         return 'string';
-    if (stream.match('←'))              return 'operator';
-    if (stream.match(/^-?\d+(\.\d+)?/)) return 'number';
-    const w = stream.match(/^[A-Za-z_]\w*/);
-    if (w) {
-      if (KEYWORDS.includes(w[0])) return 'keyword';
-      if (TYPES.includes(w[0]))    return 'typeName';
-      return 'variableName';
-    }
-    if (stream.match(/^[+\-*/<>=&^]/)) return 'operator';
-    stream.next(); return null;
-  }
-});
-
-const pseudoHighlight = HighlightStyle.define([
-  { tag: tags.keyword,      color: 'var(--cm-keyword)', fontWeight: '700' },
-  { tag: tags.typeName,     color: 'var(--cm-type)', fontWeight: '600' },
-  { tag: tags.string,       color: 'var(--cm-string)' },
-  { tag: tags.number,       color: 'var(--cm-number)' },
-  { tag: tags.comment,      color: 'var(--cm-comment)', fontStyle: 'italic' },
-  { tag: tags.operator,     color: 'var(--cm-operator)', fontWeight: '700' },
-  { tag: tags.variableName, color: 'var(--cm-variable)' },
-]);
-
-const pseudoTheme = EditorView.theme({
-  '&': { fontSize: '0.84rem', fontFamily: "'IBM Plex Mono',monospace", background: 'var(--cm-bg)', color: 'var(--cm-fg)' },
-  '.cm-content': { padding: '14px 16px', minHeight: '80px', caretColor: 'var(--cm-caret)', lineHeight: '1.7' },
-  '.cm-line': { padding: '0' }, '.cm-focused': { outline: 'none' },
-  '.cm-gutters': { background: 'var(--cm-gutter-bg)', borderRight: '1px solid var(--border)', color: 'var(--cm-gutter-fg)', fontSize: '0.72rem', fontFamily: "'IBM Plex Mono',monospace", minWidth: '38px', paddingRight: '6px' },
-  '.cm-activeLineGutter': { background: 'var(--cm-active-gutter)' }, '.cm-activeLine': { background: 'var(--cm-active-line)' },
-  '.cm-selectionBackground, ::selection': { background: 'var(--cm-selection) !important' },
-  '.cm-cursor': { borderLeftColor: 'var(--cm-caret)', borderLeftWidth: '2px' },
-}, { dark: false });
-
-const completions = KEYWORDS.concat(TYPES).map(label => ({ label, type: 'keyword', boost: 99 }));
-const DECLARE_RE = /^\s*DECLARE\s+((?:\w+\s*,\s*)*\w+)/gim;
-function declaredVarNames(docText) {
-  const names = new Set();
-  let m;
-  DECLARE_RE.lastIndex = 0;
-  while ((m = DECLARE_RE.exec(docText))) {
-    m[1].split(',').forEach(n => { const t = n.trim(); if (t) names.add(t); });
-  }
-  if (window._notebookState) Object.keys(window._notebookState).forEach(n => names.add(n));
-  return names;
-}
-function pseudoCompletion(ctx) {
-  const w = ctx.matchBefore(/[A-Za-z_][A-Za-z0-9_]*/);
-  if (!w || (w.from === w.to && !ctx.explicit)) return null;
-  const typed = w.text.toLowerCase();
-  const keywordOptions = completions.filter(c => c.label.toLowerCase().startsWith(typed));
-  const varOptions = [...declaredVarNames(ctx.state.doc.toString())]
-    .filter(name => name.toLowerCase().startsWith(typed) && !KEYWORDS.includes(name.toUpperCase()) && !TYPES.includes(name.toUpperCase()))
-    .sort()
-    .map(label => ({ label, type: 'variable', boost: 60 }));
-  const options = keywordOptions.concat(varOptions);
-  if (!options.length) return null;
-  return { from: w.from, options };
-}
-
-const arrowHandler = EditorView.domEventHandlers({
-  keydown(e, view) {
-    if (e.key !== '-') return false;
-    const sel = view.state.selection.main;
-    if (!sel.empty) return false;
-    const before = view.state.doc.sliceString(Math.max(0, sel.from-1), sel.from);
-    if (before !== '<') return false;
-    e.preventDefault();
-    view.dispatch({ changes: { from: sel.from-1, to: sel.from, insert: '←' }, selection: { anchor: sel.from } });
-    return true;
-  }
-});
-
-const AUTO_UPPER_WORDS = new Set([...KEYWORDS, ...TYPES]);
-const BOUNDARY_CHARS = new Set([
-  ' ', '\n', '\t', '(', ')', ',', ':', ';', '[', ']', '{', '}',
-  '"', "'", '.', '<', '>', '=', '+', '-', '*', '/', '←'
-]);
-function wordEndingAt(doc, pos) {
-  let start = pos;
-  while (start > 0 && /\w/.test(doc.sliceString(start - 1, start))) start--;
-  return { from: start, to: pos, text: doc.sliceString(start, pos) };
-}
-const autoUppercase = EditorView.updateListener.of(update => {
-  if (!update.docChanged) return;
-  let insertedChar = null, insertEnd = null, changeCount = 0;
-  update.changes.iterChanges((fromA, toA, fromB, toB) => {
-    changeCount++;
-    if (fromA === toA && toB - fromB === 1) {
-      insertedChar = update.state.doc.sliceString(fromB, toB);
-      insertEnd = toB;
-    }
-  });
-  if (changeCount !== 1 || insertedChar === null) return;
-  if (!BOUNDARY_CHARS.has(insertedChar)) return;
-  const boundaryPos = insertEnd - 1;
-  const w = wordEndingAt(update.state.doc, boundaryPos);
-  if (!w.text || !/^[A-Za-z_]\w*$/.test(w.text)) return;
-  const upper = w.text.toUpperCase();
-  if (w.text === upper) return;
-  if (!AUTO_UPPER_WORDS.has(upper)) return;
-  update.view.dispatch({ changes: { from: w.from, to: w.to, insert: upper } });
-});
-const autoUppercaseOnBlur = EditorView.domEventHandlers({
-  blur(e, view) {
-    const pos = view.state.selection.main.head;
-    const w = wordEndingAt(view.state.doc, pos);
-    if (!w.text || !/^[A-Za-z_]\w*$/.test(w.text)) return false;
-    const upper = w.text.toUpperCase();
-    if (w.text === upper || !AUTO_UPPER_WORDS.has(upper)) return false;
-    view.dispatch({ changes: { from: w.from, to: w.to, insert: upper } });
-    return false;
-  }
-});
-
-window.createPseudoEditor = function(textareaId, initialCode) {
-  const ta = document.getElementById(textareaId);
-  if (!ta) return null;
-  const wrap = document.createElement('div');
-  wrap.id = 'cmwrap-' + textareaId;
-  ta.parentNode.insertBefore(wrap, ta);
-  ta.style.display = 'none';
-  const view = new EditorView({
-    state: EditorState.create({
-      doc: initialCode || '',
-      extensions: [
-        lineNumbers(), highlightActiveLineGutter(), highlightActiveLine(),
-        history(), drawSelection(), pseudoLang,
-        syntaxHighlighting(pseudoHighlight), pseudoTheme,
-        keymap.of([
-          {key:'Shift-Enter', preventDefault:true, run:()=>{const m=textareaId.match(/^code-(\d+)$/);if(m&&window.runCell)window.runCell(Number(m[1]));return true;}},
-          {key:'Alt-Enter', preventDefault:true, run:()=>{const m=textareaId.match(/^code-(\d+)$/);if(m&&window.focusNextCell)window.focusNextCell(Number(m[1]));return true;}},
-          {key:'Mod-Enter', preventDefault:true, run:()=>{const m=textareaId.match(/^code-(\d+)$/);if(m&&window.runCell)window.runCell(Number(m[1]));return true;}},
-          ...defaultKeymap, ...historyKeymap, ...completionKeymap, indentWithTab
-        ]),
-        autocompletion({ override: [pseudoCompletion] }),
-        arrowHandler, autoUppercase, autoUppercaseOnBlur, EditorView.lineWrapping,
-        EditorView.updateListener.of(u => { if (u.docChanged) { ta.value = u.state.doc.toString(); if (window._saveLocalNotebookDebounced) window._saveLocalNotebookDebounced(); } }),
-      ]
-    }),
-    parent: wrap,
-  });
-  ta._cmView = view;
-  return view;
-};
-</script>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Daichi Yamamoto">
+<meta name="copyright" content="© 2026 Daichi Yamamoto. All rights reserved.">
+<meta name="description" content="IGCSE 0478 Pseudocode Skills Practice Website created by Daichi Yamamoto.">
+<title>IGCSE 0478 Pseudocode Skills Practice — Daichi Yamamoto</title>
 <style>
-:root {
-  --bg:#f4f6fa; --surface:#fff; --surface-alt:#f1f4fb; --surface-alt2:#f8f9fc;
-  --border:#d8dde8; --border-soft:#f0f2f8; --focus:#3b6fce;
-  --text:#1a1e2e; --muted:#6b7393; --placeholder:#c0c7d8;
-  --accent:#3b6fce; --accent2:#1d4ed8; --accent-tint:#eef2fb; --accent-tint2:#f0f4ff;
-  --green:#10b981; --green2:#059669; --red:#f87171; --red-tint:#fff0f0;
-  --chip-bg:#e8edf8; --chip-border:#c8d4f0; --btn-disabled:#a7c9b5;
-  --out-bg:#0f172a; --out-fg:#a3e635;
-  --shadow:0 2px 12px rgba(30,40,80,.07);
-  --shadow-focus:0 0 0 3px rgba(59,111,206,.15);
-  --cm-bg:#fff; --cm-fg:#1a1e2e; --cm-gutter-bg:#f4f6fa; --cm-gutter-fg:#94a3b8;
-  --cm-active-gutter:#eef2fb; --cm-active-line:#f0f4ff; --cm-selection:#c7d7f5; --cm-caret:#3b6fce;
-  --cm-keyword:#2563eb; --cm-type:#7c3aed; --cm-string:#059669; --cm-number:#d97706;
-  --cm-comment:#94a3b8; --cm-operator:#e11d48; --cm-variable:#1a1e2e;
-}
-:root[data-theme="dark"] {
-  --bg:#0f1420; --surface:#161d2e; --surface-alt:#1c2536; --surface-alt2:#1a2233;
-  --border:#2c374d; --border-soft:#232c3f; --focus:#5b8cf0;
-  --text:#e4e8f2; --muted:#8a93ab; --placeholder:#4a5568;
-  --accent:#5b8cf0; --accent2:#7ba3f5; --accent-tint:#1e2b47; --accent-tint2:#1b2437;
-  --green:#34d399; --green2:#10b981; --red:#f87171; --red-tint:#3d1f24;
-  --chip-bg:#232c42; --chip-border:#33405c; --btn-disabled:#2d4238;
-  --out-bg:#0a0e17; --out-fg:#a3e635;
-  --shadow:0 2px 12px rgba(0,0,0,.35);
-  --shadow-focus:0 0 0 3px rgba(91,140,240,.25);
-  --cm-bg:#161d2e; --cm-fg:#e4e8f2; --cm-gutter-bg:#131a29; --cm-gutter-fg:#5c6785;
-  --cm-active-gutter:#1e2740; --cm-active-line:#1b2437; --cm-selection:#2c3f66; --cm-caret:#5b8cf0;
-  --cm-keyword:#5b9dff; --cm-type:#b48cf2; --cm-string:#4ade80; --cm-number:#fbbf24;
-  --cm-comment:#64748b; --cm-operator:#fb7185; --cm-variable:#e4e8f2;
-}
-*{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .15s,color .15s;}
-
-/* ── Header ── */
-header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 18px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(30,40,80,.06);}
-.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:1.05rem;color:var(--accent);}
-.logo-icon{width:30px;height:30px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-family:'IBM Plex Mono',monospace;font-weight:700;}
-.logo-sub{font-size:.7rem;color:var(--muted);font-weight:400;}
-.hdr-right{display:flex;align-items:center;gap:6px;}
-.btn-hdr{padding:5px 11px;border-radius:6px;font-size:.77rem;font-weight:600;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .15s;}
-.btn-runall{background:var(--accent);color:#fff;} .btn-runall:hover{background:var(--accent2);}
-.btn-clear{background:var(--surface-alt);color:var(--muted);border:1px solid var(--border);}
-.btn-cloud{background:#0ea5e9;color:#fff;} .btn-cloud:hover{background:#0284c7;}
-.btn-notebooks{background:#7c3aed;color:#fff;} .btn-notebooks:hover{background:#6d28d9;}
-.btn-view{padding:5px 11px;border-radius:6px;font-size:.77rem;font-weight:600;border:1.5px solid var(--accent);cursor:pointer;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--accent);}
-.btn-view:hover{background:var(--accent);color:#fff;}
-.btn-view.active{background:#7c3aed;color:#fff;border-color:#7c3aed;}
-
-/* ── Auth UI ── */
-#auth-signed-out{display:flex;align-items:center;gap:6px;}
-#auth-signed-in{display:none;align-items:center;gap:8px;}
-.auth-avatar{width:28px;height:28px;border-radius:50%;border:2px solid var(--accent);}
-.auth-name{font-size:.75rem;font-weight:600;color:var(--text);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.btn-signin{background:#4285f4;color:#fff;border:none;border-radius:6px;padding:5px 12px;font-size:.77rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px;}
-.btn-signout{background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:4px 9px;font-size:.72rem;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.btn-signout:hover{border-color:var(--red);color:var(--red);}
-
-/* ── Student banner ── */
-.student-banner{display:none;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;text-align:center;padding:9px 20px;font-size:.8rem;font-weight:600;position:sticky;top:56px;z-index:90;}
-.student-banner.on{display:block;}
-
-/* ── Notebooks Drawer ── */
-.drawer-overlay{display:none;position:fixed;inset:0;background:rgba(15,23,42,.4);z-index:200;}
-.drawer-overlay.open{display:block;}
-.nb-drawer{position:fixed;top:0;right:-380px;width:360px;height:100vh;background:var(--surface);box-shadow:-4px 0 24px rgba(30,40,80,.15);z-index:201;transition:right .25s ease;display:flex;flex-direction:column;}
-.nb-drawer.open{right:0;}
-.drawer-hdr{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
-.drawer-title{font-size:1rem;font-weight:700;color:var(--text);}
-.btn-drawer-close{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--muted);padding:2px 6px;border-radius:4px;}
-.btn-drawer-close:hover{background:var(--surface-alt);}
-.drawer-body{flex:1;overflow-y:auto;padding:14px 16px;}
-.nb-list-empty{font-size:.8rem;color:var(--muted);text-align:center;padding:24px 0;font-style:italic;}
-.nb-list-item{background:var(--surface-alt2);border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;}
-.nb-list-title{font-size:.84rem;font-weight:600;color:var(--text);flex:1;}
-.nb-list-date{font-size:.7rem;color:var(--muted);white-space:nowrap;}
-.nb-list-actions{display:flex;gap:4px;}
-.btn-nb-open{background:var(--accent);color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:.72rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.btn-nb-del{background:none;border:1px solid var(--border);color:var(--muted);border-radius:5px;padding:3px 7px;font-size:.72rem;cursor:pointer;}
-.btn-nb-del:hover{border-color:var(--red);color:var(--red);}
-.drawer-footer{padding:14px 16px;border-top:1px solid var(--border);}
-.btn-new-nb{width:100%;background:var(--surface-alt);border:1.5px dashed var(--border);color:var(--muted);border-radius:8px;padding:9px;font-size:.8rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.btn-new-nb:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-tint);}
-
-/* ── Notebook ── */
-.notebook{max-width:860px;margin:0 auto;padding:26px 18px 90px;}
-.nb-title{width:100%;border:none;background:transparent;font-family:'DM Sans',sans-serif;font-size:1.45rem;font-weight:700;color:var(--text);outline:none;padding:3px 0;border-bottom:2px solid transparent;transition:border-color .2s;}
-.nb-title:focus{border-bottom-color:var(--accent);}
-.nb-title::placeholder{color:var(--placeholder);}
-.nb-meta{font-size:.72rem;color:var(--muted);margin-top:3px;margin-bottom:3px;}
-.nb-autosave-status{font-size:.68rem;color:var(--muted);opacity:.7;margin-bottom:22px;min-height:1em;}
-
-/* ── Quick Ref ── */
-.ref-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px;}
-.ref-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;cursor:pointer;background:var(--surface-alt2);border-bottom:1px solid var(--border);user-select:none;}
-.ref-hdr-title{font-size:.78rem;font-weight:600;color:var(--muted);}
-.ref-body{display:none;padding:14px 16px;}
-.ref-body.open{display:block;}
-.ref-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;}
-.ref-card{background:var(--surface-alt2);border:1px solid var(--border);border-radius:7px;padding:10px 12px;}
-.ref-card-title{font-size:.68rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;}
-.ref-code{font-family:'IBM Plex Mono',monospace;font-size:.74rem;color:var(--text);line-height:1.6;white-space:pre;}
-
-/* ── State panel ── */
-.state-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);margin-bottom:14px;}
-.state-hdr{display:flex;align-items:center;justify-content:space-between;padding:9px 16px;background:var(--accent-tint2);border-bottom:1px solid var(--border);cursor:pointer;user-select:none;}
-.state-hdr-left{display:flex;align-items:center;gap:8px;font-size:.78rem;font-weight:600;color:var(--accent);}
-.state-badge{background:var(--accent);color:#fff;font-size:.63rem;font-weight:700;padding:2px 6px;border-radius:10px;font-family:'IBM Plex Mono',monospace;}
-.state-body{display:none;padding:12px 16px;}
-.state-body.open{display:block;}
-.state-empty{font-size:.77rem;color:var(--muted);font-style:italic;}
-.state-table{width:100%;border-collapse:collapse;font-size:.77rem;}
-.state-table th{text-align:left;color:var(--muted);font-weight:600;font-size:.67rem;text-transform:uppercase;padding:3px 10px 5px 0;border-bottom:1px solid var(--border);}
-.state-table td{padding:4px 10px 4px 0;border-bottom:1px solid var(--border-soft);font-family:'IBM Plex Mono',monospace;}
-.state-table tr:last-child td{border-bottom:none;}
-.sv-name{color:var(--accent);font-weight:600;} .sv-type{color:var(--muted);font-size:.71rem;} .sv-val{color:var(--text);}
-.btn-rst{background:none;border:1px solid var(--border);color:var(--muted);border-radius:5px;padding:2px 9px;font-size:.71rem;cursor:pointer;font-family:'DM Sans',sans-serif;font-weight:600;}
-.btn-rst:hover{border-color:var(--red);color:var(--red);}
-
-/* ── Cells ── */
-.cell-wrapper{display:flex;align-items:flex-start;gap:10px;margin-bottom:14px;animation:cellIn .18s ease;}
-@keyframes cellIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-.cell-num{font-family:'IBM Plex Mono',monospace;font-size:.7rem;color:var(--muted);min-width:28px;text-align:right;padding-top:13px;user-select:none;}
-.cell{flex:1;background:var(--surface);border:1.5px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:var(--shadow);transition:border-color .2s,box-shadow .2s;}
-.cell:focus-within{border-color:var(--focus);box-shadow:var(--shadow-focus);}
-.cell-toolbar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:var(--surface-alt2);border-bottom:1px solid var(--border);}
-.cell-label{font-size:.63rem;font-weight:600;color:var(--muted);background:var(--chip-bg);border:1px solid var(--border);padding:2px 7px;border-radius:4px;letter-spacing:.5px;text-transform:uppercase;}
-.cell-tag{font-size:.61rem;color:var(--accent);background:var(--chip-bg);border:1px solid var(--chip-border);border-radius:3px;padding:1px 5px;font-family:'IBM Plex Mono',monospace;}
-.tb-spacer{flex:1;}
-.btn-run{background:var(--green);color:#fff;border:none;border-radius:5px;padding:3px 10px;font-size:.73rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .15s;}
-.btn-run:hover{background:var(--green2);} .btn-run:disabled{background:var(--btn-disabled);cursor:not-allowed;}
-.btn-del{background:none;border:none;color:var(--muted);cursor:pointer;padding:2px 5px;border-radius:4px;font-size:.78rem;}
-.btn-del:hover{color:var(--red);background:var(--red-tint);}
-.code-area{display:none;width:100%;min-height:80px;padding:14px 16px;border:none;outline:none;background:var(--cm-bg);color:var(--cm-fg);font-family:'IBM Plex Mono',monospace;font-size:0.84rem;line-height:1.7;resize:vertical;box-sizing:border-box;}
-.code-area:focus{background:var(--cm-active-line);}
-[id^="cmwrap-"]{width:100%;background:var(--cm-bg);}
-[id^="cmwrap-"] .cm-editor{width:100%;min-height:80px;}
-.legend{display:flex;flex-wrap:wrap;gap:7px;padding:6px 14px;background:var(--surface-alt2);border-top:1px solid var(--border);font-size:.67rem;font-family:'IBM Plex Mono',monospace;align-items:center;}
-.leg-item{display:flex;align-items:center;gap:3px;color:var(--muted);}
-.leg-dot{width:8px;height:8px;border-radius:2px;display:inline-block;}
-.leg-hint{margin-left:auto;color:var(--accent);font-size:.67rem;}
-.output-panel{background:var(--out-bg);border-top:1px solid #1e293b;padding:12px 16px;font-family:'IBM Plex Mono',monospace;font-size:.82rem;line-height:1.65;color:var(--out-fg);white-space:pre-wrap;word-break:break-word;max-height:320px;overflow-y:auto;border-radius:0 0 8px 8px;display:none;}
-.output-panel.on{display:block;} .output-panel.err{color:var(--red);}
-.out-loading{display:flex;align-items:center;gap:8px;color:#64748b;font-size:.79rem;}
-.spinner{width:13px;height:13px;border:2px solid #334155;border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg)}}
-.add-row{display:flex;justify-content:center;margin-top:6px;}
-.btn-add{background:var(--surface);border:1.5px dashed var(--border);color:var(--muted);border-radius:8px;padding:7px 22px;font-size:.79rem;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;width:100%;}
-.btn-add:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-tint);}
-.s-label{display:none;font-size:.68rem;font-weight:700;color:#7c3aed;text-transform:uppercase;margin-bottom:3px;font-family:'IBM Plex Mono',monospace;}
-body.student .s-label{display:block;}
-body.student .cell-toolbar,body.student .legend,body.student [id^="cmwrap-"],
-body.student .code-area,body.student .cell-num,body.student .ref-panel,
-body.student .state-panel,body.student .btn-clear,body.student .btn-runall,
-body.student .btn-cloud,body.student .btn-notebooks,body.student .add-row{display:none!important;}
-body.student .cell{border:none;box-shadow:none;background:transparent;}
-body.student .cell-wrapper{margin-bottom:8px;}
-body.student .output-panel.on{border-radius:10px;font-size:.92rem;padding:18px 22px;max-height:none;}
-
-/* ── INPUT Modal ── */
-.modal-overlay{position:fixed;inset:0;background:rgba(15,23,42,.55);z-index:9000;display:flex;align-items:center;justify-content:center;}
-.modal-box{background:var(--surface);border:1.5px solid var(--focus);border-radius:14px;padding:26px 26px 20px;width:360px;max-width:92vw;box-shadow:0 20px 60px rgba(30,40,80,.2);}
-.modal-lbl{font-size:.7rem;font-weight:700;color:var(--muted);text-transform:uppercase;margin-bottom:5px;}
-.modal-var{font-family:'IBM Plex Mono',monospace;font-size:1.05rem;font-weight:700;color:var(--accent);margin-bottom:4px;}
-.modal-desc{font-size:.8rem;color:var(--muted);margin-bottom:14px;}
-.modal-field{width:100%;font-family:'IBM Plex Mono',monospace;font-size:.95rem;padding:9px 13px;border:1.5px solid var(--border);border-radius:8px;outline:none;color:var(--text);background:var(--surface-alt2);margin-bottom:14px;}
-.modal-field:focus{border-color:var(--focus);background:var(--surface);}
-.modal-foot{display:flex;gap:8px;justify-content:flex-end;align-items:center;}
-.modal-counter{font-size:.7rem;color:var(--muted);flex:1;font-family:'IBM Plex Mono',monospace;}
-.btn-modal-ok{background:var(--green);color:#fff;border:none;border-radius:7px;padding:7px 18px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
-.btn-modal-stop{background:var(--red);color:#fff;border:none;border-radius:7px;padding:7px 14px;font-size:.8rem;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;}
-
-/* ── Toast ── */
-#toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 22px;border-radius:20px;font-size:.82rem;font-weight:600;opacity:0;transition:opacity .4s;z-index:9999;pointer-events:none;}
-
-/* ── Status bar ── */
-.status-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);padding:5px 22px;display:flex;align-items:center;gap:14px;font-size:.71rem;color:var(--muted);z-index:50;}
-.s-dot{width:7px;height:7px;border-radius:50%;background:var(--green);}
+:root{--bg:#f6f8fb;--text:#1f2937;--line:#e5e7eb;--blue:#dbeafe;--green:#dcfce7;--yellow:#fef3c7;--purple:#ede9fe;--red:#fee2e2;--orange:#ffedd5;--teal:#99f6e4;--dark:#101827;--top:#1f2740;--kw:#4da3ff;--type:#ff9f3f;--str:#bf5cff;--num:#9cdcfe}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}header{background:linear-gradient(135deg,#1d4ed8,#6d28d9);color:white;text-align:center;padding:42px 20px}header h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3.2rem)}header p{max-width:950px;margin:auto;color:#e0e7ff}nav{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:10px 14px;z-index:10;display:flex;flex-wrap:wrap;gap:6px 8px;max-height:96px;overflow-y:auto}nav a{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3;text-decoration:none;font-weight:800;font-size:.82rem;white-space:nowrap}@media (max-width:600px){nav{max-height:130px}nav a{font-size:.72rem;padding:5px 8px}}.card{scroll-margin-top:76px}.card:target{box-shadow:0 0 0 4px #6d28d9}.container{max-width:1180px;margin:auto;padding:26px 18px 60px}.section-title{font-size:1.85rem;margin:42px 0 16px}.grid{display:grid;grid-template-columns:1fr;gap:18px}.card,.quiz,.answers,.project{background:white;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px rgba(15,23,42,.07);overflow:hidden}.head{padding:16px 18px;font-weight:900;font-size:1.12rem}.blue .head{background:var(--blue);color:#1d4ed8}.green .head{background:var(--green);color:#15803d}.yellow .head{background:var(--yellow);color:#b45309}.purple .head{background:var(--purple);color:#6d28d9}.red .head{background:var(--red);color:#b91c1c}.orange .head{background:var(--orange);color:#c2410c}.teal .head{background:var(--teal);color:#0f766e}.body{padding:18px}.step{display:flex;align-items:center;gap:8px;margin:16px 0 7px;font-weight:900}.step:first-child{margin-top:0}.step span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#111827;color:white;font-size:.85rem}pre{margin:0;background:var(--dark);color:white;border-top:8px solid var(--top);border-radius:16px;padding:16px;overflow-x:visible;font-size:.95rem;line-height:1.55;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}code{font-family:Consolas,Monaco,'Courier New',monospace;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}.kw{color:var(--kw);font-weight:900}.type{color:var(--type);font-weight:900}.str{color:var(--str);font-weight:800}.num{color:var(--num)}.comment{color:#7f9a72;font-style:italic}.task{border:1px dashed #cbd5e1;background:#f9fafb;border-radius:14px;padding:12px 14px}.quiz{padding:24px;margin:28px 0 36px}.quiz h2{margin-top:0}.quiz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}.q{border:1px solid var(--line);border-radius:18px;background:#f9fafb;padding:14px}.q p{margin:0 0 10px;font-weight:900}.q label{display:block;margin:7px 0;padding:9px 10px;border:1px solid #e5e7eb;background:white;border-radius:10px;cursor:pointer}.q.correct{border-color:#86efac;background:#f0fdf4}.q.wrong{border-color:#fecaca;background:#fff1f2}.feedback{font-weight:900;margin-top:8px}.good{color:#15803d}.bad{color:#b91c1c}.score{margin-top:14px;padding:12px 14px;background:#eef2ff;color:#3730a3;border-radius:14px;font-weight:900}.answers,.project{padding:24px;margin-top:34px}details{border:1px solid var(--line);border-radius:14px;background:#f9fafb;padding:12px 14px;margin:12px 0}summary{font-weight:900;cursor:pointer}.answer-space{min-height:110px;border:2px dashed #cbd5e1;border-radius:16px;padding:14px;color:#6b7280;background:white}.scenario-answer,.own-answer{border:none;background:none;padding:0;margin:10px 0 0}.scenario-answer summary,.own-answer summary{list-style:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;font-weight:800;cursor:pointer;font-size:.88rem}.scenario-answer summary::-webkit-details-marker,.own-answer summary::-webkit-details-marker{display:none}.scenario-answer summary{background:#111827;color:white}.scenario-answer summary::before{content:"💡"}.scenario-answer[open] summary{background:#4338ca}.scenario-answer[open] summary::before{content:"✅"}.own-answer summary{background:#374151;color:white}.own-answer summary::before{content:"📝"}.own-answer[open] summary{background:#0f766e}.own-answer[open] summary::before{content:"✅"}.scenario-answer .task,.own-answer .task{margin-top:10px}.scenario-answer pre,.own-answer pre{margin-top:10px}footer{text-align:center;color:#6b7280;padding:32px}
 </style>
 </head>
 <body>
+<header><h1>IGCSE 0478 Pseudocode Skills</h1><p><strong>Created by Daichi Yamamoto</strong><br>Colored skill boxes, coding-format answers, and 5 auto-graded MCQs after each section. Click any MCQ answer to get immediate feedback.</p></header>
+<nav><a href="#topic1">1. Assignment</a><a href="#topic2">2. INPUT / OUTPUT</a><a href="#topic3">3. Sequence</a><a href="#topic4">4. IF THEN ELSE</a><a href="#topic5">5. Nested IF</a><a href="#topic6">6. CASE OF</a><a href="#topic7">7. FOR Loop</a><a href="#topic8">8. REPEAT UNTIL</a><a href="#topic9">9. WHILE Loop</a><a href="#topic10">10. Totalling / Counting / Average</a><a href="#topic11">11. Finding the Maximum</a><a href="#topic12">12. Finding the Minimum</a><a href="#topic13">13. Linear Search</a><a href="#topic14">14. Bubble Sort</a><a href="#topic15">15. Range Check</a><a href="#topic16">16. Length / Presence / Double Entry</a><a href="#topic17">17. Test Data</a><a href="#topic18">18. Trace Tables / Errors</a><a href="#topic19">19. Procedures</a><a href="#topic20">20. Functions</a><a href="#answers">Answers</a><a href="Answers.pdf" target="_blank" rel="noopener">Answer Key (PDF)</a></nav>
+<main class="container">
+<h2 id="basics" class="section-title">1. Basics</h2>
+<section class="grid">
+<article id="topic1" class="card blue"><div class="head">1. Assignment</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Declare 4 REAL (decimal) variables</span>
+<span class="kw">DECLARE</span> Cost, Price, Tax, SellingPrice : <span class="type">REAL</span>
 
-<!-- Notebooks Drawer -->
-<div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
-<div class="nb-drawer" id="nb-drawer">
-  <div class="drawer-hdr">
-    <span class="drawer-title">☁️ My Notebooks</span>
-    <button class="btn-drawer-close" onclick="closeDrawer()">✕</button>
-  </div>
-  <div class="drawer-body">
-    <div id="nb-list"><div class="nb-list-empty">Sign in to see your notebooks.</div></div>
-  </div>
-  <div class="drawer-footer">
-    <button class="btn-new-nb" onclick="newNotebook()">+ New Notebook</button>
-  </div>
-</div>
+<span class="comment">// Set the starting cost</span>
+Cost &lt;- <span class="num">10</span>
+<span class="comment">// Price is double the cost</span>
+Price &lt;- Cost * <span class="num">2</span>
+<span class="comment">// Tax is 12% of the price</span>
+Tax &lt;- Price * <span class="num">0.12</span>
+<span class="comment">// Add tax on top of the price</span>
+SellingPrice &lt;- Price + Tax
 
-<!-- Header -->
-<header>
-  <div class="logo">
-    <div class="logo-icon">PS</div>
-    <div>PseudoLab <div class="logo-sub">Cambridge 9618 · Firebase Sync</div></div>
-  </div>
-  <div class="hdr-right">
-    <button class="btn-hdr btn-clear" onclick="clearAllOutputs()">Clear</button>
-    <button class="btn-hdr btn-runall" onclick="runAllCells()">▶ Run All</button>
-    <button class="btn-hdr btn-cloud" onclick="fbSave()">☁️ Save</button>
-    <button class="btn-hdr btn-notebooks" onclick="openDrawer()">📂 Notebooks</button>
-    <button class="btn-view" id="view-btn" onclick="toggleStudentView()">👁 Student View</button>
-    <button class="btn-view" id="theme-btn" onclick="toggleDarkMode()">🌙</button>
-    <div style="width:1px;height:28px;background:var(--border);margin:0 4px;"></div>
-    <!-- Auth -->
-    <div id="auth-signed-out">
-      <button class="btn-signin" onclick="if(window.fbSignIn){fbSignIn()}else{alert('Cloud sign-in unavailable — check your connection.')}">
-        <svg width="14" height="14" viewBox="0 0 24 24"><path fill="white" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="white" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="white" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="white" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
-        Sign in with Google
-      </button>
-    </div>
-    <div id="auth-signed-in">
-      <img class="auth-avatar" id="auth-avatar" src="" alt="avatar"/>
-      <span class="auth-name" id="auth-name"></span>
-      <button class="btn-signout" onclick="fbSignOut()">Sign out</button>
-    </div>
-  </div>
-</header>
+<span class="comment">// Display the final result</span>
+<span class="kw">OUTPUT</span> <span class="str">"Selling price is "</span>, SellingPrice</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
 
-<div class="student-banner" id="s-banner">
-  📺 Student View — code hidden &nbsp;|&nbsp; <span style="opacity:.8;font-weight:400">Click "Teacher View" to return</span>
-</div>
+Amount &lt;- <span class="num">100</span>
+TotalPrice &lt;- Amount * ____
+Discount &lt;- ____
+FinalPrice &lt;- TotalPrice - TotalPrice * ____
 
-<div class="notebook">
-  <input class="nb-title" id="nb-title" type="text" placeholder="Untitled Notebook" value="My Cambridge Pseudocode Notebook"/>
-  <div class="nb-meta" id="nb-meta">Cambridge 9618 · PseudoLab · Sign in to save your work to the cloud ☁️</div>
-  <div class="nb-autosave-status" id="autosave-status"></div>
+<span class="kw">OUTPUT</span> <span class="str">"Final price is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Declare StudentName as STRING and Mark as INTEGER. Output both.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> StudentName : <span class="type">STRING</span>
+<span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
 
-  <!-- Quick Reference -->
-  <div class="ref-panel">
-    <div class="ref-hdr" onclick="toggleRef()">
-      <span class="ref-hdr-title">📘 Cambridge Pseudocode Quick Reference</span>
-      <span id="ref-icon" style="font-size:.73rem;color:var(--muted);">▶ Show</span>
-    </div>
-    <div class="ref-body" id="ref-body">
-      <div class="ref-grid">
-        <div class="ref-card"><div class="ref-card-title">Variables</div><div class="ref-code">DECLARE x : INTEGER
-x ← 42
-name ← "Alice"</div></div>
-        <div class="ref-card"><div class="ref-card-title">Input / Output</div><div class="ref-code">INPUT x
-OUTPUT "Hello " & x</div></div>
-        <div class="ref-card"><div class="ref-card-title">IF Statement</div><div class="ref-code">IF x > 0
-  THEN
-    OUTPUT "Positive"
-  ELSE
-    OUTPUT "Negative"
-ENDIF</div></div>
-        <div class="ref-card"><div class="ref-card-title">FOR Loop</div><div class="ref-code">FOR i ← 1 TO 5
-  OUTPUT i
-NEXT i</div></div>
-        <div class="ref-card"><div class="ref-card-title">WHILE Loop</div><div class="ref-code">WHILE x > 0
-  x ← x - 1
-ENDWHILE</div></div>
-        <div class="ref-card"><div class="ref-card-title">PROCEDURE</div><div class="ref-code">PROCEDURE Greet(n:STRING)
-  OUTPUT "Hello " & n
-ENDPROCEDURE
-CALL Greet("Bob")</div></div>
-        <div class="ref-card"><div class="ref-card-title">FUNCTION</div><div class="ref-code">FUNCTION Sq(n:INTEGER)
-  RETURNS INTEGER
-  RETURN n * n
-ENDFUNCTION
-OUTPUT Sq(5)</div></div>
-        <div class="ref-card"><div class="ref-card-title">Type Checking</div><div class="ref-code">TYPE_CHECK x, y
-OUTPUT TYPEOF(x)
-IF ISINTEGER(x) THEN ...</div></div>
-        <div class="ref-card"><div class="ref-card-title">CLASS (OOP)</div><div class="ref-code">CLASS Animal
-  PRIVATE
-    DECLARE name : STRING
-  PUBLIC
-    PROCEDURE NEW(n : STRING)
-      name ← n
-    ENDPROCEDURE
-    FUNCTION GetName()
-      RETURNS STRING
-      RETURN name
-    ENDFUNCTION
-ENDCLASS
-DECLARE a : Animal
-a ← NEW Animal("Rex")
-OUTPUT a.GetName()</div></div>
-        <div class="ref-card"><div class="ref-card-title">Inheritance / SUPER</div><div class="ref-code">CLASS Dog INHERITS Animal
-  PUBLIC
-    PROCEDURE NEW(n : STRING)
-      SUPER.NEW(n)
-    ENDPROCEDURE
-    PROCEDURE Speak()
-      OUTPUT GetName() & " says Woof"
-    ENDPROCEDURE
-ENDCLASS</div></div>
-      </div>
-    </div>
-  </div>
+<span class="kw">OUTPUT</span> StudentName, Mark</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">A pencil costs $2. Calculate the cost of buying 6 pencils.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> PencilCost, Quantity, TotalCost : <span class="type">REAL</span>
 
-  <!-- State Inspector -->
-  <div class="state-panel">
-    <div class="state-hdr" onclick="toggleState()">
-      <div class="state-hdr-left">🧠 Shared Variable State <span class="state-badge" id="state-count">0 vars</span></div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <button class="btn-rst" onclick="event.stopPropagation();resetState()">Reset</button>
-        <span style="font-size:.73rem;color:var(--muted)" id="state-icon">▶ Show</span>
-      </div>
-    </div>
-    <div class="state-body" id="state-body">
-      <div class="state-empty" id="state-empty">No variables yet. Run a cell to populate.</div>
-      <table class="state-table" id="state-table" style="display:none">
-        <thead><tr><th>Variable</th><th>Type</th><th>Value</th><th>Set in</th></tr></thead>
-        <tbody id="state-tbody"></tbody>
-      </table>
-    </div>
-  </div>
+PencilCost &lt;- <span class="num">2</span>
+Quantity &lt;- <span class="num">6</span>
+TotalCost &lt;- PencilCost * Quantity
 
-  <div id="cells-container"></div>
-  <div class="add-row"><button class="btn-add" onclick="addCell()">+ Add Cell</button></div>
-</div>
+<span class="kw">OUTPUT</span> <span class="str">"Total cost is "</span>, TotalCost</code></pre></details></div></article>
+<article id="topic2" class="card blue"><div class="head">2. INPUT / OUTPUT</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Declare a STRING variable to hold the name</span>
+<span class="kw">DECLARE</span> Name : <span class="type">STRING</span>
 
-<div id="toast"></div>
+<span class="comment">// Ask the user a question</span>
+<span class="kw">OUTPUT</span> <span class="str">"Please enter your name"</span>
+<span class="comment">// Store what they type in Name</span>
+<span class="kw">INPUT</span> Name
+<span class="comment">// Greet them using the value just entered</span>
+<span class="kw">OUTPUT</span> <span class="str">"Hello "</span>, Name</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Age : <span class="type">INTEGER</span>
 
-<div class="status-bar">
-  <div class="s-dot"></div>
-  <span>Local Interpreter</span><span>·</span>
-  <span id="cell-count">0 cells</span><span>·</span>
-  <span id="state-status">Shared State: 0 vars</span><span>·</span>
-  <span id="auth-status">Not signed in</span>
-  <div style="flex:1"></div>
-  <span>© 2026 Daichi Yamamoto. All rights reserved.</span>
-</div>
+<span class="kw">OUTPUT</span> <span class="str">"Please enter your age"</span>
+<span class="kw">INPUT</span> ____
 
+<span class="kw">OUTPUT</span> <span class="str">"You are "</span>, ____, <span class="str">" years old"</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input first name and class name. Output both.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> FirstName, ClassName : <span class="type">STRING</span>
+
+<span class="kw">INPUT</span> FirstName
+<span class="kw">INPUT</span> ClassName
+
+<span class="kw">OUTPUT</span> FirstName, ClassName</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Input the number of books borrowed and display it.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> BooksBorrowed : <span class="type">INTEGER</span>
+
+<span class="kw">OUTPUT</span> <span class="str">"How many books did you borrow?"</span>
+<span class="kw">INPUT</span> BooksBorrowed
+
+<span class="kw">OUTPUT</span> <span class="str">"You borrowed "</span>, BooksBorrowed, <span class="str">" books"</span></code></pre></details></div></article>
+<article id="topic3" class="card blue"><div class="head">3. Sequence</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Declare the 3 variables needed</span>
+<span class="kw">DECLARE</span> Length, Width, Area : <span class="type">REAL</span>
+
+<span class="comment">// Step 1: set the length</span>
+Length &lt;- <span class="num">10</span>
+<span class="comment">// Step 2: set the width</span>
+Width &lt;- <span class="num">5</span>
+<span class="comment">// Step 3: calculate area from length and width, in that order</span>
+Area &lt;- Length * Width
+
+<span class="comment">// Step 4: display the result</span>
+<span class="kw">OUTPUT</span> <span class="str">"Area is "</span>, Area</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Base, Height, TriangleArea : <span class="type">REAL</span>
+
+Base &lt;- <span class="num">12</span>
+Height &lt;- <span class="num">8</span>
+TriangleArea &lt;- Base * Height / ____
+
+<span class="kw">OUTPUT</span> <span class="str">"Triangle area is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Store 3 marks, calculate total, then output total.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Mark1, Mark2, Mark3, Total : <span class="type">INTEGER</span>
+
+Mark1 &lt;- <span class="num">70</span>
+Mark2 &lt;- <span class="num">85</span>
+Mark3 &lt;- <span class="num">90</span>
+Total &lt;- Mark1 + Mark2 + Mark3
+
+<span class="kw">OUTPUT</span> Total</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Calculate the average of 3 quiz scores in the correct order.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Score1, Score2, Score3, Total, Average : <span class="type">REAL</span>
+
+<span class="kw">INPUT</span> Score1
+<span class="kw">INPUT</span> Score2
+<span class="kw">INPUT</span> Score3
+Total &lt;- Score1 + Score2 + Score3
+Average &lt;- Total / <span class="num">3</span>
+
+<span class="kw">OUTPUT</span> <span class="str">"Average score is "</span>, Average</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="basics"><h2>Basics MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="selection" class="section-title">2. Selection</h2>
+<section class="grid">
+<article id="topic4" class="card green"><div class="head">4. IF THEN ELSE</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Age : <span class="type">INTEGER</span>
+
+<span class="comment">// Get the age to test</span>
+<span class="kw">INPUT</span> Age
+
+<span class="comment">// Check the condition</span>
+<span class="kw">IF</span> Age &lt; <span class="num">18</span>
+  <span class="kw">THEN</span>
+    <span class="comment">// Runs only if the condition is TRUE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Child"</span>
+  <span class="kw">ELSE</span>
+    <span class="comment">// Runs only if the condition is FALSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Adult"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Mark
+
+<span class="kw">IF</span> Mark &gt;= ____
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Output Hot if Temperature is 30 or more; otherwise output Not hot.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Temperature : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Temperature
+
+<span class="kw">IF</span> Temperature &gt;= <span class="num">30</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Hot"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Not hot"</span>
+<span class="kw">ENDIF</span></code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Ticket system: under 12 = Child ticket, otherwise Standard ticket.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Age : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Age
+
+<span class="kw">IF</span> Age &lt; <span class="num">12</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Child ticket"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Standard ticket"</span>
+<span class="kw">ENDIF</span></code></pre></details></div></article>
+<article id="topic5" class="card green"><div class="head">5. Nested IF</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Mark
+
+<span class="comment">// Outer IF: reject anything outside the valid range first</span>
+<span class="kw">IF</span> Mark &lt; <span class="num">0</span> <span class="kw">OR</span> Mark &gt; <span class="num">100</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+  <span class="kw">ELSE</span>
+    <span class="comment">// Inner IF: only reached when Mark is a valid 0-100 value</span>
+    <span class="kw">IF</span> Mark &gt;= <span class="num">50</span>
+      <span class="kw">THEN</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+      <span class="kw">ELSE</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Score : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Score
+
+<span class="kw">IF</span> Score &lt; ____ <span class="kw">OR</span> Score &gt; ____
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">IF</span> Score &gt;= ____
+      <span class="kw">THEN</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+      <span class="kw">ELSE</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Validate a mark from 0 to 50. Pass mark is 25 or above.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Mark
+
+<span class="kw">IF</span> Mark &lt; <span class="num">0</span> <span class="kw">OR</span> Mark &gt; <span class="num">50</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">IF</span> Mark &gt;= <span class="num">25</span>
+      <span class="kw">THEN</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+      <span class="kw">ELSE</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+    <span class="kw">ENDIF</span>
+<span class="kw">ENDIF</span></code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Ride condition: age over 7 and under 12; height over 110 and under 150.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Age, Height : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Age
+<span class="kw">INPUT</span> Height
+
+<span class="kw">IF</span> Age &gt; <span class="num">7</span> <span class="kw">AND</span> Age &lt; <span class="num">12</span>
+  <span class="kw">THEN</span>
+    <span class="kw">IF</span> Height &gt; <span class="num">110</span> <span class="kw">AND</span> Height &lt; <span class="num">150</span>
+      <span class="kw">THEN</span>
+        <span class="kw">OUTPUT</span> <span class="str">"You can ride"</span>
+      <span class="kw">ELSE</span>
+        <span class="kw">OUTPUT</span> <span class="str">"Height not allowed"</span>
+    <span class="kw">ENDIF</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Age not allowed"</span>
+<span class="kw">ENDIF</span></code></pre></details></div></article>
+<article id="topic6" class="card green"><div class="head">6. CASE OF</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Grade : <span class="type">CHAR</span>
+
+<span class="kw">INPUT</span> Grade
+
+<span class="comment">// Compare Grade against each listed value in turn</span>
+<span class="kw">CASE OF</span> Grade
+  <span class="str">"A"</span> : <span class="kw">OUTPUT</span> <span class="str">"Excellent"</span>
+  <span class="str">"B"</span> : <span class="kw">OUTPUT</span> <span class="str">"Good"</span>
+  <span class="str">"C"</span> : <span class="kw">OUTPUT</span> <span class="str">"Average"</span>
+  <span class="comment">// Runs for any value not listed above</span>
+  <span class="kw">OTHERWISE</span> <span class="kw">OUTPUT</span> <span class="str">"Improvement is needed"</span>
+<span class="kw">ENDCASE</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Choice : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> ____
+
+<span class="kw">CASE OF</span> Choice
+  <span class="num">1</span> : <span class="kw">OUTPUT</span> <span class="str">"Start game"</span>
+  <span class="num">2</span> : <span class="kw">OUTPUT</span> <span class="str">"Load game"</span>
+  <span class="num">3</span> : <span class="kw">OUTPUT</span> <span class="str">"Quit"</span>
+  ____ <span class="kw">OUTPUT</span> <span class="str">"Invalid choice"</span>
+____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Use CASE OF to output day name for numbers 1 to 7.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> DayNumber : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> DayNumber
+
+<span class="kw">CASE OF</span> DayNumber
+  <span class="num">1</span> : <span class="kw">OUTPUT</span> <span class="str">"Monday"</span>
+  <span class="num">2</span> : <span class="kw">OUTPUT</span> <span class="str">"Tuesday"</span>
+  <span class="num">3</span> : <span class="kw">OUTPUT</span> <span class="str">"Wednesday"</span>
+  <span class="num">4</span> : <span class="kw">OUTPUT</span> <span class="str">"Thursday"</span>
+  <span class="num">5</span> : <span class="kw">OUTPUT</span> <span class="str">"Friday"</span>
+  <span class="num">6</span> : <span class="kw">OUTPUT</span> <span class="str">"Saturday"</span>
+  <span class="num">7</span> : <span class="kw">OUTPUT</span> <span class="str">"Sunday"</span>
+  <span class="kw">OTHERWISE</span> <span class="kw">OUTPUT</span> <span class="str">"Invalid day"</span>
+<span class="kw">ENDCASE</span></code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Calculator menu: 1 Add, 2 Subtract, 3 Multiply, 4 Divide.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Choice : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Num1, Num2, Result : <span class="type">REAL</span>
+
+<span class="kw">INPUT</span> Choice
+<span class="kw">INPUT</span> Num1
+<span class="kw">INPUT</span> Num2
+
+<span class="kw">CASE OF</span> Choice
+  <span class="num">1</span> : Result &lt;- Num1 + Num2
+  <span class="num">2</span> : Result &lt;- Num1 - Num2
+  <span class="num">3</span> : Result &lt;- Num1 * Num2
+  <span class="num">4</span> : Result &lt;- Num1 / Num2
+  <span class="kw">OTHERWISE</span> <span class="kw">OUTPUT</span> <span class="str">"Invalid choice"</span>
+<span class="kw">ENDCASE</span>
+
+<span class="kw">OUTPUT</span> Result</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="selection"><h2>Selection MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="loops" class="section-title">3. Loops</h2>
+<section class="grid"><article id="topic7" class="card yellow"><div class="head">7. FOR Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+
+<span class="comment">// Repeat exactly 10 times, Counter goes 1, 2, 3 ... 10</span>
+<span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">10</span>
+  <span class="kw">OUTPUT</span> <span class="str">"*"</span>
+<span class="kw">NEXT</span> Counter</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> ____
+  <span class="kw">OUTPUT</span> Counter
+<span class="kw">NEXT</span> ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Output your name 5 times using a FOR loop.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">5</span>
+  <span class="kw">OUTPUT</span> <span class="str">"Daichi"</span>
+<span class="kw">NEXT</span> Counter</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Input 10 student marks using a FOR loop.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Counter, Mark : <span class="type">INTEGER</span>
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">10</span>
+  <span class="kw">OUTPUT</span> <span class="str">"Enter mark "</span>, Counter
+  <span class="kw">INPUT</span> Mark
+<span class="kw">NEXT</span> Counter</code></pre></details></div></article><article id="topic8" class="card yellow"><div class="head">8. REPEAT UNTIL</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
+
+<span class="comment">// Start both counters at zero</span>
+Total &lt;- <span class="num">0</span>
+Mark &lt;- <span class="num">0</span>
+
+<span class="comment">// Body always runs at least once before the test</span>
+<span class="kw">REPEAT</span>
+  Total &lt;- Total + Mark
+  <span class="kw">INPUT</span> Mark
+<span class="comment">// Stop once the user enters the sentinel value -1</span>
+<span class="kw">UNTIL</span> Mark = -<span class="num">1</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Item : <span class="type">STRING</span>
+<span class="kw">DECLARE</span> Count : <span class="type">INTEGER</span>
+
+Count &lt;- ____
+
+<span class="kw">REPEAT</span>
+  <span class="kw">INPUT</span> Item
+  Count &lt;- Count + ____
+<span class="kw">UNTIL</span> Item = <span class="str">"____"</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Ask for numbers until 999.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Number : <span class="type">INTEGER</span>
+
+<span class="kw">REPEAT</span>
+  <span class="kw">OUTPUT</span> <span class="str">"Enter a number, 999 to stop"</span>
+  <span class="kw">INPUT</span> Number
+<span class="kw">UNTIL</span> Number = <span class="num">999</span></code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Enter prices until -1 and keep a running total.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Price, Total : <span class="type">REAL</span>
+
+Total &lt;- <span class="num">0</span>
+
+<span class="kw">REPEAT</span>
+  <span class="kw">OUTPUT</span> <span class="str">"Enter price, -1 to finish"</span>
+  <span class="kw">INPUT</span> Price
+  <span class="kw">IF</span> Price &lt;&gt; -<span class="num">1</span>
+    <span class="kw">THEN</span>
+      Total &lt;- Total + Price
+  <span class="kw">ENDIF</span>
+<span class="kw">UNTIL</span> Price = -<span class="num">1</span>
+
+<span class="kw">OUTPUT</span> <span class="str">"Total is "</span>, Total</code></pre></details></div></article><article id="topic9" class="card yellow"><div class="head">9. WHILE Loop</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Mark : <span class="type">INTEGER</span>
+
+<span class="comment">// Get the first value before testing the condition</span>
+Total &lt;- <span class="num">0</span>
+<span class="kw">INPUT</span> Mark
+
+<span class="comment">// Condition tested BEFORE the body, so it may run zero times</span>
+<span class="kw">WHILE</span> Mark &lt;&gt; -<span class="num">1</span> <span class="kw">DO</span>
+  Total &lt;- Total + Mark
+  <span class="kw">INPUT</span> Mark
+<span class="kw">ENDWHILE</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Name : <span class="type">STRING</span>
+<span class="kw">DECLARE</span> Count : <span class="type">INTEGER</span>
+
+Count &lt;- ____
+<span class="kw">INPUT</span> Name
+
+<span class="kw">WHILE</span> Name &lt;&gt; <span class="str">"____"</span> <span class="kw">DO</span>
+  Count &lt;- Count + ____
+  <span class="kw">INPUT</span> ____
+<span class="kw">ENDWHILE</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Ask for scores until -1 and count valid scores.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Score, Count : <span class="type">INTEGER</span>
+
+Count &lt;- <span class="num">0</span>
+<span class="kw">INPUT</span> Score
+
+<span class="kw">WHILE</span> Score &lt;&gt; -<span class="num">1</span> <span class="kw">DO</span>
+  Count &lt;- Count + <span class="num">1</span>
+  <span class="kw">INPUT</span> Score
+<span class="kw">ENDWHILE</span>
+
+<span class="kw">OUTPUT</span> <span class="str">"Valid scores entered: "</span>, Count</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Enter sack weights until -1 and output number of sacks.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Weight : <span class="type">REAL</span>
+<span class="kw">DECLARE</span> Count : <span class="type">INTEGER</span>
+
+Count &lt;- <span class="num">0</span>
+<span class="kw">INPUT</span> Weight
+
+<span class="kw">WHILE</span> Weight &lt;&gt; -<span class="num">1</span> <span class="kw">DO</span>
+  Count &lt;- Count + <span class="num">1</span>
+  <span class="kw">INPUT</span> Weight
+<span class="kw">ENDWHILE</span>
+
+<span class="kw">OUTPUT</span> <span class="str">"Number of sacks: "</span>, Count</code></pre></details></div></article></section>
+<section class="quiz" data-quiz="loops"><h2>Loops MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="methods" class="section-title">4. Standard Methods</h2>
+<section class="grid"><article id="topic10" class="card purple"><div class="head">10. Totalling / Counting / Average</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Mark, Total : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Average : <span class="type">REAL</span>
+
+<span class="comment">// Total must start at 0 before anything is added to it</span>
+Total &lt;- <span class="num">0</span>
+
+<span class="comment">// Add each of the 5 marks onto the running total</span>
+<span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">5</span>
+  <span class="kw">INPUT</span> Mark
+  Total &lt;- Total + Mark
+<span class="kw">NEXT</span> Counter
+
+<span class="comment">// Average = total divided by how many values were added</span>
+Average &lt;- Total / <span class="num">5</span>
+<span class="kw">OUTPUT</span> Average</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Total &lt;- ____
+Total &lt;- Total + ____
+Average &lt;- Total / ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 4 prices and output total.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Price, Total : <span class="type">REAL</span>
+
+Total &lt;- <span class="num">0</span>
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">4</span>
+  <span class="kw">INPUT</span> Price
+  Total &lt;- Total + Price
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Total is "</span>, Total</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Record 6 lap times and calculate the average.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> LapTime, Total, Average : <span class="type">REAL</span>
+
+Total &lt;- <span class="num">0</span>
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">6</span>
+  <span class="kw">INPUT</span> LapTime
+  Total &lt;- Total + LapTime
+<span class="kw">NEXT</span> Counter
+
+Average &lt;- Total / <span class="num">6</span>
+<span class="kw">OUTPUT</span> <span class="str">"Average lap time is "</span>, Average</code></pre></details></div></article><article id="topic11" class="card purple"><div class="head">11. Finding the Maximum</div><div class="body"><div class="task"><strong>Key idea:</strong> Set <strong>Highest</strong> to the <strong>first</strong> value, then compare every later value against it. Never start at 0 — a list of negative numbers would break.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Number, Highest : <span class="type">INTEGER</span>
+
+<span class="comment">// Use the first number as the starting "best guess"</span>
+<span class="kw">INPUT</span> Number
+Highest &lt;- Number
+
+<span class="comment">// Start from the 2nd number since the 1st is already stored</span>
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">10</span>
+  <span class="kw">INPUT</span> Number
+  <span class="comment">// Replace Highest only when a bigger number turns up</span>
+  <span class="kw">IF</span> Number &gt; Highest
+    <span class="kw">THEN</span>
+      Highest &lt;- Number
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"The highest number is "</span>, Highest</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Counter, Mark, Highest : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Mark
+Highest &lt;- ____
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">20</span>
+  <span class="kw">INPUT</span> Mark
+  <span class="kw">IF</span> Mark ____ Highest
+    <span class="kw">THEN</span>
+      Highest &lt;- ____
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Highest mark is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 8 temperatures and output the highest one.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Counter, Temperature, Highest : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Temperature
+Highest &lt;- Temperature
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">8</span>
+  <span class="kw">INPUT</span> Temperature
+  <span class="kw">IF</span> Temperature &gt; Highest
+    <span class="kw">THEN</span>
+      Highest &lt;- Temperature
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Highest temperature is "</span>, Highest</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">A shop records the sales for each of the 7 days of a week. Output the highest daily sales figure and the day number it happened on.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Counter, Sales, Highest, HighestDay : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Sales
+Highest &lt;- Sales
+HighestDay &lt;- <span class="num">1</span>
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">7</span>
+  <span class="kw">INPUT</span> Sales
+  <span class="kw">IF</span> Sales &gt; Highest
+    <span class="kw">THEN</span>
+      Highest &lt;- Sales
+      HighestDay &lt;- Counter
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Highest sales was "</span>, Highest, <span class="str">" on day "</span>, HighestDay</code></pre></details></div></article>
+<article id="topic12" class="card purple"><div class="head">12. Finding the Minimum</div><div class="body"><div class="task"><strong>Key idea:</strong> Identical method, but <strong>Lowest</strong> starts at the first value and the comparison uses <strong>&lt;</strong> instead of <strong>&gt;</strong>.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Counter, Number, Lowest : <span class="type">INTEGER</span>
+
+<span class="comment">// Use the first number as the starting "best guess"</span>
+<span class="kw">INPUT</span> Number
+Lowest &lt;- Number
+
+<span class="comment">// Start from the 2nd number since the 1st is already stored</span>
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">10</span>
+  <span class="kw">INPUT</span> Number
+  <span class="comment">// Replace Lowest only when a smaller number turns up</span>
+  <span class="kw">IF</span> Number &lt; Lowest
+    <span class="kw">THEN</span>
+      Lowest &lt;- Number
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"The lowest number is "</span>, Lowest</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Price, Lowest : <span class="type">REAL</span>
+
+<span class="kw">INPUT</span> Price
+Lowest &lt;- ____
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">12</span>
+  <span class="kw">INPUT</span> Price
+  <span class="kw">IF</span> Price ____ Lowest
+    <span class="kw">THEN</span>
+      ____ &lt;- Price
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Cheapest price is "</span>, ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Input 6 lap times and output the fastest (lowest) time.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> LapTime, Fastest : <span class="type">REAL</span>
+
+<span class="kw">INPUT</span> LapTime
+Fastest &lt;- LapTime
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">6</span>
+  <span class="kw">INPUT</span> LapTime
+  <span class="kw">IF</span> LapTime &lt; Fastest
+    <span class="kw">THEN</span>
+      Fastest &lt;- LapTime
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Fastest lap time is "</span>, Fastest</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">A class of 30 students sit a test. Input every mark and output both the highest and the lowest mark using one loop.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Counter, Mark, Highest, Lowest : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Mark
+Highest &lt;- Mark
+Lowest &lt;- Mark
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">30</span>
+  <span class="kw">INPUT</span> Mark
+  <span class="kw">IF</span> Mark &gt; Highest
+    <span class="kw">THEN</span>
+      Highest &lt;- Mark
+  <span class="kw">ENDIF</span>
+  <span class="kw">IF</span> Mark &lt; Lowest
+    <span class="kw">THEN</span>
+      Lowest &lt;- Mark
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Highest: "</span>, Highest, <span class="str">" Lowest: "</span>, Lowest</code></pre></details></div></article>
+<article id="topic13" class="card purple"><div class="head">13. Linear Search</div><div class="body"><div class="task"><strong>Key idea:</strong> Use a <strong>BOOLEAN flag</strong> called Found. Start it as FALSE and stop as soon as it becomes TRUE, so you do not keep searching a list you have already finished with.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Titles : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">5</span>] <span class="kw">OF</span> <span class="type">STRING</span>
+<span class="kw">DECLARE</span> SearchTitle : <span class="type">STRING</span>
+<span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Found : <span class="type">BOOLEAN</span>
+
+<span class="comment">// Hardcode the 5 titles into the array (no INPUT yet)</span>
+Titles[<span class="num">1</span>] &lt;- <span class="str">"Comedy Night"</span>
+Titles[<span class="num">2</span>] &lt;- <span class="str">"Drama Files"</span>
+Titles[<span class="num">3</span>] &lt;- <span class="str">"Mystery Manor"</span>
+Titles[<span class="num">4</span>] &lt;- <span class="str">"Action Zone"</span>
+Titles[<span class="num">5</span>] &lt;- <span class="str">"Sci-Fi World"</span>
+
+<span class="comment">// Found starts FALSE, Counter starts at the first position</span>
+Found &lt;- <span class="kw">FALSE</span>
+Counter &lt;- <span class="num">1</span>
+<span class="kw">INPUT</span> SearchTitle
+
+<span class="comment">// Keep checking one position at a time until found or list ends</span>
+<span class="kw">WHILE</span> Counter &lt;= <span class="num">5</span> <span class="kw">AND</span> Found = <span class="kw">FALSE</span> <span class="kw">DO</span>
+  <span class="kw">IF</span> Titles[Counter] = SearchTitle
+    <span class="kw">THEN</span>
+      <span class="comment">// Match! Set Found to TRUE so the loop stops</span>
+      Found &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ELSE</span>
+      <span class="comment">// No match yet, move on to the next position</span>
+      Counter &lt;- Counter + <span class="num">1</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">ENDWHILE</span>
+
+<span class="comment">// Report the result once the loop has stopped</span>
+<span class="kw">IF</span> Found = <span class="kw">TRUE</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Found at position "</span>, Counter
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Title not found"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Names : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">5</span>] <span class="kw">OF</span> <span class="type">STRING</span>
+<span class="kw">DECLARE</span> SearchName : <span class="type">STRING</span>
+<span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Found : ____
+
+<span class="comment">// Hardcode the 5 names into the array</span>
+Names[<span class="num">1</span>] &lt;- <span class="str">"Amy"</span>
+Names[<span class="num">2</span>] &lt;- <span class="str">"Ben"</span>
+Names[____] &lt;- <span class="str">"Cara"</span>
+Names[<span class="num">4</span>] &lt;- ____
+Names[<span class="num">5</span>] &lt;- <span class="str">"Eve"</span>
+
+<span class="comment">// Found starts FALSE, Counter starts at the first position</span>
+Found &lt;- ____
+Counter &lt;- ____
+<span class="kw">INPUT</span> SearchName
+
+<span class="comment">// Keep checking one position at a time until found or list ends</span>
+<span class="kw">WHILE</span> Counter &lt;= <span class="num">5</span> <span class="kw">AND</span> Found = ____ <span class="kw">DO</span>
+  <span class="kw">IF</span> Names[Counter] = SearchName
+    <span class="kw">THEN</span>
+      <span class="comment">// Match! Stop the loop</span>
+      Found &lt;- ____
+    <span class="kw">ELSE</span>
+      <span class="comment">// No match yet, move to the next position</span>
+      Counter &lt;- Counter ____ <span class="num">1</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">ENDWHILE</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">An array Marks[1:10] holds ten marks. Search for a mark equal to 100 and output whether one was found.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Marks : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">10</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Found : <span class="type">BOOLEAN</span>
+
+Found &lt;- <span class="kw">FALSE</span>
+Counter &lt;- <span class="num">1</span>
+
+<span class="kw">WHILE</span> Counter &lt;= <span class="num">10</span> <span class="kw">AND</span> Found = <span class="kw">FALSE</span> <span class="kw">DO</span>
+  <span class="kw">IF</span> Marks[Counter] = <span class="num">100</span>
+    <span class="kw">THEN</span>
+      Found &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ELSE</span>
+      Counter &lt;- Counter + <span class="num">1</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">ENDWHILE</span>
+
+<span class="kw">IF</span> Found = <span class="kw">TRUE</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"A mark of 100 was found"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"No mark of 100 was found"</span>
+<span class="kw">ENDIF</span></code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">A library stores 500 book titles in an array called Titles[1:500]. Write a linear search algorithm to search for a title called SearchTitle and output whether it was found.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Titles : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">500</span>] <span class="kw">OF</span> <span class="type">STRING</span>
+<span class="kw">DECLARE</span> SearchTitle : <span class="type">STRING</span>
+<span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Found : <span class="type">BOOLEAN</span>
+
+Found &lt;- <span class="kw">FALSE</span>
+Counter &lt;- <span class="num">1</span>
+<span class="kw">INPUT</span> SearchTitle
+
+<span class="kw">WHILE</span> Counter &lt;= <span class="num">500</span> <span class="kw">AND</span> Found = <span class="kw">FALSE</span> <span class="kw">DO</span>
+  <span class="kw">IF</span> Titles[Counter] = SearchTitle
+    <span class="kw">THEN</span>
+      Found &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ELSE</span>
+      Counter &lt;- Counter + <span class="num">1</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">ENDWHILE</span>
+
+<span class="kw">IF</span> Found = <span class="kw">TRUE</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Title found"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Title not found"</span>
+<span class="kw">ENDIF</span></code></pre></details></div></article>
+<article id="topic14" class="card purple"><div class="head">14. Bubble Sort</div><div class="body"><div class="task"><strong>Key idea:</strong> Compare each pair of neighbouring elements and <strong>swap</strong> them if they are in the wrong order. Repeat passes through the list until a full pass makes <strong>no swaps</strong> — the list is then sorted.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Temperature : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">6</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Index, First, Last, Temp : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Swap : <span class="type">BOOLEAN</span>
+
+<span class="comment">// Hardcode the 6 temperatures into the array (out of order)</span>
+Temperature[<span class="num">1</span>] &lt;- <span class="num">18</span>
+Temperature[<span class="num">2</span>] &lt;- <span class="num">25</span>
+Temperature[<span class="num">3</span>] &lt;- <span class="num">14</span>
+Temperature[<span class="num">4</span>] &lt;- <span class="num">30</span>
+Temperature[<span class="num">5</span>] &lt;- <span class="num">21</span>
+Temperature[<span class="num">6</span>] &lt;- <span class="num">17</span>
+
+<span class="comment">// First and Last mark the part of the array still being sorted</span>
+First &lt;- <span class="num">1</span>
+Last &lt;- <span class="num">6</span>
+
+<span class="comment">// Keep making passes until a full pass makes no swaps</span>
+<span class="kw">REPEAT</span>
+  <span class="comment">// Assume this pass is sorted until a swap proves otherwise</span>
+  Swap &lt;- <span class="kw">FALSE</span>
+  <span class="comment">// Compare every neighbouring pair in the unsorted part</span>
+  <span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
+    <span class="kw">IF</span> Temperature[Index] &gt; Temperature[Index + <span class="num">1</span>]
+      <span class="kw">THEN</span>
+        <span class="comment">// Swap the two values using Temp as a holding space</span>
+        Temp &lt;- Temperature[Index]
+        Temperature[Index] &lt;- Temperature[Index + <span class="num">1</span>]
+        Temperature[Index + <span class="num">1</span>] &lt;- Temp
+        Swap &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ENDIF</span>
+  <span class="kw">NEXT</span> Index
+  <span class="comment">// The largest remaining value is now in place, so shrink the range</span>
+  Last &lt;- Last - <span class="num">1</span>
+<span class="kw">UNTIL</span> (<span class="kw">NOT</span> Swap) <span class="kw">OR</span> Last = <span class="num">1</span>
+
+<span class="comment">// Output the sorted array, one value at a time</span>
+<span class="kw">FOR</span> Index &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">6</span>
+  <span class="kw">OUTPUT</span> Temperature[Index]
+<span class="kw">NEXT</span> Index</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">DECLARE</span> Marks : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">8</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Index, First, Last, Temp : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Swap : <span class="type">BOOLEAN</span>
+
+<span class="comment">// Hardcode the 8 marks into the array (out of order)</span>
+Marks[<span class="num">1</span>] &lt;- <span class="num">67</span>
+Marks[<span class="num">2</span>] &lt;- <span class="num">45</span>
+Marks[____] &lt;- <span class="num">72</span>
+Marks[<span class="num">4</span>] &lt;- ____
+Marks[<span class="num">5</span>] &lt;- <span class="num">58</span>
+Marks[<span class="num">6</span>] &lt;- <span class="num">90</span>
+Marks[<span class="num">7</span>] &lt;- <span class="num">63</span>
+Marks[<span class="num">8</span>] &lt;- <span class="num">39</span>
+
+<span class="comment">// First and Last mark the part of the array still being sorted</span>
+First &lt;- <span class="num">1</span>
+Last &lt;- <span class="num">8</span>
+
+<span class="comment">// Keep making passes until a full pass makes no swaps</span>
+<span class="kw">REPEAT</span>
+  <span class="comment">// Assume this pass is sorted until a swap proves otherwise</span>
+  Swap &lt;- ____
+  <span class="comment">// Compare every neighbouring pair in the unsorted part</span>
+  <span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
+    <span class="kw">IF</span> Marks[Index] ____ Marks[Index + <span class="num">1</span>]
+      <span class="kw">THEN</span>
+        <span class="comment">// Swap the two values using Temp as a holding space</span>
+        Temp &lt;- Marks[Index]
+        Marks[Index] &lt;- Marks[Index + <span class="num">1</span>]
+        Marks[Index + <span class="num">1</span>] &lt;- ____
+        Swap &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ENDIF</span>
+  <span class="kw">NEXT</span> Index
+  <span class="comment">// The largest remaining value is now in place, so shrink the range</span>
+  Last &lt;- ____
+<span class="kw">UNTIL</span> (____ Swap) <span class="kw">OR</span> Last = ____</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">An array Marks[1:8] holds eight integers. Write a bubble sort algorithm to sort Marks into ascending order.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Marks : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">8</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Index, First, Last, Temp : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Swap : <span class="type">BOOLEAN</span>
+
+First &lt;- <span class="num">1</span>
+Last &lt;- <span class="num">8</span>
+
+<span class="kw">REPEAT</span>
+  Swap &lt;- <span class="kw">FALSE</span>
+  <span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
+    <span class="kw">IF</span> Marks[Index] &gt; Marks[Index + <span class="num">1</span>]
+      <span class="kw">THEN</span>
+        Temp &lt;- Marks[Index]
+        Marks[Index] &lt;- Marks[Index + <span class="num">1</span>]
+        Marks[Index + <span class="num">1</span>] &lt;- Temp
+        Swap &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ENDIF</span>
+  <span class="kw">NEXT</span> Index
+  Last &lt;- Last - <span class="num">1</span>
+<span class="kw">UNTIL</span> (<span class="kw">NOT</span> Swap) <span class="kw">OR</span> Last = <span class="num">1</span></code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">A teacher stores the heights of 12 students in an array called Heights[1:12]. Write a bubble sort algorithm to sort the heights into <strong>descending</strong> order (largest first).</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Heights : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">12</span>] <span class="kw">OF</span> <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Index, First, Last, Temp : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Swap : <span class="type">BOOLEAN</span>
+
+First &lt;- <span class="num">1</span>
+Last &lt;- <span class="num">12</span>
+
+<span class="kw">REPEAT</span>
+  Swap &lt;- <span class="kw">FALSE</span>
+  <span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
+    <span class="comment">// Flipped to &lt; so the largest values bubble to the front</span>
+    <span class="kw">IF</span> Heights[Index] &lt; Heights[Index + <span class="num">1</span>]
+      <span class="kw">THEN</span>
+        Temp &lt;- Heights[Index]
+        Heights[Index] &lt;- Heights[Index + <span class="num">1</span>]
+        Heights[Index + <span class="num">1</span>] &lt;- Temp
+        Swap &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ENDIF</span>
+  <span class="kw">NEXT</span> Index
+  Last &lt;- Last - <span class="num">1</span>
+<span class="kw">UNTIL</span> (<span class="kw">NOT</span> Swap) <span class="kw">OR</span> Last = <span class="num">1</span></code></pre></details></div></article></section>
+<section class="quiz" data-quiz="linearsearch"><h2>Linear Search MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 3</div></section>
+<section class="quiz" data-quiz="bubblesort"><h2>Bubble Sort MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 3</div></section>
+<section class="quiz" data-quiz="methods"><h2>Standard Methods MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="validation" class="section-title">5. Validation and Verification</h2>
+<section class="grid"><article id="topic15" class="card red"><div class="head">15. Range Check</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Mark : <span class="type">INTEGER</span>
+
+<span class="comment">// Keep asking until a value inside 0-100 is entered</span>
+<span class="kw">REPEAT</span>
+  <span class="kw">INPUT</span> Mark
+  <span class="kw">IF</span> Mark &lt; <span class="num">0</span> <span class="kw">OR</span> Mark &gt; <span class="num">100</span>
+    <span class="kw">THEN</span>
+      <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+  <span class="kw">ENDIF</span>
+<span class="comment">// Loop only ends once Mark is within range</span>
+<span class="kw">UNTIL</span> Mark &gt;= <span class="num">0</span> <span class="kw">AND</span> Mark &lt;= <span class="num">100</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">IF</span> Age &lt; ____ <span class="kw">OR</span> Age &gt; ____
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Validate score 0–20.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Score : <span class="type">INTEGER</span>
+
+<span class="kw">REPEAT</span>
+  <span class="kw">INPUT</span> Score
+  <span class="kw">IF</span> Score &lt; <span class="num">0</span> <span class="kw">OR</span> Score &gt; <span class="num">20</span>
+    <span class="kw">THEN</span>
+      <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">UNTIL</span> Score &gt;= <span class="num">0</span> <span class="kw">AND</span> Score &lt;= <span class="num">20</span></code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Height must be 110–150.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> Height : <span class="type">INTEGER</span>
+
+<span class="kw">REPEAT</span>
+  <span class="kw">INPUT</span> Height
+  <span class="kw">IF</span> Height &lt; <span class="num">110</span> <span class="kw">OR</span> Height &gt; <span class="num">150</span>
+    <span class="kw">THEN</span>
+      <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">UNTIL</span> Height &gt;= <span class="num">110</span> <span class="kw">AND</span> Height &lt;= <span class="num">150</span></code></pre></details></div></article><article id="topic16" class="card red"><div class="head">16. Length / Presence / Double Entry</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Password : <span class="type">STRING</span>
+
+<span class="comment">// LENGTH() counts the characters typed into Password</span>
+<span class="kw">IF</span> LENGTH(Password) &lt;&gt; <span class="num">8</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid length"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">IF</span> Name = ____
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Required"</span>
+<span class="kw">ENDIF</span></code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Check password length is 8–12 characters.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">DECLARE</span> Password : <span class="type">STRING</span>
+
+<span class="kw">REPEAT</span>
+  <span class="kw">INPUT</span> Password
+  <span class="kw">IF</span> LENGTH(Password) &lt; <span class="num">8</span> <span class="kw">OR</span> LENGTH(Password) &gt; <span class="num">12</span>
+    <span class="kw">THEN</span>
+      <span class="kw">OUTPUT</span> <span class="str">"Password must be 8-12 characters"</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">UNTIL</span> LENGTH(Password) &gt;= <span class="num">8</span> <span class="kw">AND</span> LENGTH(Password) &lt;= <span class="num">12</span></code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">User enters a PIN twice. Check if both match.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">DECLARE</span> PIN1, PIN2 : <span class="type">STRING</span>
+
+<span class="kw">INPUT</span> PIN1
+<span class="kw">INPUT</span> PIN2
+
+<span class="kw">IF</span> PIN1 &lt;&gt; PIN2
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"PINs do not match"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"PINs match"</span>
+<span class="kw">ENDIF</span></code></pre></details></div></article></section>
+<section class="quiz" data-quiz="validation"><h2>Validation MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="testing" class="section-title">6. Testing and Debugging</h2>
+<section class="grid"><article id="topic17" class="card orange"><div class="head">17. Test Data</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Mark must be 0 to 100 inclusive</span>
+
+Normal data: <span class="num">50</span>
+Extreme data: <span class="num">0</span>, <span class="num">100</span>
+Boundary data: -<span class="num">1</span>, <span class="num">0</span>, <span class="num">100</span>, <span class="num">101</span>
+Abnormal data: -<span class="num">12</span>, <span class="num">150</span>, <span class="str">"eleven"</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Normal data: ____
+Extreme data: ____, ____
+Boundary data: ____, ____, ____, ____</code></pre><div class="step"><span>3</span>Own Task</div><div class="task">Create test data for password length 8–12.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code>Normal data: <span class="num">10</span> characters
+Extreme data: <span class="num">8</span> characters, <span class="num">12</span> characters
+Boundary data: <span class="num">7</span> characters, <span class="num">8</span> characters, <span class="num">12</span> characters, <span class="num">13</span> characters</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Height 110–150: give normal, extreme, boundary and abnormal data.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code>Normal data: <span class="num">130</span>
+Extreme data: <span class="num">110</span>, <span class="num">150</span>
+Boundary data: <span class="num">109</span>, <span class="num">110</span>, <span class="num">150</span>, <span class="num">151</span>
+Abnormal data: -<span class="num">5</span>, <span class="num">200</span>, <span class="str">"tall"</span></code></pre></details></div></article><article id="topic18" class="card orange"><div class="head">18. Trace Tables / Errors</div><div class="body"><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">DECLARE</span> Total, Count, Number : <span class="type">INTEGER</span>
+
+<span class="comment">// Reset the totals before the loop starts</span>
+Total &lt;- <span class="num">0</span>
+Count &lt;- <span class="num">0</span>
+<span class="kw">INPUT</span> Number
+
+<span class="comment">// -1 is the sentinel value that ends data entry</span>
+<span class="kw">WHILE</span> Number &lt;&gt; -<span class="num">1</span> <span class="kw">DO</span>
+  Total &lt;- Total + Number
+  Count &lt;- Count + <span class="num">1</span>
+  <span class="kw">INPUT</span> Number
+<span class="kw">ENDWHILE</span></code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>Trace table columns:
+____ | ____ | ____ | OUTPUT</code></pre><div class="step"><span>3</span>Own Task</div><div class="task">Dry run with test data: 5, 10, -1.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code>Total | Count | Number | OUTPUT
+<span class="num">0</span>     | <span class="num">0</span>     | <span class="num">5</span>      |
+<span class="num">5</span>     | <span class="num">1</span>     | <span class="num">10</span>     |
+<span class="num">15</span>    | <span class="num">2</span>     | -<span class="num">1</span>     |
+
+<span class="comment">// Loop ends when Number = -1. Final values: Total = 15, Count = 2</span></code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Why is a trace table useful?</div><details class="scenario-answer"><summary>Show Answer</summary><div class="task">A trace table lets you manually work through (dry run) an algorithm step by step, recording how each variable's value changes and what is output at each stage. This helps you find logic errors and check that an algorithm does what it is meant to do, without needing to actually run it on a computer.</div></details></div></article></section>
+<section class="quiz" data-quiz="testing"><h2>Testing MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="functions" class="section-title">7. Functions and Procedures</h2>
+<section class="grid"><article id="topic19" class="card teal"><div class="head">19. Procedures</div><div class="body"><div class="task"><strong>Key idea:</strong> A PROCEDURE performs a task and does <strong>not</strong> return a value. It is invoked with the <span class="kw" style="color:#0f766e">CALL</span> command.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Define the procedure and its parameter</span>
+<span class="kw">PROCEDURE</span> DisplayMessage(Name : <span class="type">STRING</span>)
+  <span class="kw">OUTPUT</span> <span class="str">"Hello "</span>, Name
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="comment">// Run the procedure, passing in "Amy" as the argument</span>
+<span class="kw">CALL</span> DisplayMessage(<span class="str">"Amy"</span>)</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>____ AddNumbers(Num1 : <span class="type">INTEGER</span>, Num2 : <span class="type">INTEGER</span>)
+  <span class="kw">OUTPUT</span> Num1 + Num2
+____
+
+<span class="kw">CALL</span> ____(____, ____)</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Write a PROCEDURE called ShowSquare that receives an INTEGER parameter and outputs its square. Then CALL it.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">PROCEDURE</span> ShowSquare(Num : <span class="type">INTEGER</span>)
+  <span class="kw">OUTPUT</span> Num * Num
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">CALL</span> ShowSquare(<span class="num">6</span>)</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Write a PROCEDURE that receives a student's name and mark, and outputs them as "Name: mark".</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">PROCEDURE</span> ShowResult(Name : <span class="type">STRING</span>, Mark : <span class="type">INTEGER</span>)
+  <span class="kw">OUTPUT</span> Name, <span class="str">": "</span>, Mark
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">CALL</span> ShowResult(<span class="str">"Ben"</span>, <span class="num">85</span>)</code></pre></details></div></article><article id="topic20" class="card teal"><div class="head">20. Functions</div><div class="body"><div class="task"><strong>Key idea:</strong> A FUNCTION always <span class="kw" style="color:#0f766e">RETURNS</span> a value and is used inside an expression (e.g. an assignment or OUTPUT) — it is never invoked with CALL.</div><div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment">// Define the function: it takes a number and RETURNS a number</span>
+<span class="kw">FUNCTION</span> Square(Num : <span class="type">INTEGER</span>) <span class="kw">RETURNS</span> <span class="type">INTEGER</span>
+  <span class="kw">RETURN</span> Num * Num
+<span class="kw">ENDFUNCTION</span>
+
+<span class="comment">// Call it inside an assignment, not with CALL</span>
+<span class="kw">DECLARE</span> Result : <span class="type">INTEGER</span>
+Result &lt;- Square(<span class="num">5</span>)
+<span class="kw">OUTPUT</span> Result</code></pre><div class="step"><span>2</span>Fill in the Space</div><pre><code>____ AddNumbers(Num1 : <span class="type">INTEGER</span>, Num2 : <span class="type">INTEGER</span>) ____ <span class="type">INTEGER</span>
+  ____ Num1 + Num2
+____
+
+Total &lt;- ____(<span class="num">3</span>, <span class="num">4</span>)</code></pre><div class="step"><span>3</span>Own Pseudocode</div><div class="task">Write a FUNCTION called IsEven that receives an INTEGER and RETURNS a BOOLEAN.</div><details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">FUNCTION</span> IsEven(Num : <span class="type">INTEGER</span>) <span class="kw">RETURNS</span> <span class="type">BOOLEAN</span>
+  <span class="kw">IF</span> Num <span class="kw">MOD</span> <span class="num">2</span> = <span class="num">0</span>
+    <span class="kw">THEN</span>
+      <span class="kw">RETURN</span> <span class="kw">TRUE</span>
+    <span class="kw">ELSE</span>
+      <span class="kw">RETURN</span> <span class="kw">FALSE</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">ENDFUNCTION</span>
+
+<span class="kw">DECLARE</span> Result : <span class="type">BOOLEAN</span>
+Result &lt;- IsEven(<span class="num">8</span>)
+<span class="kw">OUTPUT</span> Result</code></pre></details><div class="step"><span>4</span>Scenario Question</div><div class="task">Write a FUNCTION called CalculateArea that receives Length and Width and returns the area.</div><details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">FUNCTION</span> CalculateArea(Length : <span class="type">REAL</span>, Width : <span class="type">REAL</span>) <span class="kw">RETURNS</span> <span class="type">REAL</span>
+  <span class="kw">RETURN</span> Length * Width
+<span class="kw">ENDFUNCTION</span>
+
+<span class="kw">DECLARE</span> Area : <span class="type">REAL</span>
+Area &lt;- CalculateArea(<span class="num">5</span>, <span class="num">3</span>)
+<span class="kw">OUTPUT</span> Area</code></pre></details></div></article></section>
+<section class="quiz" data-quiz="functions"><h2>Functions and Procedures MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<section id="answers" class="answers"><h2>Answer Page — Coding Format</h2><p style="margin:-6px 0 18px"><a href="Answers.pdf" target="_blank" rel="noopener" style="font-weight:900;color:#1d4ed8">Download the full Answer Key (coding answers + MCQ answers) as a PDF →</a></p><details open><summary>Basics Answers</summary><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
+
+Amount &lt;- <span class="num">100</span>
+TotalPrice &lt;- Amount * <span class="num">3.5</span>
+Discount &lt;- <span class="num">0.2</span>
+FinalPrice &lt;- TotalPrice - TotalPrice * Discount
+
+<span class="kw">OUTPUT</span> <span class="str">"Final price is "</span>, FinalPrice</code></pre><pre><code>TriangleArea &lt;- Base * Height / <span class="num">2</span>
+<span class="kw">OUTPUT</span> <span class="str">"Triangle area is "</span>, TriangleArea</code></pre></details><details><summary>Selection Answers</summary><pre><code><span class="kw">IF</span> Mark &gt;= <span class="num">50</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Pass"</span>
+  <span class="kw">ELSE</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Fail"</span>
+<span class="kw">ENDIF</span></code></pre><pre><code><span class="kw">OTHERWISE OUTPUT</span> <span class="str">"Invalid choice"</span>
+<span class="kw">ENDCASE</span></code></pre></details><details><summary>Loops Answers</summary><pre><code><span class="kw">FOR</span> Counter &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">10</span>
+  <span class="kw">OUTPUT</span> Counter
+<span class="kw">NEXT</span> Counter</code></pre><pre><code><span class="comment">// 8. REPEAT UNTIL</span>
+Count &lt;- <span class="num">0</span>
+
+<span class="kw">REPEAT</span>
+  <span class="kw">INPUT</span> Item
+  Count &lt;- Count + <span class="num">1</span>
+<span class="kw">UNTIL</span> Item = <span class="str">"STOP"</span></code></pre><pre><code><span class="comment">// 9. WHILE</span>
+Count &lt;- <span class="num">0</span>
+<span class="kw">INPUT</span> Name
+
+<span class="kw">WHILE</span> Name &lt;&gt; <span class="str">"STOP"</span> <span class="kw">DO</span>
+  Count &lt;- Count + <span class="num">1</span>
+  <span class="kw">INPUT</span> Name
+<span class="kw">ENDWHILE</span></code></pre></details><details><summary>Standard Methods Answers</summary><pre><code><span class="comment">// 10. Totalling / Counting / Average</span>
+Total &lt;- <span class="num">0</span>
+Total &lt;- Total + Mark
+Average &lt;- Total / <span class="num">5</span></code></pre><pre><code><span class="comment">// 11. Finding the Maximum</span>
+<span class="kw">DECLARE</span> Counter, Mark, Highest : <span class="type">INTEGER</span>
+
+<span class="kw">INPUT</span> Mark
+Highest &lt;- Mark
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">20</span>
+  <span class="kw">INPUT</span> Mark
+  <span class="kw">IF</span> Mark &gt; Highest
+    <span class="kw">THEN</span>
+      Highest &lt;- Mark
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Highest mark is "</span>, Highest</code></pre><pre><code><span class="comment">// 12. Finding the Minimum</span>
+<span class="kw">DECLARE</span> Counter : <span class="type">INTEGER</span>
+<span class="kw">DECLARE</span> Price, Lowest : <span class="type">REAL</span>
+
+<span class="kw">INPUT</span> Price
+Lowest &lt;- Price
+
+<span class="kw">FOR</span> Counter &lt;- <span class="num">2</span> <span class="kw">TO</span> <span class="num">12</span>
+  <span class="kw">INPUT</span> Price
+  <span class="kw">IF</span> Price &lt; Lowest
+    <span class="kw">THEN</span>
+      Lowest &lt;- Price
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Counter
+
+<span class="kw">OUTPUT</span> <span class="str">"Cheapest price is "</span>, Lowest</code></pre><pre><code><span class="comment">// 13. Linear Search</span>
+<span class="kw">DECLARE</span> Found : <span class="type">BOOLEAN</span>
+
+Names[<span class="num">3</span>] &lt;- <span class="str">"Cara"</span>
+Names[<span class="num">4</span>] &lt;- <span class="str">"Dan"</span>
+
+Found &lt;- <span class="kw">FALSE</span>
+Counter &lt;- <span class="num">1</span>
+
+<span class="kw">WHILE</span> Counter &lt;= <span class="num">5</span> <span class="kw">AND</span> Found = <span class="kw">FALSE</span> <span class="kw">DO</span>
+  <span class="kw">IF</span> Names[Counter] = SearchName
+    <span class="kw">THEN</span>
+      Found &lt;- <span class="kw">TRUE</span>
+    <span class="kw">ELSE</span>
+      Counter &lt;- Counter + <span class="num">1</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">ENDWHILE</span></code></pre><pre><code><span class="comment">// 14. Bubble Sort</span>
+Marks[<span class="num">3</span>] &lt;- <span class="num">72</span>
+Marks[<span class="num">4</span>] &lt;- <span class="num">51</span>
+
+Swap &lt;- <span class="kw">FALSE</span>
+<span class="kw">FOR</span> Index &lt;- First <span class="kw">TO</span> Last - <span class="num">1</span>
+  <span class="kw">IF</span> Marks[Index] &gt; Marks[Index + <span class="num">1</span>]
+    <span class="kw">THEN</span>
+      Temp &lt;- Marks[Index]
+      Marks[Index] &lt;- Marks[Index + <span class="num">1</span>]
+      Marks[Index + <span class="num">1</span>] &lt;- Temp
+      Swap &lt;- <span class="kw">TRUE</span>
+  <span class="kw">ENDIF</span>
+<span class="kw">NEXT</span> Index
+Last &lt;- Last - <span class="num">1</span>
+<span class="kw">UNTIL</span> (<span class="kw">NOT</span> Swap) <span class="kw">OR</span> Last = <span class="num">1</span>
+
+<span class="kw">FOR</span> Index &lt;- <span class="num">1</span> <span class="kw">TO</span> <span class="num">8</span>
+  <span class="kw">OUTPUT</span> Marks[Index]
+<span class="kw">NEXT</span> Index</code></pre></details><details><summary>Validation / Testing Answers</summary><pre><code><span class="kw">IF</span> Age &lt; <span class="num">7</span> <span class="kw">OR</span> Age &gt; <span class="num">12</span>
+  <span class="kw">THEN</span>
+    <span class="kw">OUTPUT</span> <span class="str">"Invalid"</span>
+<span class="kw">ENDIF</span></code></pre><pre><code>Boundary data for 110 to 150:
+<span class="num">109</span>, <span class="num">110</span>, <span class="num">150</span>, <span class="num">151</span></code></pre></details><details><summary>Functions and Procedures Answers</summary><pre><code><span class="kw">PROCEDURE</span> AddNumbers(Num1 : <span class="type">INTEGER</span>, Num2 : <span class="type">INTEGER</span>)
+  <span class="kw">OUTPUT</span> Num1 + Num2
+<span class="kw">ENDPROCEDURE</span>
+
+<span class="kw">CALL</span> AddNumbers(<span class="num">3</span>, <span class="num">4</span>)</code></pre><pre><code><span class="kw">FUNCTION</span> AddNumbers(Num1 : <span class="type">INTEGER</span>, Num2 : <span class="type">INTEGER</span>) <span class="kw">RETURNS</span> <span class="type">INTEGER</span>
+  <span class="kw">RETURN</span> Num1 + Num2
+<span class="kw">ENDFUNCTION</span>
+
+Total &lt;- AddNumbers(<span class="num">3</span>, <span class="num">4</span>)</code></pre></details></section>
+<section id="project" class="project"><h2>Final Mini Project</h2><p><strong>Scenario:</strong> A teacher wants an algorithm to process marks for a small class.</p><div class="task"><ul><li>Declare all variables with suitable data types.</li><li>Input name and mark for each student.</li><li>Validate each mark is 0–100.</li><li>Calculate total, average, highest, lowest, and number of passes.</li></ul></div><div class="answer-space">Write pseudocode here...</div></section>
+</main>
+<footer>
+  <strong>IGCSE 0478 Pseudocode Practice Website</strong><br>
+  Created by Daichi Yamamoto<br>
+  © 2026 Daichi Yamamoto. All rights reserved.<br>
+  Educational use permitted with attribution to Daichi Yamamoto.
+</footer>
 <script>
-// ═══════════════════════════════════════════
-//  CORE STATE (exposed to window for Firebase module)
-// ═══════════════════════════════════════════
-window._cellIdCounter    = 0;
-window._cells            = [];
-window._notebookState    = {};
-window._executionCounter = 0;
-window._globalProcs      = {};
-window._globalFuncs      = {};
-window._globalFiles      = {};
-window._globalClasses    = {};
-window._currentNotebookId = null;
-let studentMode = false;
-
-// Alias for internal use. Note: there is deliberately NO alias for the shared
-// variable state — fbOpen() replaces window._notebookState with a whole new
-// object, so anything holding a second reference would keep the stale one.
-const cells            = window._cells;
-
-// ═══════════════════════════════════════════
-//  LOCAL AUTOSAVE (survives page refresh — no sign-in needed)
-// ═══════════════════════════════════════════
-const LOCAL_SAVE_KEY = 'pseudolab-local-notebook';
-let _localSaveTimer = null;
-function saveLocalNotebook() {
-  try {
-    const data = {
-      title: document.getElementById('nb-title')?.value || '',
-      cells: cells.map(c => ({ code: window._getCode ? window._getCode(c.id) : '' }))
-    };
-    localStorage.setItem(LOCAL_SAVE_KEY, JSON.stringify(data));
-  } catch(e) {}
-}
-function saveLocalNotebookDebounced() {
-  clearTimeout(_localSaveTimer);
-  _localSaveTimer = setTimeout(saveLocalNotebook, 400);
-}
-window._saveLocalNotebook = saveLocalNotebook;
-window._saveLocalNotebookDebounced = saveLocalNotebookDebounced;
-
-function restoreLocalNotebook() {
-  let raw; try { raw = localStorage.getItem(LOCAL_SAVE_KEY); } catch(e) { return false; }
-  if (!raw) return false;
-  let data; try { data = JSON.parse(raw); } catch(e) { return false; }
-  if (!data || !Array.isArray(data.cells) || data.cells.length === 0) return false;
-  const titleEl = document.getElementById('nb-title');
-  if (titleEl && typeof data.title === 'string' && data.title) titleEl.value = data.title.slice(0, 200);
-  data.cells.slice(0, 300).forEach(cd => {
-    addCell(cd && typeof cd.code === 'string' ? cd.code : '');
-  });
-  return true;
-}
-window.addEventListener('beforeunload', saveLocalNotebook);
-
-// ═══════════════════════════════════════════
-//  AUTH STATUS
-// ═══════════════════════════════════════════
-setInterval(() => {
-  const user = window._fbUser;
-  const el   = document.getElementById('auth-status');
-  const meta = document.getElementById('nb-meta');
-  if (!el) return;
-  if (user) {
-    el.textContent   = '☁️ ' + (user.displayName || user.email);
-    if (meta) meta.textContent = 'Cambridge 9618 · PseudoLab · Signed in as ' + (user.displayName || user.email);
-  } else {
-    el.textContent = 'Not signed in';
-  }
-}, 1000);
-
-// ═══════════════════════════════════════════
-//  AUTO-SAVE
-// ═══════════════════════════════════════════
-setInterval(() => {
-  if (!window._fbUser || !window._currentNotebookId) return;
-  window._autoSave().then(() => {
-    const status = document.getElementById('autosave-status');
-    if (status && window._lastAutoSaveAt) {
-      const t = window._lastAutoSaveAt;
-      const hh = String(t.getHours()).padStart(2,'0'), mm = String(t.getMinutes()).padStart(2,'0'), ss = String(t.getSeconds()).padStart(2,'0');
-      status.textContent = 'Last saved ' + hh + ':' + mm + ':' + ss;
-    }
-  });
-}, 60000);
-
-window.addEventListener('DOMContentLoaded', () => {
-  if (!restoreLocalNotebook()) addCell();
-  document.getElementById('nb-title')?.addEventListener('input', saveLocalNotebookDebounced);
-});
-
-// ═══════════════════════════════════════════
-//  SHARED STATE PANEL
-// ═══════════════════════════════════════════
-function refreshStatePanel() {
-  const entries = Object.entries(window._notebookState);
-  document.getElementById('state-count').textContent  = entries.length + ' var' + (entries.length!==1?'s':'');
-  document.getElementById('state-status').textContent = 'Shared State: ' + entries.length + ' var' + (entries.length!==1?'s':'');
-  const empty = document.getElementById('state-empty');
-  const table = document.getElementById('state-table');
-  const tbody = document.getElementById('state-tbody');
-  if (entries.length === 0) { empty.style.display='block'; table.style.display='none'; return; }
-  empty.style.display='none'; table.style.display='table'; tbody.innerHTML='';
-  for (const [name,info] of entries) {
-    const val = typeof info.value==='string' ? '"'+info.value+'"' : String(info.value);
-    const tr = document.createElement('tr');
-    // Names and values come from pseudocode the user typed — text, not markup.
-    [['sv-name',name],['sv-type',info.type],['sv-val',val],['sv-type','Cell ['+info.cellId+']']]
-      .forEach(([cls,text])=>{ const td=tr.insertCell(); td.className=cls; td.textContent=text; });
-    tbody.appendChild(tr);
-  }
-  const body=document.getElementById('state-body');
-  if(!body.classList.contains('open')){body.classList.add('open');document.getElementById('state-icon').textContent='▼ Hide';}
-}
-window._refreshStatePanel = refreshStatePanel;
-
-function resetState() {
-  if(!confirm('Reset all shared variable state?')) return;
-  window._notebookState={}; window._executionCounter=0;
-  window._globalProcs={}; window._globalFuncs={}; window._globalFiles={}; window._globalClasses={};
-  refreshStatePanel();
-  cells.forEach(c=>{const t=document.getElementById('tag-'+c.id);if(t)t.textContent='not run';});
-}
-
-// ═══════════════════════════════════════════
-//  CELL MANAGEMENT
-// ═══════════════════════════════════════════
-function addCell(code) {
-  window._cellIdCounter++;
-  const id = window._cellIdCounter;
-  cells.push({ id });
-
-  const container = document.getElementById('cells-container');
-  const wrap = document.createElement('div');
-  wrap.className='cell-wrapper'; wrap.id='wrap-'+id;
-
-  const numEl=document.createElement('div');
-  numEl.className='cell-num'; numEl.textContent='['+id+']';
-
-  const cell=document.createElement('div');
-  cell.className='cell'; cell.id='cell-'+id;
-
-  const toolbar=document.createElement('div'); toolbar.className='cell-toolbar';
-  toolbar.innerHTML='<span class="cell-label">Pseudocode</span><span class="cell-tag" id="tag-'+id+'">not run</span><div class="tb-spacer"></div>';
-  const btnRun=document.createElement('button'); btnRun.className='btn-run'; btnRun.textContent='▶ Run'; btnRun.onclick=()=>runCell(id);
-  const btnDel=document.createElement('button'); btnDel.className='btn-del'; btnDel.textContent='✕'; btnDel.onclick=()=>deleteCell(id);
-  toolbar.appendChild(btnRun); toolbar.appendChild(btnDel);
-
-  const ta=document.createElement('textarea'); ta.className='code-area'; ta.id='code-'+id;
-  ta.value=code||''; ta.spellcheck=false;
-  ta.addEventListener('keydown',e=>handleKeydown(e,id));
-
-  const legend=document.createElement('div'); legend.className='legend';
-  legend.innerHTML='<span class="leg-item"><span class="leg-dot" style="background:#2563eb"></span>keyword</span><span class="leg-item"><span class="leg-dot" style="background:#7c3aed"></span>type</span><span class="leg-item"><span class="leg-dot" style="background:#059669"></span>string</span><span class="leg-item"><span class="leg-dot" style="background:#d97706"></span>number</span><span class="leg-item"><span class="leg-dot" style="background:#e11d48"></span>← op</span><span class="leg-item"><span class="leg-dot" style="background:#94a3b8"></span>// comment</span><span class="leg-hint">💡 &lt;- → ←  |  ⇧Enter to run  |  ⌥Enter next cell</span>';
-
-  const outEl=document.createElement('div'); outEl.className='output-panel'; outEl.id='out-'+id;
-  const sLabel=document.createElement('div'); sLabel.className='s-label'; sLabel.textContent='Cell '+id+' output';
-
-  cell.appendChild(toolbar); cell.appendChild(ta); cell.appendChild(legend);
-  cell.appendChild(outEl); cell.appendChild(sLabel);
-  wrap.appendChild(numEl); wrap.appendChild(cell);
-  container.appendChild(wrap);
-  updateCellCount();
-  saveLocalNotebookDebounced();
-
-  setTimeout(()=>{
-    if(window.createPseudoEditor){ window.createPseudoEditor('code-'+id,code||''); }
-    else {
-      ta.style.display='block';
-      let attempts=0;
-      const retry=setInterval(()=>{
-        if(window.createPseudoEditor){
-          clearInterval(retry);
-          ta.style.display='none';
-          window.createPseudoEditor('code-'+id,ta.value);
-          return;
-        }
-        attempts++;
-        if(attempts===40&&!window._cmFallbackWarned){
-          window._cmFallbackWarned=true;
-          if(window.showToast)window.showToast('⚠️ Advanced editor unavailable — using basic mode. Check your connection.','#f87171');
-          else alert('Advanced editor unavailable — using basic mode. Check your connection.');
-        }
-      },200);
-    }
-  },60);
-}
-window._addCell = addCell;
-
-function deleteCell(id) {
-  if(cells.length<=1){alert('At least one cell must remain.');return;}
-  const w=document.getElementById('wrap-'+id);
-  w.style.opacity='0'; w.style.transform='scale(.97)'; w.style.transition='all .15s';
-  setTimeout(()=>{ w.remove(); const i=cells.findIndex(c=>c.id===id); if(i>-1)cells.splice(i,1); updateCellCount(); saveLocalNotebookDebounced(); },150);
-}
-
-function updateCellCount(){
-  document.getElementById('cell-count').textContent=cells.length+' cell'+(cells.length!==1?'s':'');
-}
-
-function getCode(id){
-  const ta=document.getElementById('code-'+id);
-  return ta&&ta._cmView ? ta._cmView.state.doc.toString() : (ta?ta.value:'');
-}
-window._getCode = getCode;
-
-// ═══════════════════════════════════════════
-//  INPUT MODAL
-// ═══════════════════════════════════════════
-function promptInput(varName,count){
-  return new Promise((resolve,reject)=>{
-    document.getElementById('pseudo-modal')?.remove();
-    const overlay=document.createElement('div');
-    overlay.className='modal-overlay'; overlay.id='pseudo-modal';
-    overlay.innerHTML='<div class="modal-box"><div class="modal-lbl">INPUT required</div><div class="modal-var" id="modal-var"></div><div class="modal-desc">Enter a value for <strong id="modal-var2"></strong>:</div><input class="modal-field" id="modal-field" type="text" placeholder="type a value..." autocomplete="off"/><div class="modal-foot"><span class="modal-counter">Input #'+Number(count)+'</span><button class="btn-modal-stop" id="modal-stop" title="Stuck in an infinite loop? Stop execution.">⏹ Stop</button><button class="btn-modal-ok" id="modal-ok">OK ↵</button></div></div>';
-    document.body.appendChild(overlay);
-    // varName is parsed out of user pseudocode — inject it as text, not markup.
-    overlay.querySelector('#modal-var').textContent  = varName;
-    overlay.querySelector('#modal-var2').textContent = varName;
-    const field=document.getElementById('modal-field');
-    const ok=document.getElementById('modal-ok');
-    const stopBtn=document.getElementById('modal-stop');
-    field.focus();
-    const submit=()=>{ overlay.remove(); resolve(field.value); };
-    const stop=()=>{ overlay.remove(); reject({type:'pseudo_stop'}); };
-    ok.addEventListener('click',submit);
-    stopBtn.addEventListener('click',stop);
-    field.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();submit();} });
-  });
-}
-
-// ═══════════════════════════════════════════
-//  INTERPRETER
-// ═══════════════════════════════════════════
-class PseudoInterpreter {
-  constructor(shared, inputProvider){
-    this.env={}; this.types={};
-    for(const[k,v]of Object.entries(shared)){this.env[k]=v.value;this.types[k]=v.type;}
-    this.procedures={}; this.functions={}; this.output=[]; this.files={}; this.classes={};
-    this.inputProvider = inputProvider || (async ()=>'');
-    this.currentLine = null;
-    this.callDepth = 0;         // guards against runaway PROCEDURE/FUNCTION/method recursion
-    this.thisInstance = null;   // the object a class method is currently executing on ('this'/SUPER context)
-    this.currentClass = null;   // the class the currently-executing method body was resolved from
-  }
-  async run(src){
-    const lines=this.tokenize(src.split('\n').map(l=>l.trimEnd()));
-    try{await this.execBlock(lines,0,lines.length);}
-    catch(e){
-      if(e.type==='return'){}
-      else if(e.type==='pseudo_stop')this.output.push('⏹ Execution stopped by user.');
-      else if(e.type==='pseudo_error')this.output.push('ERROR (line '+(e.line??'?')+'): '+e.msg);
-      else this.output.push('ERROR (line '+(this.currentLine??'?')+'): '+e.message);
-    }
-    return{output:this.output.join('\n'),env:this.env,types:this.types};
-  }
-  // Strip // comments and normalise the <- arrow to ←, but only OUTSIDE string
-  // literals — so OUTPUT "http://example.com" and "a<-b" survive intact.
-  normalizeLine(line){
-    let out='',inStr=false,q='';
-    for(let i=0;i<line.length;i++){
-      const c=line[i];
-      if(inStr){out+=c;if(c===q)inStr=false;continue;}
-      if(c==='"'||c==="'"){inStr=true;q=c;out+=c;continue;}
-      if(c==='/'&&line[i+1]==='/')break;              // rest of the line is a comment
-      if(c==='<'&&line[i+1]==='-'){out+='←';i++;continue;}
-      out+=c;
-    }
-    return out;
-  }
-  tokenize(lines){return lines.map((raw,i)=>({raw,src:this.normalizeLine(raw).trim(),ln:i+1})).filter(l=>l.src.length>0);}
-  // Upper-case a built-in type name (keeping any [1:5] suffix); leave anything
-  // else — i.e. a class name — exactly as the student wrote it.
-  normalizeType(type){
-    if(!type)return type;
-    const base=type.split('[')[0],up=base.toUpperCase();
-    if(['INTEGER','REAL','STRING','BOOLEAN','CHAR','DATE','ARRAY'].includes(up))return up+type.slice(base.length);
-    return type;
-  }
-  async execBlock(lines,from,to){let i=from;while(i<to)i=await this.execLine(lines,i,to);}
-  async execLine(lines,i,to){
-    this.currentLine=lines[i].ln;
-    const s=lines[i].src;
-    if(/^DECLARE\s+/i.test(s)){
-      const m=s.match(/^DECLARE\s+((?:\w+\s*,\s*)*\w+)\s*(?::\s*(\w+(?:\[.*?\])?))?/i);
-      if(m)for(const n of m[1].split(','))this.checkName(n.trim());
-      if(m){
-        const names=m[1].split(',').map(n=>n.trim()).filter(Boolean);
-        // Built-in type names are case-insensitive like every other keyword
-        // (Integer / integer / INTEGER all work) and are normalised to upper
-        // case here; class names stay exactly as written, since those ARE
-        // case-sensitive.
-        const type=this.normalizeType(m[2]||''),baseType=type.split('[')[0];
-        if(type&&!['INTEGER','REAL','STRING','BOOLEAN','CHAR','DATE'].includes(baseType)&&baseType!=='ARRAY'&&!(baseType in this.classes))
-          this.err('Unknown data type "'+type+'" in DECLARE '+names.join(', ')+' — expected INTEGER, REAL, STRING, BOOLEAN, CHAR, DATE, ARRAY, or a class name declared earlier with CLASS (case-sensitive)');
-        for(const name of names){
-          this.types[name]=type||'UNKNOWN';
-          if(!(name in this.env)){if(type==='INTEGER'||type==='REAL')this.env[name]=0;else if(type==='STRING')this.env[name]='';else if(type==='BOOLEAN')this.env[name]=false;else if(type.startsWith('ARRAY'))this.env[name]={};else this.env[name]=null;}
-        }
-      }
-      return i+1;}
-    if(/^CONSTANT\s+/i.test(s)){const m=s.match(/^CONSTANT\s+(\w+)\s*[=←]\s*(.+)/i);if(m)this.env[m[1]]=await this.eval(m[2].trim());return i+1;}
-    if(/^OUTPUT\s+/i.test(s)){
-      const rest=s.replace(/^OUTPUT\s+/i,'').trim();
-      const parts=this.splitTop(rest,',');
-      const vals=[];for(const p of parts)vals.push(String(await this.eval(p.trim())));
-      this.output.push(vals.join(''));
-      return i+1;}
-    if(/^TYPE_CHECK\s+/i.test(s)){
-      const vars=s.replace(/^TYPE_CHECK\s+/i,'').split(',').map(v=>v.trim()).filter(Boolean);
-      this.output.push('── TYPE_CHECK ────────────────────────');
-      for(const vn of vars){const type=this.types[vn]||this._inferType(vn);const value=vn in this.env?this.env[vn]:'(undeclared)';const valStr=typeof value==='string'?'"'+value+'"':String(value);this.output.push('  '+vn+' : '+type+' = '+valStr);}
-      this.output.push('────────────────────────────────');
-      return i+1;}
-    if(/^INPUT\s+/i.test(s)){
-      const name=s.replace(/^INPUT\s+/i,'').trim();
-      const raw=await this.inputProvider(name);
-      const type=this.types[name]||''; let val=raw;
-      if((type==='INTEGER'||type==='REAL')&&raw!==''&&!isNaN(Number(raw)))val=type==='INTEGER'?parseInt(raw):parseFloat(raw);
-      else if(type==='BOOLEAN')val=raw.toLowerCase()==='true';
-      this.env[name]=val; this.output.push('INPUT '+name+' → '+val); return i+1;}
-    if(/^OPENFILE\s+/i.test(s)){
-      const m=s.match(/^OPENFILE\s+(.+?)\s+FOR\s+(READ|WRITE|APPEND)\s*$/i);
-      if(!m)this.err('Invalid OPENFILE — expected OPENFILE <file> FOR READ|WRITE|APPEND');
-      const fname=String(await this.eval(m[1].trim())),mode=m[2].toUpperCase();
-      if(mode==='WRITE')this.files[fname]={lines:[],readIndex:0,mode:'WRITE'};
-      else if(mode==='APPEND'){if(!this.files[fname])this.files[fname]={lines:[],readIndex:0,mode:'APPEND'};else this.files[fname].mode='APPEND';}
-      else{if(!this.files[fname])this.err('File "'+fname+'" not found — cannot open for READ');this.files[fname].mode='READ';this.files[fname].readIndex=0;}
-      return i+1;}
-    if(/^WRITEFILE\s+/i.test(s)){
-      const rest=s.replace(/^WRITEFILE\s+/i,''),parts=this.splitTop(rest,',');
-      if(parts.length<2)this.err('Invalid WRITEFILE — expected WRITEFILE <file>, <data>');
-      const fname=String(await this.eval(parts[0].trim())),f=this.files[fname];
-      if(!f||(f.mode!=='WRITE'&&f.mode!=='APPEND'))this.err('File "'+fname+'" is not open for WRITE/APPEND');
-      f.lines.push(String(await this.eval(parts.slice(1).join(',').trim())));
-      return i+1;}
-    if(/^READFILE\s+/i.test(s)){
-      const rest=s.replace(/^READFILE\s+/i,''),parts=this.splitTop(rest,',');
-      if(parts.length<2)this.err('Invalid READFILE — expected READFILE <file>, <variable>');
-      const fname=String(await this.eval(parts[0].trim())),varName=parts[1].trim(),f=this.files[fname];
-      if(!f||f.mode!=='READ')this.err('File "'+fname+'" is not open for READ');
-      if(f.readIndex>=f.lines.length)this.err('Attempted to READFILE past end of "'+fname+'" — check EOF('+fname+') first');
-      this.env[varName]=f.lines[f.readIndex++];
-      return i+1;}
-    if(/^CLOSEFILE\s+/i.test(s)){
-      const fname=String(await this.eval(s.replace(/^CLOSEFILE\s+/i,'').trim()));
-      if(this.files[fname])this.files[fname].mode='CLOSED';
-      return i+1;}
-    if(/^CALL\s+/i.test(s)){await this.callProc(s.replace(/^CALL\s+/i,'').trim());return i+1;}
-    if(/^RETURN\s+/i.test(s))throw{type:'return',value:await this.eval(s.replace(/^RETURN\s+/i,'').trim())};
-    if(/^IF\s+/i.test(s))return await this.execIf(lines,i,to);
-    if(/^FOR\s+/i.test(s))return await this.execFor(lines,i,to);
-    if(/^WHILE\s+/i.test(s))return await this.execWhile(lines,i,to);
-    if(/^REPEAT$/i.test(s))return await this.execRepeat(lines,i,to);
-    if(/^CASE\s+OF\s+/i.test(s))return await this.execCase(lines,i,to);
-    if(/^PROCEDURE\s+/i.test(s))return this.collectProc(lines,i,to);
-    if(/^FUNCTION\s+/i.test(s))return this.collectFunc(lines,i,to);
-    if(/^CLASS\s+/i.test(s))return this.collectClass(lines,i,to);
-    if(/^(ENDIF|ENDWHILE|ENDCASE|NEXT|UNTIL|ELSE|THEN|ENDPROCEDURE|ENDFUNCTION|ENDCLASS|OTHERWISE|RETURNS|PRIVATE|PUBLIC)(\s|$)/i.test(s))return i+1;
-    const am=s.match(/^([A-Za-z_]\w*(?:\.[A-Za-z_]\w*|\[.+?\])*)\s*←\s*(.+)$/);
-    if(am){await this.assign(am[1].trim(),am[2].trim());return i+1;}
-    const dotCallM=s.match(/^(.+)\.(\w+)\s*\(/);
-    if(dotCallM){
-      const openIdx=dotCallM[0].length-1,closeRel=this.matchParen(s.slice(openIdx));
-      if(closeRel>=0&&openIdx+closeRel===s.length-1){await this.eval(s);return i+1;}
-    }
-    if(/^[A-Za-z_]\w*\s*\(/.test(s)){await this.callProc(s);return i+1;}
-    return i+1;
-  }
-  async assign(lhs,rhs){
-    const dam=lhs.match(/^(.+)\.(\w+)\[(.+)\]$/);
-    if(dam){
-      const obj=await this.resolveInstance(dam[1].trim()),attrName=dam[2];
-      const decl=this.resolveAttrDecl(obj.__class,attrName);
-      if(!decl)this.err('Attribute "'+attrName+'" not found on class "'+obj.__class+'"');
-      if(decl.visibility==='PRIVATE'&&!this.thisInstance)this.err('Attribute "'+attrName+'" is PRIVATE in class "'+decl.definedIn+'" — cannot be assigned from outside the class');
-      const idx=await this.idxKey(dam[3]);
-      if(typeof obj.attrs[attrName]!=='object'||obj.attrs[attrName]===null)obj.attrs[attrName]={};
-      obj.attrs[attrName][idx]=await this.eval(rhs);
-      return;
-    }
-    const dm=lhs.match(/^(.+)\.(\w+)$/);
-    if(dm){ await this.setObjectAttr(dm[1].trim(),dm[2],await this.eval(rhs)); return; }
-    const m=lhs.match(/^(\w+)\[(.+)\]$/);
-    if(m){
-      const name=m[1];
-      if(!(name in this.env))this.err('Variable "'+name+'" is not declared — use DECLARE before assigning to it');
-      const idx=await this.idxKey(m[2]);
-      if(typeof this.env[name]!=='object')this.env[name]={};
-      this.env[name][idx]=await this.eval(rhs);
-    } else {
-      if(!(lhs in this.env))this.err('Variable "'+lhs+'" is not declared — use DECLARE before assigning to it');
-      const val=await this.eval(rhs);
-      this.checkType(lhs,val);
-      this.env[lhs]=val;
-    }
-  }
-  checkType(name,val){
-    const type=this.types[name];
-    if(!type)return;
-    if((type==='INTEGER'||type==='REAL')&&(typeof val!=='number'||Number.isNaN(val)))
-      this.err('Type mismatch: cannot assign '+JSON.stringify(val)+' to '+type+' variable "'+name+'"');
-    if(type==='BOOLEAN'&&typeof val!=='boolean')
-      this.err('Type mismatch: cannot assign '+JSON.stringify(val)+' to BOOLEAN variable "'+name+'"');
-  }
-  // Variable names become object keys; these few would reach into JavaScript's
-  // own object machinery rather than the pseudocode program's variables.
-  checkName(name){
-    if(['__proto__','constructor','prototype'].includes(name))
-      this.err('"'+name+'" is a reserved name and cannot be used as a variable');
-  }
-
-  async idxKey(s){const parts=this.splitTop(s,',');const vals=[];for(const p of parts)vals.push(await this.eval(p.trim()));return vals.join(',');}
-  async execIf(lines,i,to){
-    const condStr=lines[i].src.replace(/^IF\s+/i,'').replace(/\s+THEN\s*$/i,'').trim();
-    let depth=0,thenIdx=-1,elseIdx=-1,endIdx=-1;
-    for(let j=i;j<to;j++){const u=lines[j].src.toUpperCase();if(/^IF\s+/.test(u))depth++;if(depth===1&&/\bTHEN\b/.test(u)&&thenIdx<0)thenIdx=j;if(depth===1&&/^ELSE$/.test(u)&&elseIdx<0)elseIdx=j;if(/^ENDIF/.test(u)){depth--;if(depth===0){endIdx=j;break;}}}
-    if(endIdx<0)this.err('Missing ENDIF');
-    const tS=thenIdx>=0?thenIdx+1:i+1,tE=elseIdx>=0?elseIdx:endIdx;
-    const eS=elseIdx>=0?elseIdx+1:endIdx,eE=endIdx;
-    if(await this.eval(condStr))await this.execBlock(lines,tS,tE);else await this.execBlock(lines,eS,eE);
-    return endIdx+1;}
-  async execFor(lines,i,to){
-    const m=lines[i].src.match(/^FOR\s+(\w+)\s*←\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$/i);
-    if(!m)this.err('Invalid FOR — expected: FOR variable ← start TO end [STEP step]  (check the ← arrow between the variable and the start value)');const vn=m[1],stop=Number(await this.eval(m[3])),step=m[4]?Number(await this.eval(m[4])):1;
-    if(step===0)this.err('STEP 0 in a FOR loop — the counter would never move, so the loop can never finish. Use a positive STEP to count up or a negative STEP to count down');
-    if(Number.isNaN(step))this.err('STEP value is not a number in this FOR loop — check the expression after STEP');
-    if(Number.isNaN(stop))this.err('The TO value is not a number in this FOR loop — check the expression after TO');
-    let depth=0,nextIdx=-1;
-    for(let j=i;j<to;j++){if(/^FOR\s+/i.test(lines[j].src))depth++;if(/^NEXT\s+/i.test(lines[j].src)){depth--;if(depth===0){nextIdx=j;break;}}}
-    if(nextIdx<0)this.err('Missing NEXT');
-    this.env[vn]=Number(await this.eval(m[2]));let iter=0;
-    while((step>0?this.env[vn]<=stop:this.env[vn]>=stop)&&iter++<10000){await this.execBlock(lines,i+1,nextIdx);this.env[vn]=Number(this.env[vn])+step;}
-    if(iter>=10000)this.output.push('⚠ FOR loop stopped after 10000 iterations (possible infinite loop — check STEP/TO values)');
-    return nextIdx+1;}
-  async execWhile(lines,i,to){
-    const condStr=lines[i].src.replace(/^WHILE\s+/i,'').replace(/\s+DO\s*$/i,'').trim();let depth=0,endIdx=-1;
-    for(let j=i;j<to;j++){if(/^WHILE\s+/i.test(lines[j].src))depth++;if(/^ENDWHILE/i.test(lines[j].src)){depth--;if(depth===0){endIdx=j;break;}}}
-    if(endIdx<0)this.err('Missing ENDWHILE');let iter=0;
-    while(await this.eval(condStr)&&iter++<10000)await this.execBlock(lines,i+1,endIdx);
-    if(iter>=10000)this.output.push('⚠ WHILE loop stopped after 10000 iterations (possible infinite loop — check the condition)');
-    return endIdx+1;}
-  async execRepeat(lines,i,to){
-    let untilIdx=-1;for(let j=i+1;j<to;j++){if(/^UNTIL\s+/i.test(lines[j].src)){untilIdx=j;break;}}
-    if(untilIdx<0)this.err('Missing UNTIL');const condStr=lines[untilIdx].src.replace(/^UNTIL\s+/i,'').trim();
-    let iter=0;do{await this.execBlock(lines,i+1,untilIdx);iter++;}while(!(await this.eval(condStr))&&iter<10000);
-    if(iter>=10000)this.output.push('⚠ REPEAT loop stopped after 10000 iterations (possible infinite loop — check the UNTIL condition)');
-    return untilIdx+1;}
-  async execCase(lines,i,to){
-    const val=await this.eval(lines[i].src.replace(/^CASE\s+OF\s+/i,'').trim());let endIdx=-1;
-    for(let j=i+1;j<to;j++){if(/^ENDCASE/i.test(lines[j].src)){endIdx=j;break;}}
-    if(endIdx<0)this.err('Missing ENDCASE');let matched=false;
-    for(let j=i+1;j<endIdx&&!matched;j++){const s=lines[j].src;if(/^OTHERWISE\s*:/i.test(s)){const body=s.replace(/^OTHERWISE\s*:\s*/i,'').trim();if(body)await this.execOneLiner(body);matched=true;}else{const cm=s.match(/^(.+?)\s*:\s*(.*)/);if(cm&&(await this.eval(cm[1].trim()))==val){if(cm[2].trim())await this.execOneLiner(cm[2].trim());matched=true;}}}
-    return endIdx+1;}
-  async execOneLiner(src){
-    if(/^OUTPUT\s+/i.test(src)){
-      const rest=src.replace(/^OUTPUT\s+/i,'').trim();
-      const parts=this.splitTop(rest,',');
-      const vals=[];for(const p of parts)vals.push(String(await this.eval(p.trim())));
-      this.output.push(vals.join(''));
-      return;
-    }
-    if(/^RETURN\s+/i.test(src))throw{type:'return',value:await this.eval(src.replace(/^RETURN\s+/i,'').trim())};
-    if(/^CALL\s+/i.test(src)){await this.callProc(src.replace(/^CALL\s+/i,'').trim());return;}
-    const am=src.match(/^([A-Za-z_]\w*(?:\.[A-Za-z_]\w*|\[.+?\])*)\s*←\s*(.+)$/);
-    if(am){await this.assign(am[1].trim(),am[2].trim());return;}
-    const dotCallM=src.match(/^(.+)\.(\w+)\s*\(/);
-    if(dotCallM){
-      const openIdx=dotCallM[0].length-1,closeRel=this.matchParen(src.slice(openIdx));
-      if(closeRel>=0&&openIdx+closeRel===src.length-1){await this.eval(src);return;}
-    }
-    if(/^[A-Za-z_]\w*\s*\(/.test(src)){await this.callProc(src);return;}
-  }
-  collectProc(lines,i,to){
-    const m=lines[i].src.match(/^PROCEDURE\s+(\w+)\s*(?:\(([^)]*)\))?/i);if(!m)this.err('Invalid PROCEDURE');
-    const name=m[1],params=m[2]?m[2].split(',').map(p=>p.trim().split(/\s*:\s*/)[0].trim()):[];
-    let depth=0,endIdx=-1;
-    for(let j=i;j<to;j++){if(/^PROCEDURE\s+/i.test(lines[j].src))depth++;if(/^ENDPROCEDURE/i.test(lines[j].src)){depth--;if(depth===0){endIdx=j;break;}}}
-    if(endIdx<0)this.err('Missing ENDPROCEDURE');
-    this.procedures[name]={params,body:lines.slice(i+1,endIdx)};this.output.push('[PROCEDURE '+name+' defined]');return endIdx+1;}
-  collectFunc(lines,i,to){
-    const m=lines[i].src.match(/^FUNCTION\s+(\w+)\s*(?:\(([^)]*)\))?/i);if(!m)this.err('Invalid FUNCTION');
-    const name=m[1],params=m[2]?m[2].split(',').map(p=>p.trim().split(/\s*:\s*/)[0].trim()):[];
-    let depth=0,endIdx=-1;
-    for(let j=i;j<to;j++){if(/^FUNCTION\s+/i.test(lines[j].src))depth++;if(/^ENDFUNCTION/i.test(lines[j].src)){depth--;if(depth===0){endIdx=j;break;}}}
-    if(endIdx<0)this.err('Missing ENDFUNCTION');
-    this.functions[name]={params,body:lines.slice(i+1,endIdx)};this.output.push('[FUNCTION '+name+' defined]');return endIdx+1;}
-  collectClass(lines,i,to){
-    const cm=lines[i].src.match(/^CLASS\s+(\w+)(?:\s+INHERITS\s+(\w+))?\s*$/i);
-    if(!cm)this.err('Invalid CLASS — expected: CLASS <Name> [INHERITS <ParentName>]');
-    const name=cm[1],parent=cm[2]||null;
-    let depth=0,endIdx=-1;
-    for(let j=i;j<to;j++){if(/^CLASS\s+/i.test(lines[j].src))depth++;if(/^ENDCLASS/i.test(lines[j].src)){depth--;if(depth===0){endIdx=j;break;}}}
-    if(endIdx<0)this.err('Missing ENDCLASS for class "'+name+'"');
-    const attrs=[],procs={},funcs={};let visibility='PRIVATE',j=i+1;
-    while(j<endIdx){
-      const s=lines[j].src;
-      if(/^PRIVATE\s*$/i.test(s)){visibility='PRIVATE';j++;continue;}
-      if(/^PUBLIC\s*$/i.test(s)){visibility='PUBLIC';j++;continue;}
-      if(/^DECLARE\s+/i.test(s)){
-        const dm=s.match(/^DECLARE\s+((?:\w+\s*,\s*)*\w+)\s*(?::\s*(\w+(?:\[.*?\])?))?/i);
-        if(dm){const names=dm[1].split(',').map(n=>n.trim()).filter(Boolean),type=this.normalizeType(dm[2]||'');for(const nm of names)attrs.push({name:nm,type,visibility});}
-        j++;continue;}
-      if(/^PROCEDURE\s+/i.test(s)){
-        const pm=s.match(/^PROCEDURE\s+(\w+)\s*(?:\(([^)]*)\))?/i);if(!pm)this.err('Invalid PROCEDURE inside CLASS "'+name+'"');
-        const pname=pm[1],params=pm[2]?pm[2].split(',').map(p=>p.trim().split(/\s*:\s*/)[0].trim()):[];
-        let pd=0,pend=-1;for(let k=j;k<endIdx;k++){if(/^PROCEDURE\s+/i.test(lines[k].src))pd++;if(/^ENDPROCEDURE/i.test(lines[k].src)){pd--;if(pd===0){pend=k;break;}}}
-        if(pend<0)this.err('Missing ENDPROCEDURE for "'+pname+'" in CLASS "'+name+'"');
-        procs[pname]={params,body:lines.slice(j+1,pend),visibility};j=pend+1;continue;}
-      if(/^FUNCTION\s+/i.test(s)){
-        const fm2=s.match(/^FUNCTION\s+(\w+)\s*(?:\(([^)]*)\))?/i);if(!fm2)this.err('Invalid FUNCTION inside CLASS "'+name+'"');
-        const fname2=fm2[1],params=fm2[2]?fm2[2].split(',').map(p=>p.trim().split(/\s*:\s*/)[0].trim()):[];
-        let fd=0,fend=-1;for(let k=j;k<endIdx;k++){if(/^FUNCTION\s+/i.test(lines[k].src))fd++;if(/^ENDFUNCTION/i.test(lines[k].src)){fd--;if(fd===0){fend=k;break;}}}
-        if(fend<0)this.err('Missing ENDFUNCTION for "'+fname2+'" in CLASS "'+name+'"');
-        funcs[fname2]={params,body:lines.slice(j+1,fend),visibility};j=fend+1;continue;}
-      j++;
-    }
-    this.classes[name]={name,parent,attrs,procs,funcs};
-    this.output.push('[CLASS '+name+(parent?' INHERITS '+parent:'')+' defined]');
-    return endIdx+1;}
-  resolveMember(className,name){
-    let c=this.classes[className];const seen=new Set();
-    while(c&&!seen.has(c.name)){
-      seen.add(c.name);
-      if(c.procs&&name in c.procs)return Object.assign({},c.procs[name],{definedIn:c.name,kind:'procs'});
-      if(c.funcs&&name in c.funcs)return Object.assign({},c.funcs[name],{definedIn:c.name,kind:'funcs'});
-      c=c.parent?this.classes[c.parent]:null;
-    }
-    return null;}
-  resolveAttrDecl(className,name){
-    let c=this.classes[className];const seen=new Set();
-    while(c&&!seen.has(c.name)){
-      seen.add(c.name);
-      const found=c.attrs.find(a=>a.name===name);
-      if(found)return Object.assign({},found,{definedIn:c.name});
-      c=c.parent?this.classes[c.parent]:null;
-    }
-    return null;}
-  async instantiate(className,argStrs){
-    const cls=this.classes[className];
-    if(!cls)this.err('Class "'+className+'" is not declared — define it with CLASS '+className+' ... ENDCLASS first');
-    const chain=[];let c=cls;const seen=new Set();
-    while(c){
-      if(seen.has(c.name))this.err('Circular inheritance detected involving class "'+c.name+'" — a class cannot inherit from itself, directly or through a chain of parents');
-      seen.add(c.name);chain.unshift(c);
-      if(c.parent&&!this.classes[c.parent])this.err('Class "'+c.parent+'" (parent of "'+c.name+'") is not declared');
-      c=c.parent?this.classes[c.parent]:null;}
-    const attrs={},attrTypes={};
-    for(const kls of chain)for(const a of kls.attrs){
-      attrTypes[a.name]=a.type;
-      attrs[a.name]=(a.type==='INTEGER'||a.type==='REAL')?0:a.type==='STRING'?'':a.type==='BOOLEAN'?false:a.type.startsWith('ARRAY')?{}:null;
-    }
-    const instance={__pcObject:true,__class:className,attrs,attrTypes};
-    Object.defineProperty(instance,'toString',{value:()=>'<'+className+' object>',enumerable:false});
-    const ctor=this.resolveMember(className,'NEW');
-    if(ctor&&ctor.kind==='procs')await this.invokeMethod(instance,ctor,argStrs);
-    else if(argStrs.filter(a=>a.trim()!=='').length)this.err('Class "'+className+'" has no constructor PROCEDURE NEW but arguments were supplied');
-    return instance;}
-  async invokeMethod(instance,member,argStrs){
-    const child=this.makeChild();
-    const locals={};
-    // Attribute reads/writes go straight through to instance.attrs (the single shared
-    // source of truth) so nested SUPER/self calls that mutate it are never clobbered by
-    // a stale snapshot merged back afterwards; params/locals live only in `locals`.
-    child.env=new Proxy({},{
-      get:(_t,key)=>key in instance.attrs?instance.attrs[key]:locals[key],
-      set:(_t,key,val)=>{if(key in instance.attrs)instance.attrs[key]=val;else locals[key]=val;return true;},
-      has:(_t,key)=>key in instance.attrs||key in locals,
-      deleteProperty:(_t,key)=>{if(key in instance.attrs)delete instance.attrs[key];else delete locals[key];return true;},
-      ownKeys:()=>Array.from(new Set([...Object.keys(instance.attrs),...Object.keys(locals)])),
-      getOwnPropertyDescriptor:(_t,key)=>({enumerable:true,configurable:true,value:key in instance.attrs?instance.attrs[key]:locals[key]}),
-    });
-    child.thisInstance=instance;
-    child.currentClass=member.definedIn;
-    for(let idx=0;idx<member.params.length;idx++){if(argStrs[idx]!==undefined)child.env[member.params[idx]]=await this.eval(argStrs[idx]);}
-    let ret=null;
-    try{await child.execBlock(member.body,0,member.body.length);}catch(e){if(e.type==='return')ret=e.value;else throw e;}
-    this.output.push(...child.output);
-    return ret;}
-  async resolveInstance(path){
-    if(path.toUpperCase()==='SUPER'){
-      if(!this.thisInstance)this.err('SUPER can only be used inside a class method');
-      return this.thisInstance;
-    }
-    const val=await this.eval(path);
-    if(!val||typeof val!=='object'||!val.__pcObject)this.err('"'+path+'" is not an object instance — did you forget NEW, or is the variable declared with a class type?');
-    return val;}
-  async getObjectAttr(path,attrName){
-    const obj=await this.resolveInstance(path);
-    if(!(attrName in obj.attrs))this.err('Attribute "'+attrName+'" not found on class "'+obj.__class+'"');
-    const decl=this.resolveAttrDecl(obj.__class,attrName);
-    if(decl&&decl.visibility==='PRIVATE'&&!this.thisInstance)this.err('Attribute "'+attrName+'" is PRIVATE in class "'+decl.definedIn+'" — cannot be accessed from outside the class');
-    return obj.attrs[attrName];}
-  async setObjectAttr(path,attrName,value){
-    const obj=await this.resolveInstance(path);
-    const decl=this.resolveAttrDecl(obj.__class,attrName);
-    if(!decl)this.err('Attribute "'+attrName+'" not found on class "'+obj.__class+'"');
-    if(decl.visibility==='PRIVATE'&&!this.thisInstance)this.err('Attribute "'+attrName+'" is PRIVATE in class "'+decl.definedIn+'" — cannot be assigned from outside the class');
-    obj.attrs[attrName]=value;}
-  async callObjectMethod(path,methodName,argStrs){
-    let obj,startClass;const isSuper=path.toUpperCase()==='SUPER';
-    if(isSuper){
-      if(!this.thisInstance)this.err('SUPER can only be used inside a class method');
-      obj=this.thisInstance;
-      const curCls=this.currentClass?this.classes[this.currentClass]:null;
-      if(!curCls||!curCls.parent)this.err('SUPER.'+methodName+'(...) used, but this class has no parent (no INHERITS)');
-      startClass=curCls.parent;
-    } else { obj=await this.resolveInstance(path); startClass=obj.__class; }
-    const member=this.resolveMember(startClass,methodName);
-    if(!member)this.err('Method "'+methodName+'" not found on class "'+obj.__class+'"');
-    if(member.visibility==='PRIVATE'&&!this.thisInstance&&!isSuper)this.err('Method "'+methodName+'" is PRIVATE in class "'+member.definedIn+'" — cannot be called from outside the class');
-    return await this.invokeMethod(obj,member,argStrs);}
-  async callProc(callStr){
-    const m=callStr.match(/^(\w+)\s*(?:\(([^)]*)\))?/);if(!m)return;
-    const name=m[1],argStrs=m[2]?m[2].split(',').map(s=>s.trim()):[];
-    if(this.thisInstance&&!this.procedures[name]){
-      const self=this.resolveMember(this.thisInstance.__class,name);
-      if(self){await this.invokeMethod(this.thisInstance,self,argStrs);return;}
-    }
-    const proc=this.procedures[name];if(!proc){this.output.push('[CALL '+name+' — not defined]');return;}
-    const outerKeys=new Set(Object.keys(this.env));
-    const child=this.makeChild();
-    for(let idx=0;idx<proc.params.length;idx++){if(argStrs[idx]!==undefined)child.env[proc.params[idx]]=await this.eval(argStrs[idx]);}
-    try{await child.execBlock(proc.body,0,proc.body.length);}catch(e){if(e.type!=='return')throw e;}
-    this.output.push(...child.output);
-    for(const k of outerKeys)if(k in child.env)this.env[k]=child.env[k];}
-  async callFunc(name,argStrs){
-    const fn=this.functions[name];if(!fn)this.err('Function '+name+' not defined');
-    const child=this.makeChild();
-    for(let idx=0;idx<fn.params.length;idx++){if(argStrs[idx]!==undefined)child.env[fn.params[idx]]=await this.eval(argStrs[idx]);}
-    let ret=null;try{await child.execBlock(fn.body,0,fn.body.length);}catch(e){if(e.type==='return')ret=e.value;else throw e;}
-    this.output.push(...child.output);return ret;}
-  makeChild(){
-    // Every PROCEDURE/FUNCTION/method call funnels through here, so this is the one
-    // place that can catch runaway recursion. These calls are async, so a runaway never
-    // blows the JS stack — it would just consume memory until the tab freezes.
-    if(this.callDepth>=200)this.err('Maximum call depth (200) exceeded — this usually means a PROCEDURE or FUNCTION calls itself forever with no stopping condition (check your base case)');
-    const c=new PseudoInterpreter({},this.inputProvider);c.env=Object.assign({},this.env);c.types=Object.assign({},this.types);c.procedures=this.procedures;c.functions=this.functions;c.files=this.files;c.classes=this.classes;c.callDepth=this.callDepth+1;return c;}
-  async eval(raw){
-    const s=raw.trim();if(!s)return'';
-    const amp=this.splitTop(s,'&');if(amp.length>1){const vals=[];for(const p of amp)vals.push(String(await this.eval(p.trim())));return vals.join('');}
-    if(s.toUpperCase()==='TRUE')return true;if(s.toUpperCase()==='FALSE')return false;
-    if(s.toUpperCase()==='NULL')return null;
-    if(/^"[^"]*"$/.test(s))return s.slice(1,-1);if(/^'[^']*'$/.test(s))return s.slice(1,-1);
-    // NOT is handled *after* the OR/AND splits below, so that
-    // "NOT a AND b" parses as "(NOT a) AND b" — NOT binds tighter than AND/OR.
-    if(s[0]==='('&&this.matchParen(s)===s.length-1)return await this.eval(s.slice(1,-1));
-    const or=this.splitTop(s,'OR');if(or.length>1){let acc=false;for(const p of or)acc=acc||(await this.eval(p.trim()));return acc;}
-    const and=this.splitTop(s,'AND');if(and.length>1){let acc=true;for(const p of and)acc=acc&&(await this.eval(p.trim()));return acc;}
-    if(/^NOT\s+/i.test(s))return!(await this.eval(s.replace(/^NOT\s+/i,'')));
-    for(const op of['<=','>=','<>','!=','=','<','>']){const idx=this.findTop(s,op);if(idx>=0){const L=await this.eval(s.slice(0,idx).trim()),R=await this.eval(s.slice(idx+op.length).trim());if(op==='<=')return L<=R;if(op==='>=')return L>=R;if(op==='<>'||op==='!=')return L!=R;if(op==='=')return L==R;if(op==='<')return L<R;if(op==='>') return L>R;}}
-    const as=this.findAddSub(s);if(as>=0){const op=s[as],L=await this.eval(s.slice(0,as).trim()),R=await this.eval(s.slice(as+1).trim());return op==='+'?(typeof L==='string'||typeof R==='string'?String(L)+String(R):Number(L)+Number(R)):Number(L)-Number(R);}
-    const md=this.findMul(s);if(md){const L=Number(await this.eval(s.slice(0,md.idx).trim())),R=Number(await this.eval(s.slice(md.idx+md.op.length).trim()));if(md.op==='*')return L*R;if(md.op==='/')return L/R;if(md.op==='MOD')return L%R;if(md.op==='DIV')return Math.trunc(L/R);}
-    if(s[0]==='-')return-Number(await this.eval(s.slice(1)));
-    if(/^-?\d+(\.\d+)?$/.test(s))return Number(s);
-    const newM=s.match(/^NEW\s+(\w+)\s*\(/i);
-    if(newM){
-      const openIdx=newM[0].length-1,closeRel=this.matchParen(s.slice(openIdx));
-      if(closeRel>=0&&openIdx+closeRel===s.length-1){
-        const argsStr=s.slice(openIdx+1,s.length-1);
-        const args=argsStr.trim()?this.splitTop(argsStr,',').map(a=>a.trim()):[];
-        return await this.instantiate(newM[1],args);
-      }
-    }
-    const dcall=s.match(/^(.+)\.(\w+)\s*\(/);
-    if(dcall){
-      const openIdx=dcall[0].length-1,closeRel=this.matchParen(s.slice(openIdx));
-      if(closeRel>=0&&openIdx+closeRel===s.length-1){
-        const argsStr=s.slice(openIdx+1,s.length-1);
-        const args=argsStr.trim()?this.splitTop(argsStr,',').map(a=>a.trim()):[];
-        return await this.callObjectMethod(dcall[1].trim(),dcall[2],args);
-      }
-    }
-    const darr=s.match(/^(.+)\.(\w+)\[(.+)\]$/);
-    if(darr){
-      const val=await this.getObjectAttr(darr[1].trim(),darr[2]);
-      return (val&&typeof val==='object')?(val[await this.idxKey(darr[3])]??0):0;
-    }
-    const dattr=s.match(/^(.+)\.(\w+)$/);
-    if(dattr)return await this.getObjectAttr(dattr[1].trim(),dattr[2]);
-    const fm=s.match(/^(\w+)\s*\(/);
-    const fmOpenIdx=fm?fm[0].length-1:-1;
-    const fmCloseRel=fm?this.matchParen(s.slice(fmOpenIdx)):-1;
-    if(fm&&fmCloseRel>=0&&fmOpenIdx+fmCloseRel===s.length-1){
-      const fname=fm[1],argsStr=s.slice(fmOpenIdx+1,s.length-1);
-      const args=argsStr.trim()?this.splitTop(argsStr,',').map(a=>a.trim()):[];
-      switch(fname.toUpperCase()){
-        case'LENGTH':case'LEN':return String(await this.eval(args[0])).length;
-        case'UCASE':case'UPPER':return String(await this.eval(args[0])).toUpperCase();
-        case'LCASE':case'LOWER':return String(await this.eval(args[0])).toLowerCase();
-        case'SUBSTR':case'MID':case'SUBSTRING':{const st=String(await this.eval(args[0])),fr=Number(await this.eval(args[1]))-1,ln=args[2]?Number(await this.eval(args[2])):undefined;return ln!==undefined?st.substr(fr,ln):st.substr(fr);}
-        case'LEFT':return String(await this.eval(args[0])).slice(0,Number(await this.eval(args[1])));
-        case'RIGHT':{const st=String(await this.eval(args[0]));return st.slice(st.length-Number(await this.eval(args[1])));}
-        case'INT':return Math.trunc(Number(await this.eval(args[0])));
-        case'ROUND':{const places=args[1]!==undefined?Number(await this.eval(args[1])):0,factor=Math.pow(10,places);return Math.round(Number(await this.eval(args[0]))*factor)/factor;}
-        case'REAL':return parseFloat(await this.eval(args[0]));
-        case'STR':case'NUM_TO_STR':return String(await this.eval(args[0]));
-        case'NUM':case'STR_TO_NUM':return Number(await this.eval(args[0]));
-        case'ABS':return Math.abs(Number(await this.eval(args[0])));
-        case'SQRT':return Math.sqrt(Number(await this.eval(args[0])));
-        case'RANDOM':return Math.random();
-        case'ASC':return String(await this.eval(args[0])).charCodeAt(0);
-        case'CHR':return String.fromCharCode(Number(await this.eval(args[0])));
-        case'MOD':return Number(await this.eval(args[0]))%Number(await this.eval(args[1]));
-        case'DIV':return Math.trunc(Number(await this.eval(args[0]))/Number(await this.eval(args[1])));
-        case'EOF':{const fname=String(await this.eval(args[0])),f=this.files[fname];return!f||f.readIndex>=f.lines.length;}
-        case'TYPEOF':{const vn=args[0]?.trim();if(vn in this.types&&this.types[vn])return this.types[vn];return this._inferType(vn);}
-        case'ISINTEGER':case'IS_INTEGER':{const vn=args[0]?.trim();const t=this.types[vn]||'';if(t==='INTEGER')return true;if(t)return false;const v=await this.eval(vn);return typeof v==='number'&&Number.isInteger(v);}
-        case'ISREAL':case'IS_REAL':{const vn=args[0]?.trim();const t=this.types[vn]||'';if(t==='REAL')return true;if(t)return false;return typeof(await this.eval(vn))==='number';}
-        case'ISSTRING':case'IS_STRING':{const vn=args[0]?.trim();const t=this.types[vn]||'';if(t==='STRING')return true;if(t)return false;return typeof(await this.eval(vn))==='string';}
-        case'ISBOOLEAN':case'IS_BOOLEAN':{const vn=args[0]?.trim();const t=this.types[vn]||'';if(t==='BOOLEAN')return true;if(t)return false;return typeof(await this.eval(vn))==='boolean';}
-        case'ISARRAY':case'IS_ARRAY':{const vn=args[0]?.trim();const t=this.types[vn]||'';if(t.startsWith('ARRAY'))return true;if(t)return false;return typeof(await this.eval(vn))==='object';}
-        case'ISNUMERIC':case'IS_NUMERIC':{const v=String(await this.eval(args[0]?.trim()));return v.trim()!==''&&!isNaN(Number(v));}
-      }
-      if(this.thisInstance&&!this.functions[fname]){
-        const self=this.resolveMember(this.thisInstance.__class,fname);
-        if(self)return await this.invokeMethod(this.thisInstance,self,args);
-      }
-      if(this.functions[fname])return await this.callFunc(fname,args);return 0;}
-    const arrm=s.match(/^(\w+)\[(.+)\]$/);if(arrm){if(!(arrm[1] in this.env))this.err('Variable "'+arrm[1]+'" is not declared');const arr=this.env[arrm[1]];return(arr&&typeof arr==='object')?(arr[await this.idxKey(arrm[2])]??0):0;}
-    if(/^[A-Za-z_]\w*$/.test(s)){if(s in this.env)return this.env[s];this.err('Variable "'+s+'" is not declared');}
-    if(s[0]==='"'||s[0]==="'")this.err('Malformed string literal '+s+' — strings must start and end with matching " or \' quotes');
-    return s;}
-  matchParen(s){let d=0;for(let i=0;i<s.length;i++){if(s[i]==='(')d++;if(s[i]===')')d--;if(d===0)return i;}return-1;}
-  splitTop(s,op){const isKw=/^[A-Z]+$/.test(op);const parts=[];let depth=0,inStr=false,strCh='',buf='',i=0;while(i<s.length){const ch=s[i];if(inStr){buf+=ch;if(ch===strCh)inStr=false;i++;continue;}if(ch==='"'||ch==="'"){inStr=true;strCh=ch;buf+=ch;i++;continue;}if(ch==='('||ch==='['){depth++;buf+=ch;i++;continue;}if(ch===')'||ch===']'){depth--;buf+=ch;i++;continue;}if(depth===0){if(!isKw&&s.startsWith(op,i)){parts.push(buf);buf='';i+=op.length;continue;}if(isKw&&!(i>0&&/\w/.test(s[i-1]))){const rest=s.slice(i);const m=rest.match(new RegExp('^'+op+'\\b','i'));if(m){parts.push(buf);buf='';i+=m[0].length;continue;}}}buf+=ch;i++;}parts.push(buf);return parts;}
-  findTop(s,op){let depth=0,inStr=false,strCh='';for(let i=0;i<s.length;i++){const ch=s[i];if(inStr){if(ch===strCh)inStr=false;continue;}if(ch==='"'||ch==="'"){inStr=true;strCh=ch;continue;}if(ch==='(')depth++;if(ch===')')depth--;if(depth===0&&s.startsWith(op,i))return i;}return-1;}
-  findAddSub(s){let depth=0,inStr=false;for(let i=s.length-1;i>=0;i--){const ch=s[i];if(ch===')'||ch===']')depth++;if(ch==='('||ch==='[')depth--;if(ch==='"'||ch==="'")inStr=!inStr;if(!inStr&&depth===0&&(ch==='+'||ch==='-')){let j=i-1;while(j>=0&&/\s/.test(s[j]))j--;if(j>=0&&/[\w\)\]"']/.test(s[j]))return i;}}return-1;}
-  findMul(s){let depth=0,inStr=false;for(let i=s.length-1;i>=0;i--){const ch=s[i];if(ch===')')depth++;if(ch==='(')depth--;if(ch==='"'||ch==="'")inStr=!inStr;if(!inStr&&depth===0){if(ch==='*'||ch==='/')return{idx:i,op:ch};for(const kw of['MOD','DIV']){const start=i-kw.length+1;if(start>=0&&s.slice(start,i+1).toUpperCase()===kw){const before=start-1,after=i+1;if(!((before<0||/\W/.test(s[before]))&&(after>=s.length||/\W/.test(s[after]))))continue;let pb=before;while(pb>=0&&/\s/.test(s[pb]))pb--;if(!(pb>=0&&/[\w\)\]"']/.test(s[pb])))continue;return{idx:start,op:kw};}}}}return null;}
-  _inferType(vn){if(!(vn in this.env))return'UNDECLARED';const v=this.env[vn];if(typeof v==='boolean')return'BOOLEAN';if(typeof v==='number')return Number.isInteger(v)?'INTEGER':'REAL';if(typeof v==='string')return'STRING';if(typeof v==='object')return'ARRAY';return'UNKNOWN';}
-  err(msg){throw{type:'pseudo_error',msg,line:this.currentLine};}
-}
-
-// ═══════════════════════════════════════════
-//  RUN CELL
-// ═══════════════════════════════════════════
-async function runCell(id){
-  const code=getCode(id).trim();if(!code)return;
-  const outEl=document.getElementById('out-'+id);
-  const btn=document.getElementById('btn-run-'+id)||document.querySelector('#cell-'+id+' .btn-run');
-  const tag=document.getElementById('tag-'+id);
-  if(btn)btn.disabled=true;outEl.className='output-panel';
-  outEl.className='output-panel on';outEl.innerHTML='<div class="out-loading"><div class="spinner"></div> Running...</div>';
-  if(tag)tag.textContent='running...';await new Promise(r=>setTimeout(r,30));
-  let promptCount=0;
-  const liveInputProvider=async(varName)=>{promptCount++;return await promptInput(varName,promptCount);};
-  try{
-    const interp=new PseudoInterpreter(window._notebookState,liveInputProvider);
-    interp.procedures=Object.assign({},window._globalProcs);
-    interp.functions=Object.assign({},window._globalFuncs);
-    interp.files=Object.assign({},window._globalFiles);
-    interp.classes=Object.assign({},window._globalClasses);
-    const result=await interp.run(code);
-    for(const[name,value]of Object.entries(result.env)){
-      if(name in interp.types||name in window._notebookState)
-        window._notebookState[name]={type:result.types[name]||(window._notebookState[name]?window._notebookState[name].type:'UNKNOWN'),value,cellId:id};
-    }
-    Object.assign(window._globalProcs,interp.procedures);Object.assign(window._globalFuncs,interp.functions);Object.assign(window._globalFiles,interp.files);Object.assign(window._globalClasses,interp.classes);
-    const text=result.output||'(no output)';
-    outEl.textContent=text;outEl.className='output-panel on'+(text.startsWith('ERROR:')?' err':'');
-    if(tag)tag.textContent=text.startsWith('ERROR:')?'error':(text.includes('⏹ Execution stopped by user.')?'stopped':'run #'+(++window._executionCounter));
-    refreshStatePanel();
-  }catch(e){outEl.className='output-panel on err';outEl.textContent='ERROR: '+(e.msg||e.message);if(tag)tag.textContent='error';}
-  if(btn)btn.disabled=false;
-}
-
-async function runAllCells(){for(const c of cells)await runCell(c.id);}
-
-function clearAllOutputs(){
-  cells.forEach(c=>{const el=document.getElementById('out-'+c.id);if(el){el.className='output-panel';el.textContent='';}const t=document.getElementById('tag-'+c.id);if(t)t.textContent='not run';});
-  window._executionCounter=0;
-}
-
-// ═══════════════════════════════════════════
-//  DRAWER
-// ═══════════════════════════════════════════
-function openDrawer(){document.getElementById('nb-drawer').classList.add('open');document.getElementById('drawer-overlay').classList.add('open');if(window._fbUser)window.loadNotebookList();}
-function closeDrawer(){document.getElementById('nb-drawer').classList.remove('open');document.getElementById('drawer-overlay').classList.remove('open');}
-function newNotebook(){
-  if(!confirm('Start a new notebook? Current work will be cleared.'))return;
-  window._notebookState={}; window._executionCounter=0;
-  window._globalProcs={}; window._globalFuncs={}; window._globalFiles={}; window._globalClasses={}; window._currentNotebookId=null;
-  document.getElementById('cells-container').innerHTML=''; cells.length=0; window._cellIdCounter=0;
-  document.getElementById('nb-title').value='Untitled Notebook';
-  addCell();
-  saveLocalNotebookDebounced();
-  closeDrawer(); refreshStatePanel();
-}
-
-// ═══════════════════════════════════════════
-//  STUDENT VIEW
-// ═══════════════════════════════════════════
-function toggleStudentView(){
-  studentMode=!studentMode;
-  const btn=document.getElementById('view-btn'),banner=document.getElementById('s-banner');
-  if(studentMode){
-    document.body.classList.add('student');banner.classList.add('on');btn.classList.add('active');btn.innerHTML='✏️ Teacher View';
-    cells.forEach(c=>{const out=document.getElementById('out-'+c.id),lbl=document.getElementById('slbl-'+c.id);if(out&&!out.classList.contains('on')){out.classList.add('on');out.textContent='— not run yet —';out.style.color='#475569';out.style.fontStyle='italic';if(lbl)lbl._wasEmpty=true;}});
-  }else{
-    document.body.classList.remove('student');banner.classList.remove('on');btn.classList.remove('active');btn.innerHTML='👁 Student View';
-    cells.forEach(c=>{const out=document.getElementById('out-'+c.id),lbl=document.getElementById('slbl-'+c.id);if(lbl&&lbl._wasEmpty&&out){out.classList.remove('on');out.textContent='';out.style.color='';out.style.fontStyle='';lbl._wasEmpty=false;}});
-  }
-}
-
-// ═══════════════════════════════════════════
-//  DARK MODE
-// ═══════════════════════════════════════════
-function updateThemeBtn(){
-  const btn=document.getElementById('theme-btn');
-  if(!btn)return;
-  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  btn.textContent=isDark?'☀️':'🌙';
-  btn.title=isDark?'Switch to light mode':'Switch to dark mode';
-}
-function toggleDarkMode(){
-  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
-  if(isDark){document.documentElement.removeAttribute('data-theme');localStorage.setItem('pseudolab-theme','light');}
-  else{document.documentElement.setAttribute('data-theme','dark');localStorage.setItem('pseudolab-theme','dark');}
-  updateThemeBtn();
-}
-updateThemeBtn();
-
-// ═══════════════════════════════════════════
-//  PANEL TOGGLES + HELPERS
-// ═══════════════════════════════════════════
-function toggleRef(){const b=document.getElementById('ref-body'),i=document.getElementById('ref-icon'),o=b.classList.toggle('open');i.textContent=o?'▼ Hide':'▶ Show';}
-function toggleState(){const b=document.getElementById('state-body'),i=document.getElementById('state-icon'),o=b.classList.toggle('open');i.textContent=o?'▼ Hide':'▶ Show';}
-
-function focusNextCell(id){
-  const idx=cells.findIndex(c=>c.id===id);
-  if(idx<0||idx>=cells.length-1)return;
-  const ta=document.getElementById('code-'+cells[idx+1].id);
-  if(!ta)return;
-  if(ta._cmView)ta._cmView.focus();else ta.focus();
-}
-
-function handleKeydown(e,id){
-  if(e.key==='-'&&e.target.tagName==='TEXTAREA'){const ta=e.target,pos=ta.selectionStart,before=ta.value.slice(Math.max(0,pos-1),pos);if(before==='<'){e.preventDefault();ta.value=ta.value.slice(0,pos-1)+'←'+ta.value.slice(pos);ta.selectionStart=ta.selectionEnd=pos;return;}}
-  if(e.key==='Enter'&&e.altKey){e.preventDefault();focusNextCell(id);return;}
-  if(e.key==='Enter'&&(e.ctrlKey||e.metaKey||e.shiftKey)){e.preventDefault();runCell(id);}
-}
-window._pseudolabAuthor = 'Daichi Yamamoto'; // © 2026 — PSEUDOLAB-DY-2026-f250276d70de2464 — do not remove
+const quizData={basics:[['Which keyword declares a variable?',['INPUT','DECLARE','OUTPUT','NEXT'],1,'DECLARE states variables and data types.'],['Best data type for a name?',['INTEGER','REAL','STRING','BOOLEAN'],2,'Names are text, so use STRING.'],['What does <- mean?',['Equal to','Assignment','Not equal','End'],1,'<- assigns a value.'],['Best data type for whole-number age?',['INTEGER','REAL','STRING','CHAR'],0,'Whole numbers use INTEGER.'],['Why does sequence matter?',['It changes names','It removes declarations','It avoids loops','Order affects result'],3,'Algorithms run in order.']],selection:[['Which keyword ends IF?',['NEXT','ENDWHILE','ENDIF','STOP'],2,'ENDIF closes IF.'],['Both conditions true?',['OR','AND','NOT','OTHERWISE'],1,'AND requires both.'],['Best for menu choices?',['CASE OF','DECLARE','OUTPUT','LENGTH'],0,'CASE OF handles fixed choices.'],['Not equal operator?',['=','<=','>=','<>'],3,'<> means not equal.'],['Invalid CASE choice?',['NEXT','THEN','OTHERWISE','INPUT'],2,'OTHERWISE handles other values.']],loops:[['Exactly 10 repetitions?',['FOR','CASE','IF','DECLARE'],0,'FOR is count-controlled.'],['Always runs once?',['FOR','WHILE','REPEAT UNTIL','CASE'],2,'REPEAT UNTIL tests at the end.'],['May run zero times?',['REPEAT','WHILE','OUTPUT','CASE'],1,'WHILE tests at the start.'],['Closes FOR loop?',['ENDIF','ENDCASE','UNTIL','NEXT Counter'],3,'NEXT closes FOR.'],['Sentinel value?',['Stop value','Data type','Declaration','Trace column'],0,'A sentinel stops input.']],methods:[['Total starts at?',['0','1','100','TRUE'],0,'Totals usually start at 0.'],['Increment counter?',['Count <- Count - 1','Count <- Count + 1','Count <- 0','Count <- Total'],1,'Add 1 to Count.'],['Average formula?',['Total * Count','Count / Total','Total + Count','Total / Count'],3,'Average is total divided by count.'],['In a linear search, the flag Found starts as?',['TRUE','FALSE','1','100'],1,'Found starts FALSE and only becomes TRUE when the item is located.'],['To find the highest value in a list, Highest should be set to...?',['0','The first value in the list','1000','The last value in the list'],1,'Starting at the first value works for every list, including one made only of negative numbers.'],['Which comparison is used when finding the LOWEST value?',['IF Number > Lowest','IF Number = Lowest','IF Number < Lowest','IF Number <> Lowest'],2,'Finding the minimum uses < ; finding the maximum uses > .']],linearsearch:[['What causes the search loop to stop early, before reaching the end of the list?',['The counter reaches zero','The Found flag becomes TRUE','The array runs out of memory','The list is sorted first'],1,'Found is set to TRUE as soon as a match is located, which ends the loop immediately.'],['What data type must Found be declared as?',['INTEGER','STRING','BOOLEAN','CHAR'],2,'Found can only hold TRUE or FALSE, so it is a BOOLEAN.'],['In the worst case, how many comparisons does a linear search need for a 40-item list?',['1 comparison','20 comparisons','0 comparisons','40 comparisons'],3,'If the item is last or missing, every one of the 40 items must be checked.']],bubblesort:[['What happens to Last after each complete pass through the list?',['It decreases by one','It increases by one','It resets back to one','It stays exactly the same'],0,'Each pass places the next-largest value correctly, so Last is reduced by one to skip it next time.'],['What condition ends the REPEAT...UNTIL loop in the sample bubble sort?',['Index reaches First','The array becomes empty','No swap was made or Last equals one','Temperature exceeds one hundred'],2,'The loop stops once a full pass makes no swaps, or Last has been reduced to one.'],['Why are two neighbouring elements swapped during a pass?',['Because they are exactly equal','Because they are out of the correct order','Because the loop has just finished','Because Last has reached zero'],1,'A swap happens whenever an element is greater than the one next to it, fixing the order.']],validation:[['Value between limits?',['Presence','Range','Length','Double entry'],1,'Range check tests lower and upper limits.'],['Blank input check?',['Presence','Range','Length','Bubble'],0,'Presence check prevents blanks.'],['Exactly 8 chars?',['Range','Length','Double entry','Trace'],1,'Length check counts characters.'],['Data entered twice?',['Range','Length','Double entry','CASE'],2,'Double entry verifies matching inputs.'],['Valid mark 0-100 rejects?',['50','0','101','100'],2,'101 is outside the range.']],testing:[['Normal data means?',['Expected valid data','Invalid data','Boundary outside','No data'],0,'Normal data should be accepted.'],['Extreme values for 0-100?',['-1 and 101','0 and 100','50 and 60','0 and 101'],1,'Extreme values are valid ends.'],['Boundary for lower end 0?',['-1 and 0','0 and 1','99 and 100','100 and 101'],0,'Boundary checks just outside and just inside.'],['Trace table records?',['Variable changes','Only headings','Only code','Only comments'],0,'Trace tables record changing values.'],['Missing keyword after IF?',['NEXT','ENDIF','ENDCASE','DECLARE'],1,'IF blocks end with ENDIF.']],functions:[['What is the key difference between a FUNCTION and a PROCEDURE?',['A FUNCTION always returns a value; a PROCEDURE does not','A PROCEDURE always returns a value; a FUNCTION does not','They are exactly the same','A FUNCTION cannot take parameters'],0,'A FUNCTION always RETURNS a value; a PROCEDURE performs a task without returning one.'],['How do you invoke a PROCEDURE named PrintReport?',['PrintReport()','CALL PrintReport()','RETURN PrintReport()','OUTPUT PrintReport()'],1,'PROCEDUREs are invoked with the CALL command.'],['Which keyword must appear in a FUNCTION header but never in a PROCEDURE header?',['CALL','RETURNS','DECLARE','ENDFUNCTION'],1,'RETURNS specifies the data type of the value a FUNCTION sends back.'],['Which statement sends a value back to the calling code inside a FUNCTION?',['OUTPUT','CALL','RETURN','INPUT'],2,'RETURN passes the result back and ends the FUNCTION.'],['A parameter declared BYREF instead of BYVAL means...?',['The parameter is optional','Changes made inside the subroutine also change the original argument','The parameter must be a STRING','The subroutine cannot use the parameter'],1,'BYREF passes a reference so changes affect the original variable; BYVAL passes a copy.']]};
+function renderQuizzes(){document.querySelectorAll('[data-quiz]').forEach(function(sec){var key=sec.getAttribute('data-quiz');var grid=sec.querySelector('.quiz-grid');grid.innerHTML=quizData[key].map(function(q,i){return '<div class="q" data-correct="'+q[2]+'" data-explain="'+q[3]+'"><p>'+(i+1)+'. '+q[0]+'</p>'+q[1].map(function(a,j){return '<label><input type="radio" name="'+key+i+'" value="'+j+'"> '+a+'</label>';}).join('')+'<div class="feedback"></div></div>';}).join('');sec.querySelector('.score').textContent='Score: 0 / '+quizData[key].length;});}
+function updateScore(sec){var qs=sec.querySelectorAll('.q');var score=0;qs.forEach(function(q){if(q.classList.contains('correct'))score++;});sec.querySelector('.score').textContent='Score: '+score+' / '+qs.length;}
+document.addEventListener('change',function(e){if(!e.target.matches('.q input'))return;var q=e.target.closest('.q');var sec=e.target.closest('.quiz');var correct=q.getAttribute('data-correct');var fb=q.querySelector('.feedback');q.classList.remove('correct','wrong');if(e.target.value===correct){q.classList.add('correct');fb.innerHTML='<span class="good">Correct.</span> '+q.getAttribute('data-explain');}else{q.classList.add('wrong');var right=q.querySelector('input[value="'+correct+'"]').parentElement.textContent.trim();fb.innerHTML='<span class="bad">Incorrect.</span> Correct answer: <strong>'+right+'</strong>. '+q.getAttribute('data-explain');}updateScore(sec);});
+renderQuizzes();
 </script>
-<!-- © 2026 Daichi Yamamoto. All Rights Reserved. PSEUDOLAB-DY-2026-f250276d70de2464 -->
 </body>
 </html>
