@@ -10,11 +10,12 @@
 <style>
 :root{--bg:#f6f8fb;--text:#1f2937;--line:#e5e7eb;--blue:#dbeafe;--green:#dcfce7;--yellow:#fef3c7;--purple:#ede9fe;--red:#fee2e2;--orange:#ffedd5;--teal:#99f6e4;--dark:#101827;--top:#1f2740;--kw:#4da3ff;--type:#ff9f3f;--str:#bf5cff;--num:#9cdcfe}
 *{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}header{background:linear-gradient(135deg,#1d4ed8,#6d28d9);color:white;text-align:center;padding:42px 20px}header h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3.2rem)}header p{max-width:950px;margin:auto;color:#e0e7ff}nav{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:10px 14px;z-index:10;display:flex;flex-wrap:wrap;gap:6px 8px;max-height:96px;overflow-y:auto}nav a{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3;text-decoration:none;font-weight:800;font-size:.82rem;white-space:nowrap}@media (max-width:600px){nav{max-height:130px}nav a{font-size:.72rem;padding:5px 8px}}.card{scroll-margin-top:76px}.card:target{box-shadow:0 0 0 4px #6d28d9}.container{max-width:1180px;margin:auto;padding:26px 18px 60px}.section-title{font-size:1.85rem;margin:42px 0 16px}.grid{display:grid;grid-template-columns:1fr;gap:18px}.card,.quiz,.answers,.project{background:white;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px rgba(15,23,42,.07);overflow:hidden}.head{padding:16px 18px;font-weight:900;font-size:1.12rem}.blue .head{background:var(--blue);color:#1d4ed8}.green .head{background:var(--green);color:#15803d}.yellow .head{background:var(--yellow);color:#b45309}.purple .head{background:var(--purple);color:#6d28d9}.red .head{background:var(--red);color:#b91c1c}.orange .head{background:var(--orange);color:#c2410c}.teal .head{background:var(--teal);color:#0f766e}.body{padding:18px}.step{display:flex;align-items:center;gap:8px;margin:16px 0 7px;font-weight:900}.step:first-child{margin-top:0}.step span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#111827;color:white;font-size:.85rem}pre{margin:0;background:var(--dark);color:white;border-top:8px solid var(--top);border-radius:16px;padding:16px;overflow-x:visible;font-size:.95rem;line-height:1.55;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}code{font-family:Consolas,Monaco,'Courier New',monospace;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}.kw{color:var(--kw);font-weight:900}.type{color:var(--type);font-weight:900}.str{color:var(--str);font-weight:800}.num{color:var(--num)}.comment{color:#7f9a72;font-style:italic}.task{border:1px dashed #cbd5e1;background:#f9fafb;border-radius:14px;padding:12px 14px}.quiz{padding:24px;margin:28px 0 36px}.quiz h2{margin-top:0}.quiz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}.q{border:1px solid var(--line);border-radius:18px;background:#f9fafb;padding:14px}.q p{margin:0 0 10px;font-weight:900}.q label{display:block;margin:7px 0;padding:9px 10px;border:1px solid #e5e7eb;background:white;border-radius:10px;cursor:pointer}.q.correct{border-color:#86efac;background:#f0fdf4}.q.wrong{border-color:#fecaca;background:#fff1f2}.feedback{font-weight:900;margin-top:8px}.good{color:#15803d}.bad{color:#b91c1c}.score{margin-top:14px;padding:12px 14px;background:#eef2ff;color:#3730a3;border-radius:14px;font-weight:900}.answers,.project{padding:24px;margin-top:34px}details{border:1px solid var(--line);border-radius:14px;background:#f9fafb;padding:12px 14px;margin:12px 0}summary{font-weight:900;cursor:pointer}.answer-space{min-height:110px;border:2px dashed #cbd5e1;border-radius:16px;padding:14px;color:#6b7280;background:white}.scenario-answer,.own-answer{border:none;background:none;padding:0;margin:10px 0 0}.scenario-answer summary,.own-answer summary{list-style:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;font-weight:800;cursor:pointer;font-size:.88rem}.scenario-answer summary::-webkit-details-marker,.own-answer summary::-webkit-details-marker{display:none}.scenario-answer summary{background:#111827;color:white}.scenario-answer summary::before{content:"💡"}.scenario-answer[open] summary{background:#4338ca}.scenario-answer[open] summary::before{content:"✅"}.own-answer summary{background:#374151;color:white}.own-answer summary::before{content:"📝"}.own-answer[open] summary{background:#0f766e}.own-answer[open] summary::before{content:"✅"}.scenario-answer .task,.own-answer .task{margin-top:10px}.scenario-answer pre,.own-answer pre{margin-top:10px}footer{text-align:center;color:#6b7280;padding:32px}
+.practice-group{display:flex;flex-direction:column;gap:18px;margin-bottom:10px}.practice-card{background:white;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px rgba(15,23,42,.07);padding:20px 22px}.practice-card .ptitle{font-weight:900;font-size:1.05rem;margin-bottom:6px}.practice-card .ptier{font-weight:700;color:#9ca3af;font-size:.72rem;text-transform:uppercase;letter-spacing:.03em}.practice-card .task{margin:10px 0}.practice-card .pconcept{color:#4b5563;margin:8px 0 4px;font-size:.85rem}.practice-card .phint{color:#6b7280;font-size:.85rem;margin:0 0 12px;font-style:italic}.card-toolbar{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.copy-btn{flex:none;background:#eef2ff;color:#3730a3;border:1px solid #c7d2fe;border-radius:999px;padding:6px 12px;font-weight:800;font-size:.72rem;cursor:pointer;white-space:nowrap}.copy-btn:hover{background:#e0e7ff}.copy-btn.copied{background:#dcfce7;color:#15803d;border-color:#86efac}.editor-wrap{position:relative;border-radius:16px;overflow:hidden;border-top:8px solid var(--top)}.editor-wrap .code-highlight{margin:0;background:var(--dark);color:#e5e7eb;padding:14px 16px;font-family:Consolas,Monaco,'Courier New',monospace;font-size:.92rem;line-height:1.5;white-space:pre;min-height:150px;pointer-events:none;overflow:auto;border-top:none}.code-editor{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:14px 16px;background:transparent;color:transparent;caret-color:#e5e7eb;border:none;font-family:Consolas,Monaco,'Courier New',monospace;font-size:.92rem;line-height:1.5;white-space:pre;resize:none;overflow:auto}.run-btn{margin-top:10px;background:#1d4ed8;color:white;border:none;border-radius:999px;padding:9px 18px;font-weight:800;cursor:pointer;font-size:.85rem}.run-btn:hover{background:#1e40af}.test-result{margin-top:12px;font-size:.85rem}.test-line{padding:7px 10px;border-radius:10px;margin-bottom:6px}.test-line.pass{background:#f0fdf4;color:#15803d}.test-line.fail{background:#fff1f2;color:#b91c1c}.test-line code{background:rgba(0,0,0,.06);padding:1px 5px;border-radius:5px;color:inherit}.overall-msg{margin-top:8px;font-weight:900}.overall-msg.pass{color:#15803d}.overall-msg.fail{color:#b91c1c}.output-block{margin-bottom:14px}.output-label{font-weight:800;font-size:.78rem;color:#374151;margin:0 0 4px}.output-box{margin:0 0 8px;background:#0b1220;color:#d1fae5;border-radius:12px;padding:10px 14px;font-family:Consolas,Monaco,'Courier New',monospace;font-size:.85rem;line-height:1.5;white-space:pre-wrap;word-break:break-word;max-height:220px;overflow:auto}.output-box.expected{color:#fecdd3;background:#1f1315}.autocomplete-dropdown{position:absolute;z-index:20;background:#1a2233;border:1px solid #33415c;border-radius:10px;box-shadow:0 10px 24px rgba(0,0,0,.35);max-height:180px;overflow-y:auto;min-width:160px;font-family:Consolas,Monaco,'Courier New',monospace;font-size:.82rem}.autocomplete-item{padding:6px 12px;color:#e5e7eb;cursor:pointer;display:flex;justify-content:space-between;gap:10px;white-space:nowrap}.autocomplete-item .ac-tag{font-size:.68rem;color:#93c5fd;font-family:Arial,Helvetica,sans-serif}.autocomplete-item.active,.autocomplete-item:hover{background:#2c3a56}
 </style>
 </head>
 <body>
 <header><h1>IGCSE 0478 Pseudocode Skills</h1><p><strong>Created by Daichi Yamamoto</strong><br>Colored skill boxes, coding-format answers, and 5 auto-graded MCQs after each section. Click any MCQ answer to get immediate feedback.</p></header>
-<nav><a href="#topic1">1. Assignment</a><a href="#topic2">2. INPUT / OUTPUT</a><a href="#topic3">3. Sequence</a><a href="#topic4">4. IF THEN ELSE</a><a href="#topic5">5. Nested IF</a><a href="#topic6">6. CASE OF</a><a href="#topic7">7. FOR Loop</a><a href="#topic8">8. REPEAT UNTIL</a><a href="#topic9">9. WHILE Loop</a><a href="#topic10">10. Totalling / Counting / Average</a><a href="#topic11">11. Finding the Maximum</a><a href="#topic12">12. Finding the Minimum</a><a href="#topic13">13. Linear Search</a><a href="#topic14">14. Bubble Sort</a><a href="#topic15">15. Range Check</a><a href="#topic16">16. Length / Presence / Double Entry</a><a href="#topic17">17. Test Data</a><a href="#topic18">18. Trace Tables / Errors</a><a href="#topic19">19. Procedures</a><a href="#topic20">20. Functions</a><a href="#answers">Answers</a><a href="Answers.pdf" target="_blank" rel="noopener">Answer Key (PDF)</a></nav>
+<nav><a href="#topic1">1. Assignment</a><a href="#topic2">2. INPUT / OUTPUT</a><a href="#topic3">3. Sequence</a><a href="#topic4">4. IF THEN ELSE</a><a href="#topic5">5. Nested IF</a><a href="#topic6">6. CASE OF</a><a href="#topic7">7. FOR Loop</a><a href="#topic8">8. REPEAT UNTIL</a><a href="#topic9">9. WHILE Loop</a><a href="#topic10">10. Totalling / Counting / Average</a><a href="#topic11">11. Finding the Maximum</a><a href="#topic12">12. Finding the Minimum</a><a href="#topic13">13. Linear Search</a><a href="#topic14">14. Bubble Sort</a><a href="#topic15">15. Range Check</a><a href="#topic16">16. Length / Presence / Double Entry</a><a href="#topic17">17. Test Data</a><a href="#topic18">18. Trace Tables / Errors</a><a href="#topic19">19. Procedures</a><a href="#topic20">20. Functions</a><a href="#looppractice">21. Loop Coding Practice</a><a href="#answers">Answers</a><a href="Answers.pdf" target="_blank" rel="noopener">Answer Key (PDF)</a></nav>
 <main class="container">
 <h2 id="basics" class="section-title">1. Basics</h2>
 <section class="grid">
@@ -890,6 +891,15 @@ Area &lt;- CalculateArea(<span class="num">5</span>, <span class="num">3</span>)
 <span class="kw">OUTPUT</span> Area</code></pre></details></div></article></section>
 <section class="quiz" data-quiz="functions"><h2>Functions and Procedures MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
 
+<h2 id="looppractice" class="section-title">21. Loop Coding Practice (Auto-Checked)</h2>
+<p style="max-width:900px;margin:-6px 0 20px;color:#4b5563">Write real pseudocode for each problem below, then press <strong>Run &amp; Check</strong> — your code runs in a live pseudocode interpreter right in the browser and is automatically marked correct or incorrect against the expected output. 10 FOR loop, 10 WHILE loop, and 10 REPEAT UNTIL problems, each set going from basic → medium → applied.</p>
+<h3 style="margin:30px 0 4px">FOR Loop Practice (10)</h3>
+<div id="forloop-practice" class="practice-group"></div>
+<h3 style="margin:34px 0 4px">WHILE Loop Practice (10)</h3>
+<div id="whileloop-practice" class="practice-group"></div>
+<h3 style="margin:34px 0 4px">REPEAT UNTIL Practice (10)</h3>
+<div id="repeatuntil-practice" class="practice-group"></div>
+
 <section id="answers" class="answers"><h2>Answer Page — Coding Format</h2><p style="margin:-6px 0 18px"><a href="Answers.pdf" target="_blank" rel="noopener" style="font-weight:900;color:#1d4ed8">Download the full Answer Key (coding answers + MCQ answers) as a PDF →</a></p><details open><summary>Basics Answers</summary><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
 
 Amount &lt;- <span class="num">100</span>
@@ -1013,6 +1023,608 @@ function renderQuizzes(){document.querySelectorAll('[data-quiz]').forEach(functi
 function updateScore(sec){var qs=sec.querySelectorAll('.q');var score=0;qs.forEach(function(q){if(q.classList.contains('correct'))score++;});sec.querySelector('.score').textContent='Score: '+score+' / '+qs.length;}
 document.addEventListener('change',function(e){if(!e.target.matches('.q input'))return;var q=e.target.closest('.q');var sec=e.target.closest('.quiz');var correct=q.getAttribute('data-correct');var fb=q.querySelector('.feedback');q.classList.remove('correct','wrong');if(e.target.value===correct){q.classList.add('correct');fb.innerHTML='<span class="good">Correct.</span> '+q.getAttribute('data-explain');}else{q.classList.add('wrong');var right=q.querySelector('input[value="'+correct+'"]').parentElement.textContent.trim();fb.innerHTML='<span class="bad">Incorrect.</span> Correct answer: <strong>'+right+'</strong>. '+q.getAttribute('data-explain');}updateScore(sec);});
 renderQuizzes();
+
+// ── Loop Coding Practice: live pseudocode interpreter + auto-checker ──
+// Ported from Pseudocode_practice/interpreter.js (Cambridge 9618 pseudocode interpreter),
+// reused here so student code is actually run and checked, not just multiple-choice.
+// ← and <- are the same assignment arrow — accept either spelling everywhere (typed, pasted,
+// or hand-written), same as the full Pseudocode_IDE where typing "<-" auto-converts to "←".
+function normalizeArrows(src){
+  let out='',inStr=false,strCh='';
+  for(let i=0;i<src.length;i++){
+    const ch=src[i];
+    if(inStr){ out+=ch; if(ch===strCh) inStr=false; continue; }
+    if(ch==='"'||ch==="'"){ inStr=true; strCh=ch; out+=ch; continue; }
+    if(ch==='<' && src[i+1]==='-'){ out+='←'; i++; continue; }
+    out+=ch;
+  }
+  return out;
+}
+class PseudoInterpreter {
+  constructor(shared = {}, opts = {}) {
+    this.env = {}; this.types = {};
+    for (const [k, v] of Object.entries(shared)) { this.env[k] = v.value; this.types[k] = v.type; }
+    this.procedures = {}; this.functions = {}; this.output = []; this.inputValues = []; this.files = {};
+    this.silent = !!opts.silent;
+  }
+  run(src) {
+    src = normalizeArrows(src);
+    const lines = this.tokenize(src.split('\n').map(l => l.trimEnd()));
+    try { this.execBlock(lines, 0, lines.length); }
+    catch (e) {
+      if (e.type === 'return') { }
+      else if (e.type === 'pseudo_error') this.output.push('ERROR: ' + e.msg);
+      else this.output.push('ERROR: ' + e.message);
+    }
+    return { output: this.output.join('\n'), env: this.env, types: this.types };
+  }
+  tokenize(lines) { return lines.map((raw, i) => ({ raw, src: raw.replace(/\/\/.*$/, '').trim(), ln: i + 1 })).filter(l => l.src.length > 0); }
+  execBlock(lines, from, to) { let i = from; while (i < to) i = this.execLine(lines, i, to); }
+  execLine(lines, i, to) {
+    const s = lines[i].src;
+    if (/^DECLARE\s+/i.test(s)) {
+      const m = s.match(/^DECLARE\s+(\w+)\s*(?::\s*(\w+(?:\[.*?\])?))?/i);
+      if (m) {
+        const name = m[1], type = (m[2] || '').toUpperCase();
+        this.types[name] = type || 'UNKNOWN';
+        if (!(name in this.env)) {
+          if (type === 'INTEGER' || type === 'REAL') this.env[name] = 0;
+          else if (type === 'STRING') this.env[name] = '';
+          else if (type === 'BOOLEAN') this.env[name] = false;
+          else if (type.startsWith('ARRAY')) this.env[name] = {};
+          else this.env[name] = null;
+        }
+      }
+      return i + 1;
+    }
+    if (/^CONSTANT\s+/i.test(s)) { const m = s.match(/^CONSTANT\s+(\w+)\s*[=←]\s*(.+)/i); if (m) this.env[m[1]] = this.eval(m[2].trim()); return i + 1; }
+    if (/^OUTPUT\s+/i.test(s)) {
+      const rest = s.replace(/^OUTPUT\s+/i, '').trim();
+      const parts = this.splitTop(rest, ',');
+      this.output.push(parts.map(p => String(this.eval(p.trim()))).join(''));
+      return i + 1;
+    }
+    if (/^INPUT\s+/i.test(s)) {
+      const name = s.replace(/^INPUT\s+/i, '').trim();
+      const raw = this.inputValues.length > 0 ? this.inputValues.shift() : '';
+      const type = this.types[name] || ''; let val = raw;
+      if ((type === 'INTEGER' || type === 'REAL') && raw !== '' && !isNaN(Number(raw))) val = type === 'INTEGER' ? parseInt(raw) : parseFloat(raw);
+      else if (type === 'BOOLEAN') val = String(raw).toLowerCase() === 'true';
+      this.env[name] = val;
+      if (!this.silent) this.output.push('INPUT ' + name + ' → ' + val);
+      return i + 1;
+    }
+    if (/^CALL\s+/i.test(s)) { this.callProc(s.replace(/^CALL\s+/i, '').trim()); return i + 1; }
+    if (/^RETURN\s+/i.test(s)) throw { type: 'return', value: this.eval(s.replace(/^RETURN\s+/i, '').trim()) };
+    if (/^IF\s+/i.test(s)) return this.execIf(lines, i, to);
+    if (/^FOR\s+/i.test(s)) return this.execFor(lines, i, to);
+    if (/^WHILE\s+/i.test(s)) return this.execWhile(lines, i, to);
+    if (/^REPEAT$/i.test(s)) return this.execRepeat(lines, i, to);
+    if (/^CASE\s+OF\s+/i.test(s)) return this.execCase(lines, i, to);
+    if (/^PROCEDURE\s+/i.test(s)) return this.collectProc(lines, i, to);
+    if (/^FUNCTION\s+/i.test(s)) return this.collectFunc(lines, i, to);
+    if (/^(ENDIF|ENDWHILE|ENDCASE|NEXT|UNTIL|ELSE|THEN|ENDPROCEDURE|ENDFUNCTION|OTHERWISE|RETURNS)(\s|$)/i.test(s)) return i + 1;
+    const am = s.match(/^([A-Za-z_]\w*(?:\[.+?\])?(?:\.\w+)?)\s*←\s*(.+)$/);
+    if (am) { this.assign(am[1].trim(), am[2].trim()); return i + 1; }
+    if (/^[A-Za-z_]\w*\s*\(/.test(s)) { this.callProc(s); return i + 1; }
+    return i + 1;
+  }
+  assign(lhs, rhs) {
+    const m = lhs.match(/^(\w+)\[(.+)\]$/);
+    if (m) { const name = m[1], idx = this.idxKey(m[2]); if (typeof this.env[name] !== 'object' || this.env[name] === null) this.env[name] = {}; this.env[name][idx] = this.eval(rhs); }
+    else this.env[lhs] = this.eval(rhs);
+  }
+  idxKey(s) { return this.splitTop(s, ',').map(p => this.eval(p.trim())).join(','); }
+  execIf(lines, i, to) {
+    const condStr = lines[i].src.replace(/^IF\s+/i, '').replace(/\s+THEN\s*$/i, '').trim();
+    let depth = 0, thenIdx = -1, elseIdx = -1, endIdx = -1;
+    for (let j = i; j < to; j++) {
+      const u = lines[j].src.toUpperCase();
+      if (/^IF\s+/.test(u)) depth++;
+      if (depth === 1 && /\bTHEN\b/.test(u) && thenIdx < 0) thenIdx = j;
+      if (depth === 1 && /^ELSE$/.test(u) && elseIdx < 0) elseIdx = j;
+      if (/^ENDIF/.test(u)) { depth--; if (depth === 0) { endIdx = j; break; } }
+    }
+    if (endIdx < 0) this.err('Missing ENDIF');
+    const tS = thenIdx >= 0 ? thenIdx + 1 : i + 1, tE = elseIdx >= 0 ? elseIdx : endIdx;
+    const eS = elseIdx >= 0 ? elseIdx + 1 : endIdx, eE = endIdx;
+    if (this.eval(condStr)) this.execBlock(lines, tS, tE); else this.execBlock(lines, eS, eE);
+    return endIdx + 1;
+  }
+  execFor(lines, i, to) {
+    const m = lines[i].src.match(/^FOR\s+(\w+)\s*←\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$/i);
+    if (!m) this.err('Invalid FOR');
+    const vn = m[1], stop = Number(this.eval(m[3])), step = m[4] ? Number(this.eval(m[4])) : 1;
+    let depth = 0, nextIdx = -1;
+    for (let j = i; j < to; j++) {
+      if (/^FOR\s+/i.test(lines[j].src)) depth++;
+      if (/^NEXT\s+/i.test(lines[j].src)) { depth--; if (depth === 0) { nextIdx = j; break; } }
+    }
+    if (nextIdx < 0) this.err('Missing NEXT');
+    this.env[vn] = Number(this.eval(m[2])); let iter = 0;
+    while ((step > 0 ? this.env[vn] <= stop : this.env[vn] >= stop) && iter++ < 10000) {
+      this.execBlock(lines, i + 1, nextIdx);
+      this.env[vn] = Number(this.env[vn]) + step;
+    }
+    if (iter >= 10000) this.output.push('⚠ FOR loop stopped after 10000 iterations (possible infinite loop — check STEP/TO values)');
+    return nextIdx + 1;
+  }
+  execWhile(lines, i, to) {
+    const condStr = lines[i].src.replace(/^WHILE\s+/i, '').replace(/\s+DO\s*$/i, '').trim();
+    let depth = 0, endIdx = -1;
+    for (let j = i; j < to; j++) {
+      if (/^WHILE\s+/i.test(lines[j].src)) depth++;
+      if (/^ENDWHILE/i.test(lines[j].src)) { depth--; if (depth === 0) { endIdx = j; break; } }
+    }
+    if (endIdx < 0) this.err('Missing ENDWHILE');
+    let iter = 0;
+    while (this.eval(condStr) && iter++ < 10000) this.execBlock(lines, i + 1, endIdx);
+    if (iter >= 10000) this.output.push('⚠ WHILE loop stopped after 10000 iterations (possible infinite loop — check the condition)');
+    return endIdx + 1;
+  }
+  execRepeat(lines, i, to) {
+    let untilIdx = -1;
+    for (let j = i + 1; j < to; j++) { if (/^UNTIL\s+/i.test(lines[j].src)) { untilIdx = j; break; } }
+    if (untilIdx < 0) this.err('Missing UNTIL');
+    const condStr = lines[untilIdx].src.replace(/^UNTIL\s+/i, '').trim();
+    let iter = 0;
+    do { this.execBlock(lines, i + 1, untilIdx); iter++; } while (!this.eval(condStr) && iter < 10000);
+    if (iter >= 10000) this.output.push('⚠ REPEAT loop stopped after 10000 iterations (possible infinite loop — check the UNTIL condition)');
+    return untilIdx + 1;
+  }
+  execCase(lines, i, to) {
+    const val = this.eval(lines[i].src.replace(/^CASE\s+OF\s+/i, '').trim());
+    let endIdx = -1;
+    for (let j = i + 1; j < to; j++) { if (/^ENDCASE/i.test(lines[j].src)) { endIdx = j; break; } }
+    if (endIdx < 0) this.err('Missing ENDCASE');
+    const branches = [];
+    for (let j = i + 1; j < endIdx; j++) {
+      const s = lines[j].src;
+      const otherwiseM = s.match(/^OTHERWISE\s*:\s*(.*)$/i);
+      if (otherwiseM) { branches.push({ otherwise: true, startLine: j, firstStmt: otherwiseM[1] }); continue; }
+      const labelM = s.match(/^(.+?)\s*:\s*(.*)$/);
+      if (labelM && this.looksLikeCaseLabel(labelM[1])) branches.push({ label: labelM[1].trim(), startLine: j, firstStmt: labelM[2] });
+    }
+    for (let b = 0; b < branches.length; b++) {
+      const bodyEnd = b + 1 < branches.length ? branches[b + 1].startLine : endIdx;
+      branches[b].bodyLines = { from: branches[b].startLine + 1, to: bodyEnd, firstStmt: branches[b].firstStmt };
+    }
+    let matched = false;
+    for (const br of branches) {
+      if (matched) break;
+      if (br.otherwise) {
+        if (br.firstStmt.trim()) this.execLine([{ src: br.firstStmt }], 0, 1);
+        this.execBlock(lines, br.bodyLines.from, br.bodyLines.to);
+        matched = true; continue;
+      }
+      const rangeM = br.label.match(/^(.+?)\s+TO\s+(.+)$/i);
+      let isMatch;
+      if (rangeM) { const lo = this.eval(rangeM[1].trim()), hi = this.eval(rangeM[2].trim()); isMatch = val >= lo && val <= hi; }
+      else isMatch = this.eval(br.label) == val;
+      if (isMatch) {
+        if (br.firstStmt.trim()) this.execLine([{ src: br.firstStmt }], 0, 1);
+        this.execBlock(lines, br.bodyLines.from, br.bodyLines.to);
+        matched = true;
+      }
+    }
+    return endIdx + 1;
+  }
+  looksLikeCaseLabel(s) { const t = s.trim(); if (!t) return false; if (/^(IF|FOR|WHILE|REPEAT|CALL|OUTPUT|INPUT|DECLARE)\b/i.test(t)) return false; return true; }
+  collectProc(lines, i, to) {
+    const m = lines[i].src.match(/^PROCEDURE\s+(\w+)\s*(?:\(([^)]*)\))?/i);
+    if (!m) this.err('Invalid PROCEDURE');
+    const name = m[1], params = this.parseParams(m[2]);
+    let depth = 0, endIdx = -1;
+    for (let j = i; j < to; j++) { if (/^PROCEDURE\s+/i.test(lines[j].src)) depth++; if (/^ENDPROCEDURE/i.test(lines[j].src)) { depth--; if (depth === 0) { endIdx = j; break; } } }
+    if (endIdx < 0) this.err('Missing ENDPROCEDURE');
+    this.procedures[name] = { params, body: lines.slice(i + 1, endIdx) };
+    if (!this.silent) this.output.push('[PROCEDURE ' + name + ' defined]');
+    return endIdx + 1;
+  }
+  collectFunc(lines, i, to) {
+    const m = lines[i].src.match(/^FUNCTION\s+(\w+)\s*(?:\(([^)]*)\))?/i);
+    if (!m) this.err('Invalid FUNCTION');
+    const name = m[1], params = this.parseParams(m[2]).map(p => ({ ...p, mode: 'BYVAL' }));
+    let depth = 0, endIdx = -1;
+    for (let j = i; j < to; j++) { if (/^FUNCTION\s+/i.test(lines[j].src)) depth++; if (/^ENDFUNCTION/i.test(lines[j].src)) { depth--; if (depth === 0) { endIdx = j; break; } } }
+    if (endIdx < 0) this.err('Missing ENDFUNCTION');
+    this.functions[name] = { params, body: lines.slice(i + 1, endIdx) };
+    if (!this.silent) this.output.push('[FUNCTION ' + name + ' defined]');
+    return endIdx + 1;
+  }
+  parseParams(paramStr) {
+    if (!paramStr || !paramStr.trim()) return [];
+    let mode = 'BYVAL';
+    return this.splitTop(paramStr, ',').map(raw => {
+      let p = raw.trim();
+      const modeM = p.match(/^(BYREF|BYVAL)\s+(.+)$/i);
+      if (modeM) { mode = modeM[1].toUpperCase(); p = modeM[2].trim(); }
+      const name = p.split(/\s*:\s*/)[0].trim();
+      return { name, mode };
+    });
+  }
+  callProc(callStr) {
+    const m = callStr.match(/^(\w+)\s*(?:\(([^)]*)\))?/);
+    if (!m) return;
+    const name = m[1], argStrs = m[2] ? this.splitTop(m[2], ',').map(s => s.trim()) : [];
+    const proc = this.procedures[name];
+    if (!proc) { this.output.push('[CALL ' + name + ' — not defined]'); return; }
+    const outerKeys = new Set(Object.keys(this.env));
+    const child = this.makeChild();
+    proc.params.forEach((p, idx) => { if (argStrs[idx] !== undefined) child.env[p.name] = this.eval(argStrs[idx]); });
+    try { child.execBlock(proc.body, 0, proc.body.length); } catch (e) { if (e.type !== 'return') throw e; }
+    this.output.push(...child.output);
+    this.inputValues = child.inputValues;
+    for (const k of outerKeys) if (k in child.env) this.env[k] = child.env[k];
+    proc.params.forEach((p, idx) => { if (p.mode !== 'BYREF') return; const argName = argStrs[idx]; if (argName && /^[A-Za-z_]\w*$/.test(argName)) this.env[argName] = child.env[p.name]; });
+  }
+  callFunc(name, argStrs) {
+    const fn = this.functions[name];
+    if (!fn) this.err('Function ' + name + ' not defined');
+    const child = this.makeChild();
+    fn.params.forEach((p, idx) => { if (argStrs[idx] !== undefined) child.env[p.name] = this.eval(argStrs[idx]); });
+    let ret = null;
+    try { child.execBlock(fn.body, 0, fn.body.length); } catch (e) { if (e.type === 'return') ret = e.value; else throw e; }
+    this.output.push(...child.output);
+    this.inputValues = child.inputValues;
+    return ret;
+  }
+  makeChild() { const c = new PseudoInterpreter({}, { silent: this.silent }); c.env = Object.assign({}, this.env); c.types = Object.assign({}, this.types); c.procedures = this.procedures; c.functions = this.functions; c.inputValues = this.inputValues; c.files = this.files; return c; }
+  eval(raw) {
+    const s = raw.trim();
+    if (!s) return '';
+    const amp = this.splitTop(s, '&');
+    if (amp.length > 1) return amp.map(p => String(this.eval(p.trim()))).join('');
+    if (s.toUpperCase() === 'TRUE') return true;
+    if (s.toUpperCase() === 'FALSE') return false;
+    if (/^"[^"]*"$/.test(s)) return s.slice(1, -1);
+    if (/^'[^']*'$/.test(s)) return s.slice(1, -1);
+    if (/^NOT\s+/i.test(s)) return !this.eval(s.replace(/^NOT\s+/i, ''));
+    if (s[0] === '(' && this.matchParen(s) === s.length - 1) return this.eval(s.slice(1, -1));
+    const or = this.splitTop(s, 'OR');
+    if (or.length > 1) return or.reduce((a, p) => a || this.eval(p.trim()), false);
+    const and = this.splitTop(s, 'AND');
+    if (and.length > 1) return and.reduce((a, p) => a && this.eval(p.trim()), true);
+    for (const op of ['<=', '>=', '<>', '!=', '=', '<', '>']) {
+      const idx = this.findTop(s, op);
+      if (idx >= 0) {
+        const L = this.eval(s.slice(0, idx).trim()), R = this.eval(s.slice(idx + op.length).trim());
+        if (op === '<=') return L <= R; if (op === '>=') return L >= R;
+        if (op === '<>' || op === '!=') return L != R; if (op === '=') return L == R;
+        if (op === '<') return L < R; if (op === '>') return L > R;
+      }
+    }
+    const as = this.findAddSub(s);
+    if (as >= 0) {
+      const op = s[as], L = this.eval(s.slice(0, as).trim()), R = this.eval(s.slice(as + 1).trim());
+      return op === '+' ? (typeof L === 'string' || typeof R === 'string' ? String(L) + String(R) : Number(L) + Number(R)) : Number(L) - Number(R);
+    }
+    const md = this.findMul(s);
+    if (md) {
+      const L = Number(this.eval(s.slice(0, md.idx).trim())), R = Number(this.eval(s.slice(md.idx + md.op.length).trim()));
+      if (md.op === '*') return L * R; if (md.op === '/') return L / R;
+      if (md.op === 'MOD') return L % R; if (md.op === 'DIV') return Math.trunc(L / R);
+    }
+    if (s[0] === '-') return -Number(this.eval(s.slice(1)));
+    if (/^-?\d+(\.\d+)?$/.test(s)) return Number(s);
+    const arrm = s.match(/^(\w+)\[(.+)\]$/);
+    if (arrm) { const arr = this.env[arrm[1]]; return (arr && typeof arr === 'object') ? (arr[this.idxKey(arrm[2])] ?? 0) : 0; }
+    if (/^[A-Za-z_]\w*$/.test(s)) return s in this.env ? this.env[s] : 0;
+    return s;
+  }
+  matchParen(s) { let d = 0; for (let i = 0; i < s.length; i++) { if (s[i] === '(') d++; if (s[i] === ')') d--; if (d === 0) return i; } return -1; }
+  splitTop(s, op) {
+    const isKw = /^[A-Z]+$/.test(op);
+    const parts = []; let depth = 0, inStr = false, strCh = '', buf = '', i = 0;
+    while (i < s.length) {
+      const ch = s[i];
+      if (inStr) { buf += ch; if (ch === strCh) inStr = false; i++; continue; }
+      if (ch === '"' || ch === "'") { inStr = true; strCh = ch; buf += ch; i++; continue; }
+      if (ch === '(' || ch === '[') { depth++; buf += ch; i++; continue; }
+      if (ch === ')' || ch === ']') { depth--; buf += ch; i++; continue; }
+      if (depth === 0) {
+        if (!isKw && s.startsWith(op, i)) { parts.push(buf); buf = ''; i += op.length; continue; }
+        if (isKw) { const rest = s.slice(i); const m = rest.match(new RegExp('^' + op + '\\b', 'i')); if (m) { parts.push(buf); buf = ''; i += m[0].length; continue; } }
+      }
+      buf += ch; i++;
+    }
+    parts.push(buf); return parts;
+  }
+  findTop(s, op) {
+    let depth = 0, inStr = false, strCh = '';
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      if (inStr) { if (ch === strCh) inStr = false; continue; }
+      if (ch === '"' || ch === "'") { inStr = true; strCh = ch; continue; }
+      if (ch === '(' || ch === '[') depth++;
+      if (ch === ')' || ch === ']') depth--;
+      if (depth === 0 && s.startsWith(op, i)) return i;
+    }
+    return -1;
+  }
+  findAddSub(s) {
+    let depth = 0, inStr = false;
+    for (let i = s.length - 1; i >= 0; i--) {
+      const ch = s[i];
+      if (ch === ')' || ch === ']') depth++; if (ch === '(' || ch === '[') depth--;
+      if (ch === '"' || ch === "'") inStr = !inStr;
+      if (!inStr && depth === 0 && (ch === '+' || ch === '-')) {
+        let j = i - 1; while (j >= 0 && /\s/.test(s[j])) j--;
+        if (j >= 0 && /[\w\)\]"']/.test(s[j])) return i;
+      }
+    }
+    return -1;
+  }
+  findMul(s) {
+    let depth = 0, inStr = false;
+    for (let i = s.length - 1; i >= 0; i--) {
+      const ch = s[i];
+      if (ch === ')' || ch === ']') depth++; if (ch === '(' || ch === '[') depth--;
+      if (ch === '"' || ch === "'") inStr = !inStr;
+      if (!inStr && depth === 0) {
+        if (ch === '*' || ch === '/') return { idx: i, op: ch };
+        for (const kw of ['MOD', 'DIV']) {
+          const start = i - kw.length + 1;
+          if (start >= 0 && s.slice(start, i + 1).toUpperCase() === kw) {
+            const before = start - 1, after = i + 1;
+            if (!((before < 0 || /\W/.test(s[before])) && (after >= s.length || /\W/.test(s[after])))) continue;
+            let pb = before; while (pb >= 0 && /\s/.test(s[pb])) pb--;
+            if (!(pb >= 0 && /[\w\)\]"']/.test(s[pb]))) continue;
+            return { idx: start, op: kw };
+          }
+        }
+      }
+    }
+    return null;
+  }
+  err(msg) { throw { type: 'pseudo_error', msg }; }
+}
+
+const LOOP_PROBLEMS = [
+  {"id":"forloop-basic-1","topic":"forloop","tier":"basic","title":"Print numbers 1 to N","scenario":"Input a value for UpperLimit, then use a FOR loop to output every whole number from 1 to UpperLimit, one per line.","concept":"A count-controlled FOR loop printing every value it takes.","hint":"FOR CurrentNumber ← 1 TO UpperLimit, then OUTPUT CurrentNumber each pass.","starter":"DECLARE UpperLimit : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT UpperLimit\n// TODO: use a FOR loop to output 1, 2, ..., UpperLimit (one per line)\n","solution":"DECLARE UpperLimit : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT UpperLimit\nFOR CurrentNumber ← 1 TO UpperLimit\n  OUTPUT CurrentNumber\nNEXT CurrentNumber\n","tests":[{"inputs":["5"],"expectLines":["1","2","3","4","5"]}]},
+  {"id":"forloop-basic-2","topic":"forloop","tier":"basic","title":"Times-table for a number","scenario":"Input a value for Number, then use a FOR loop to output its multiplication table from 1x to 10x, one line per row (e.g. \"4 x 3 = 12\").","concept":"A fixed-length FOR loop building a multiplication fact each pass.","hint":"FOR Multiplier ← 1 TO 10, output Number, \" x \", Multiplier, \" = \", Number * Multiplier.","starter":"DECLARE Number : INTEGER\nDECLARE Multiplier : INTEGER\nINPUT Number\n// TODO: use a FOR loop to output the 1x to 10x table for Number\n","solution":"DECLARE Number : INTEGER\nDECLARE Multiplier : INTEGER\nINPUT Number\nFOR Multiplier ← 1 TO 10\n  OUTPUT Number, \" x \", Multiplier, \" = \", Number * Multiplier\nNEXT Multiplier\n","tests":[{"inputs":["4"],"expectLines":["4 x 1 = 4","4 x 2 = 8","4 x 3 = 12","4 x 4 = 16","4 x 5 = 20","4 x 6 = 24","4 x 7 = 28","4 x 8 = 32","4 x 9 = 36","4 x 10 = 40"]}]},
+  {"id":"forloop-basic-3","topic":"forloop","tier":"basic","title":"Sum of numbers from A to B","scenario":"A raffle uses ticket numbers from StartNumber to EndNumber. To check the batch is complete, the organiser wants the sum of every ticket number in that range. Input StartNumber and EndNumber and output the total.","concept":"The FOR loop bounds can both come from input, not just start at 1.","hint":"Initialise Total to 0, then FOR CurrentNumber ← StartNumber TO EndNumber adding CurrentNumber to Total each pass.","starter":"DECLARE StartNumber : INTEGER\nDECLARE EndNumber : INTEGER\nDECLARE Total : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT StartNumber\nINPUT EndNumber\nTotal ← 0\n// TODO: use a FOR loop to sum every whole number from StartNumber to EndNumber inclusive into Total, then output it\n","solution":"DECLARE StartNumber : INTEGER\nDECLARE EndNumber : INTEGER\nDECLARE Total : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT StartNumber\nINPUT EndNumber\nTotal ← 0\nFOR CurrentNumber ← StartNumber TO EndNumber\n  Total ← Total + CurrentNumber\nNEXT CurrentNumber\nOUTPUT \"Sum = \", Total\n","tests":[{"inputs":["3","7"],"expectLines":["Sum = 25"]}]},
+  {"id":"forloop-basic-4","topic":"forloop","tier":"basic","title":"Countdown with STEP -1","scenario":"A rocket launch console counts down from StartNumber to 1 before liftoff. Input StartNumber and print the countdown, one number per line, ending at 1.","concept":"FOR loops can count downward using a negative STEP.","hint":"FOR CurrentNumber ← StartNumber TO 1 STEP -1, then OUTPUT CurrentNumber.","starter":"DECLARE StartNumber : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT StartNumber\n// TODO: use a FOR loop with STEP -1 to output StartNumber, StartNumber-1, ..., 1 (one per line)\n","solution":"DECLARE StartNumber : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT StartNumber\nFOR CurrentNumber ← StartNumber TO 1 STEP -1\n  OUTPUT CurrentNumber\nNEXT CurrentNumber\n","tests":[{"inputs":["4"],"expectLines":["4","3","2","1"]}]},
+  {"id":"forloop-basic-5","topic":"forloop","tier":"basic","title":"Sum of even numbers using STEP 2","scenario":"A charity only accepts donations in even amounts ($2, $4, $6...). Given an UpperLimit, add up every even number from 2 up to UpperLimit and output the total collected.","concept":"STEP does not have to be 1 — a STEP of 2 skips every other value.","hint":"FOR CurrentNumber ← 2 TO UpperLimit STEP 2, adding CurrentNumber to Total each pass.","starter":"DECLARE UpperLimit : INTEGER\nDECLARE Total : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT UpperLimit\nTotal ← 0\n// TODO: use a FOR loop with STEP 2 to sum every even number from 2 to UpperLimit into Total, then output it\n","solution":"DECLARE UpperLimit : INTEGER\nDECLARE Total : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT UpperLimit\nTotal ← 0\nFOR CurrentNumber ← 2 TO UpperLimit STEP 2\n  Total ← Total + CurrentNumber\nNEXT CurrentNumber\nOUTPUT \"Sum of evens = \", Total\n","tests":[{"inputs":["10"],"expectLines":["Sum of evens = 30"]}]},
+  {"id":"forloop-medium-1","topic":"forloop","tier":"medium","title":"Print squares of 1 to N","scenario":"A tile designer is laying square tiles of increasing size (1x1, 2x2, 3x3...) up to size UpperLimit, and needs the area of every tile size printed alongside it.","concept":"Using the loop variable twice in the same expression.","hint":"FOR CurrentNumber ← 1 TO UpperLimit, output CurrentNumber, \"^2 = \", CurrentNumber * CurrentNumber.","starter":"DECLARE UpperLimit : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT UpperLimit\n// TODO: use a FOR loop to output \"CurrentNumber^2 = <square>\" for CurrentNumber from 1 to UpperLimit\n","solution":"DECLARE UpperLimit : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT UpperLimit\nFOR CurrentNumber ← 1 TO UpperLimit\n  OUTPUT CurrentNumber, \"^2 = \", CurrentNumber * CurrentNumber\nNEXT CurrentNumber\n","tests":[{"inputs":["4"],"expectLines":["1^2 = 1","2^2 = 4","3^2 = 9","4^2 = 16"]}]},
+  {"id":"forloop-medium-2","topic":"forloop","tier":"medium","title":"Count numbers divisible by 3","scenario":"A cafe queue system gives every 3rd customer between ticket StartNumber and EndNumber a free coffee voucher. Count how many customers in that range qualify.","concept":"Combining a FOR loop with an IF condition to count matches, not print them.","hint":"FOR CurrentNumber ← StartNumber TO EndNumber, IF CurrentNumber MOD 3 = 0 THEN increment Count.","starter":"DECLARE StartNumber : INTEGER\nDECLARE EndNumber : INTEGER\nDECLARE Count : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT StartNumber\nINPUT EndNumber\nCount ← 0\n// TODO: use a FOR loop and IF to count how many whole numbers from StartNumber to EndNumber are divisible by 3, then output Count\n","solution":"DECLARE StartNumber : INTEGER\nDECLARE EndNumber : INTEGER\nDECLARE Count : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT StartNumber\nINPUT EndNumber\nCount ← 0\nFOR CurrentNumber ← StartNumber TO EndNumber\n  IF CurrentNumber MOD 3 = 0 THEN\n    Count ← Count + 1\n  ENDIF\nNEXT CurrentNumber\nOUTPUT \"Count = \", Count\n","tests":[{"inputs":["1","12"],"expectLines":["Count = 4"]}]},
+  {"id":"forloop-medium-3","topic":"forloop","tier":"medium","title":"Reverse-print an array with STEP -1","scenario":"A leaderboard stores the last 5 quiz scores in the order they happened, but the results screen needs to display them in reverse (most recent first). Output the 5 stored Numbers in reverse order.","concept":"FOR loops over an index can run backwards to print an array in reverse.","hint":"FOR Index ← 5 TO 1 STEP -1, output Numbers[Index].","starter":"DECLARE Numbers : ARRAY[1:5] OF INTEGER\nDECLARE Index : INTEGER\nNumbers[1] ← 10\nNumbers[2] ← 20\nNumbers[3] ← 30\nNumbers[4] ← 40\nNumbers[5] ← 50\n// TODO: use a FOR loop with STEP -1 to output Numbers in reverse order\n","solution":"DECLARE Numbers : ARRAY[1:5] OF INTEGER\nDECLARE Index : INTEGER\nNumbers[1] ← 10\nNumbers[2] ← 20\nNumbers[3] ← 30\nNumbers[4] ← 40\nNumbers[5] ← 50\nFOR Index ← 5 TO 1 STEP -1\n  OUTPUT Numbers[Index]\nNEXT Index\n","tests":[{"inputs":[],"expectLines":["50","40","30","20","10"]}]},
+  {"id":"forloop-applied-1","topic":"forloop","tier":"applied","title":"Nested FOR: multiplication grid","scenario":"A worksheet generator needs to print a 3x3 multiplication grid for a maths class, showing every RowNumber x ColumnNumber combination and its product.","concept":"Two nested FOR loops build every combination of a row and a column value — the core pattern behind 2D array traversal.","hint":"FOR RowNumber ← 1 TO 3, and inside it FOR ColumnNumber ← 1 TO 3, output RowNumber, \" x \", ColumnNumber, \" = \", RowNumber * ColumnNumber.","starter":"DECLARE RowNumber : INTEGER\nDECLARE ColumnNumber : INTEGER\n// TODO: use nested FOR loops (RowNumber 1 to 3, ColumnNumber 1 to 3) to output \"RowNumber x ColumnNumber = <product>\" for every combination\n","solution":"DECLARE RowNumber : INTEGER\nDECLARE ColumnNumber : INTEGER\nFOR RowNumber ← 1 TO 3\n  FOR ColumnNumber ← 1 TO 3\n    OUTPUT RowNumber, \" x \", ColumnNumber, \" = \", RowNumber * ColumnNumber\n  NEXT ColumnNumber\nNEXT RowNumber\n","tests":[{"inputs":[],"expectLines":["1 x 1 = 1","1 x 2 = 2","1 x 3 = 3","2 x 1 = 2","2 x 2 = 4","2 x 3 = 6","3 x 1 = 3","3 x 2 = 6","3 x 3 = 9"]}]},
+  {"id":"forloop-applied-2","topic":"forloop","tier":"applied","title":"Tally even and odd counts","scenario":"A raffle organiser wants to know, out of every entry number from 1 to UpperLimit, how many are odd and how many are even, to split two different prizes fairly.","concept":"A FOR loop with an IF/ELSE inside it, updating one of two separate tallies each pass.","hint":"FOR CurrentNumber ← 1 TO UpperLimit, IF CurrentNumber MOD 2 = 0 THEN increment EvenCount ELSE increment OddCount.","starter":"DECLARE UpperLimit : INTEGER\nDECLARE CurrentNumber : INTEGER\nDECLARE EvenCount : INTEGER\nDECLARE OddCount : INTEGER\nINPUT UpperLimit\nEvenCount ← 0\nOddCount ← 0\n// TODO: use a FOR loop and IF/ELSE to count how many of 1..UpperLimit are even vs odd, then output both counts\n","solution":"DECLARE UpperLimit : INTEGER\nDECLARE CurrentNumber : INTEGER\nDECLARE EvenCount : INTEGER\nDECLARE OddCount : INTEGER\nINPUT UpperLimit\nEvenCount ← 0\nOddCount ← 0\nFOR CurrentNumber ← 1 TO UpperLimit\n  IF CurrentNumber MOD 2 = 0 THEN\n    EvenCount ← EvenCount + 1\n  ELSE\n    OddCount ← OddCount + 1\n  ENDIF\nNEXT CurrentNumber\nOUTPUT \"Even count = \", EvenCount\nOUTPUT \"Odd count = \", OddCount\n","tests":[{"inputs":["7"],"expectLines":["Even count = 3","Odd count = 4"]}]},
+  {"id":"whileloop-basic-1","topic":"whileloop","tier":"basic","title":"Countdown with a launch message","scenario":"Input a value for SecondsLeft, then use a WHILE loop to output \"T-minus <SecondsLeft>\" once per second while counting down, followed by \"Liftoff!\" once it reaches 0.","concept":"A pre-condition WHILE loop that decrements a variable until it reaches 0.","hint":"WHILE SecondsLeft > 0, output \"T-minus \", SecondsLeft, then SecondsLeft ← SecondsLeft - 1. Output \"Liftoff!\" after the loop ends.","starter":"DECLARE SecondsLeft : INTEGER\nINPUT SecondsLeft\n// TODO: WHILE SecondsLeft > 0, output \"T-minus <SecondsLeft>\" and decrement SecondsLeft; then output \"Liftoff!\" after the loop\n","solution":"DECLARE SecondsLeft : INTEGER\nINPUT SecondsLeft\nWHILE SecondsLeft > 0\n  OUTPUT \"T-minus \", SecondsLeft\n  SecondsLeft ← SecondsLeft - 1\nENDWHILE\nOUTPUT \"Liftoff!\"\n","tests":[{"inputs":["3"],"expectLines":["T-minus 3","T-minus 2","T-minus 1","Liftoff!"]}]},
+  {"id":"whileloop-basic-2","topic":"whileloop","tier":"basic","title":"Sum numbers until a sentinel value","scenario":"Input numbers one at a time and add each one to a running Total using a WHILE loop, stopping as soon as -1 is entered; then output the Total.","concept":"A common validation/accumulation pattern: keep reading input until a special sentinel value (-1) appears.","hint":"INPUT Number once before the loop. WHILE Number <> -1, add Number to Total, then INPUT Number again.","starter":"DECLARE Number : INTEGER\nDECLARE Total : INTEGER\nTotal ← 0\n// TODO: input numbers and add them to Total until -1 is entered, then output Total\n","solution":"DECLARE Number : INTEGER\nDECLARE Total : INTEGER\nTotal ← 0\nINPUT Number\nWHILE Number <> -1\n  Total ← Total + Number\n  INPUT Number\nENDWHILE\nOUTPUT \"Total = \", Total\n","tests":[{"inputs":["4","6","2","-1"],"expectLines":["Total = 12"]}]},
+  {"id":"whileloop-basic-3","topic":"whileloop","tier":"basic","title":"Halve a number until it reaches 1","scenario":"A computer science teacher explains binary search by repeatedly halving a list size until only one item is left, and wants to know how many halving steps that takes for a given starting size.","concept":"Counting how many times a value can be halved with DIV — the same idea behind binary search's step count.","hint":"WHILE CurrentValue > 1, CurrentValue ← CurrentValue DIV 2, and increment Steps each pass.","starter":"DECLARE CurrentValue : INTEGER\nDECLARE Steps : INTEGER\nINPUT CurrentValue\nSteps ← 0\n// TODO: WHILE CurrentValue > 1, halve CurrentValue using DIV and count the steps taken; output Steps\n","solution":"DECLARE CurrentValue : INTEGER\nDECLARE Steps : INTEGER\nINPUT CurrentValue\nSteps ← 0\nWHILE CurrentValue > 1\n  CurrentValue ← CurrentValue DIV 2\n  Steps ← Steps + 1\nENDWHILE\nOUTPUT \"Steps = \", Steps\n","tests":[{"inputs":["20"],"expectLines":["Steps = 4"]}]},
+  {"id":"whileloop-basic-4","topic":"whileloop","tier":"basic","title":"Print multiples of 3 under a limit","scenario":"A shuttle bus runs every 3 minutes. Print every departure time from the first one up to (but not including) the last scheduled minute, Limit.","concept":"A WHILE loop driven by a running value being compared against a limit, rather than a fixed count.","hint":"Start CurrentValue at 3. WHILE CurrentValue < Limit, output CurrentValue, then add 3 to CurrentValue.","starter":"DECLARE Limit : INTEGER\nDECLARE CurrentValue : INTEGER\nINPUT Limit\nCurrentValue ← 3\n// TODO: WHILE CurrentValue is less than Limit, output CurrentValue and add 3 to it\n","solution":"DECLARE Limit : INTEGER\nDECLARE CurrentValue : INTEGER\nINPUT Limit\nCurrentValue ← 3\nWHILE CurrentValue < Limit\n  OUTPUT CurrentValue\n  CurrentValue ← CurrentValue + 3\nENDWHILE\n","tests":[{"inputs":["15"],"expectLines":["3","6","9","12"]}]},
+  {"id":"whileloop-basic-5","topic":"whileloop","tier":"basic","title":"Count the digits of a number","scenario":"A banking app validates PIN codes by checking how many digits a number has. Input a number and count how many digits it contains.","concept":"Stripping off one digit at a time with DIV until nothing is left.","hint":"WHILE CurrentNumber > 0, increment DigitCount, then CurrentNumber ← CurrentNumber DIV 10.","starter":"DECLARE CurrentNumber : INTEGER\nDECLARE DigitCount : INTEGER\nINPUT CurrentNumber\nDigitCount ← 0\n// TODO: WHILE CurrentNumber > 0, count the digits of CurrentNumber using DIV, then output DigitCount\n","solution":"DECLARE CurrentNumber : INTEGER\nDECLARE DigitCount : INTEGER\nINPUT CurrentNumber\nDigitCount ← 0\nWHILE CurrentNumber > 0\n  DigitCount ← DigitCount + 1\n  CurrentNumber ← CurrentNumber DIV 10\nENDWHILE\nOUTPUT \"Digits = \", DigitCount\n","tests":[{"inputs":["4523"],"expectLines":["Digits = 4"]}]},
+  {"id":"whileloop-medium-1","topic":"whileloop","tier":"medium","title":"Validate input is within range","scenario":"An online quiz only accepts scores between 1 and 100. Keep asking the user to re-enter their score until they type a valid value in that range, then confirm it was accepted.","concept":"A WHILE loop that re-prompts for input as long as it is invalid — the classic input-validation pattern.","hint":"WHILE Number < 1 OR Number > 100, output a message and read Number again.","starter":"DECLARE Number : INTEGER\nINPUT Number\n// TODO: WHILE Number is outside 1 to 100, output \"Invalid, try again\" and read Number again; then output \"Accepted: <Number>\"\n","solution":"DECLARE Number : INTEGER\nINPUT Number\nWHILE Number < 1 OR Number > 100\n  OUTPUT \"Invalid, try again\"\n  INPUT Number\nENDWHILE\nOUTPUT \"Accepted: \", Number\n","tests":[{"inputs":["150","-2","42"],"expectLines":["Invalid, try again","Invalid, try again","Accepted: 42"]}]},
+  {"id":"whileloop-medium-2","topic":"whileloop","tier":"medium","title":"Doubling growth periods","scenario":"A savings account balance doubles every year under a special offer. Given a starting balance and a target amount, work out how many years (doublings) it takes to reach or exceed the target.","concept":"Counting how many doublings it takes a value to exceed a target — a simplified compound-growth model.","hint":"WHILE CurrentValue <= TargetValue, double CurrentValue and increment Periods.","starter":"DECLARE CurrentValue : INTEGER\nDECLARE TargetValue : INTEGER\nDECLARE Periods : INTEGER\nINPUT CurrentValue\nINPUT TargetValue\nPeriods ← 0\n// TODO: WHILE CurrentValue has not exceeded TargetValue, double CurrentValue and count the periods; output Periods\n","solution":"DECLARE CurrentValue : INTEGER\nDECLARE TargetValue : INTEGER\nDECLARE Periods : INTEGER\nINPUT CurrentValue\nINPUT TargetValue\nPeriods ← 0\nWHILE CurrentValue <= TargetValue\n  CurrentValue ← CurrentValue * 2\n  Periods ← Periods + 1\nENDWHILE\nOUTPUT \"Periods = \", Periods\n","tests":[{"inputs":["5","40"],"expectLines":["Periods = 4"]}]},
+  {"id":"whileloop-medium-3","topic":"whileloop","tier":"medium","title":"First power of 2 above N","scenario":"A stadium is choosing a seating capacity that must be the smallest power of 2 greater than the expected attendance, TargetNumber. Find that seating capacity.","concept":"Growing a value by repeated multiplication until it exceeds a target.","hint":"Start CurrentPower at 1. WHILE CurrentPower <= TargetNumber, multiply CurrentPower by 2.","starter":"DECLARE TargetNumber : INTEGER\nDECLARE CurrentPower : INTEGER\nINPUT TargetNumber\nCurrentPower ← 1\n// TODO: WHILE CurrentPower is not greater than TargetNumber, double CurrentPower; then output it\n","solution":"DECLARE TargetNumber : INTEGER\nDECLARE CurrentPower : INTEGER\nINPUT TargetNumber\nCurrentPower ← 1\nWHILE CurrentPower <= TargetNumber\n  CurrentPower ← CurrentPower * 2\nENDWHILE\nOUTPUT \"First power of 2 above N = \", CurrentPower\n","tests":[{"inputs":["20"],"expectLines":["First power of 2 above N = 32"]}]},
+  {"id":"whileloop-applied-1","topic":"whileloop","tier":"applied","title":"Euclid's GCD algorithm","scenario":"A carpenter has two plank lengths and wants the largest length that can evenly measure both, so no wood is wasted when cutting. Calculate the greatest common divisor of the two lengths.","concept":"Euclid's algorithm: a compact WHILE loop that finds the greatest common divisor using MOD.","hint":"WHILE SecondNumber <> 0: TempValue ← SecondNumber, SecondNumber ← FirstNumber MOD SecondNumber, FirstNumber ← TempValue. The answer ends up in FirstNumber.","starter":"DECLARE FirstNumber : INTEGER\nDECLARE SecondNumber : INTEGER\nDECLARE TempValue : INTEGER\nINPUT FirstNumber\nINPUT SecondNumber\n// TODO: use Euclid's algorithm (WHILE SecondNumber <> 0) to find the GCD of FirstNumber and SecondNumber, then output it\n","solution":"DECLARE FirstNumber : INTEGER\nDECLARE SecondNumber : INTEGER\nDECLARE TempValue : INTEGER\nINPUT FirstNumber\nINPUT SecondNumber\nWHILE SecondNumber <> 0\n  TempValue ← SecondNumber\n  SecondNumber ← FirstNumber MOD SecondNumber\n  FirstNumber ← TempValue\nENDWHILE\nOUTPUT \"GCD = \", FirstNumber\n","tests":[{"inputs":["48","18"],"expectLines":["GCD = 6"]}]},
+  {"id":"whileloop-applied-2","topic":"whileloop","tier":"applied","title":"Fuel vs distance simulation","scenario":"A delivery drone has a limited fuel supply and needs to travel to a customer TargetDistance metres away, using 1 unit of fuel for every 10 metres flown. Simulate the flight and report how far it actually got and how much fuel is left — it stops as soon as either the fuel runs out or it reaches the target.","concept":"A WHILE loop with two conditions combined by AND — it stops as soon as either one fails.","hint":"WHILE Fuel > 0 AND Distance < TargetDistance: add 10 to Distance and subtract 1 from Fuel.","starter":"DECLARE Fuel : INTEGER\nDECLARE TargetDistance : INTEGER\nDECLARE Distance : INTEGER\nINPUT Fuel\nINPUT TargetDistance\nDistance ← 0\n// TODO: WHILE there is Fuel left AND Distance has not reached TargetDistance, move 10 and use 1 Fuel each pass\n// then output the final Distance and Fuel\n","solution":"DECLARE Fuel : INTEGER\nDECLARE TargetDistance : INTEGER\nDECLARE Distance : INTEGER\nINPUT Fuel\nINPUT TargetDistance\nDistance ← 0\nWHILE Fuel > 0 AND Distance < TargetDistance\n  Distance ← Distance + 10\n  Fuel ← Fuel - 1\nENDWHILE\nOUTPUT \"Distance = \", Distance\nOUTPUT \"Fuel left = \", Fuel\n","tests":[{"inputs":["5","35"],"expectLines":["Distance = 40","Fuel left = 1"]}]},
+  {"id":"repeatuntil-basic-1","topic":"repeatuntil","tier":"basic","title":"Keep asking until a positive number","scenario":"Use a REPEAT UNTIL loop to keep asking for a Number until a positive value is entered, then output what was entered.","concept":"A post-condition loop: the body always runs at least once, before the condition is even checked.","hint":"REPEAT, INPUT Number, UNTIL Number > 0.","starter":"DECLARE Number : INTEGER\n// TODO: REPEAT reading INPUT Number UNTIL Number is positive, then output \"Got: <Number>\"\n","solution":"DECLARE Number : INTEGER\nREPEAT\n  INPUT Number\nUNTIL Number > 0\nOUTPUT \"Got: \", Number\n","tests":[{"inputs":["-3","0","7"],"expectLines":["Got: 7"]}]},
+  {"id":"repeatuntil-basic-2","topic":"repeatuntil","tier":"basic","title":"Print numbers up to a limit","scenario":"Input a value for Limit, then use a REPEAT UNTIL loop to output every whole number from 1 up to Limit, one per line.","concept":"A REPEAT UNTIL loop that counts upward, similar to a FOR loop but written as post-condition.","hint":"Start CurrentNumber at 1. REPEAT: output CurrentNumber, increment CurrentNumber. UNTIL CurrentNumber > Limit.","starter":"DECLARE Limit : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT Limit\nCurrentNumber ← 1\n// TODO: REPEAT outputting CurrentNumber and incrementing it UNTIL CurrentNumber is greater than Limit\n","solution":"DECLARE Limit : INTEGER\nDECLARE CurrentNumber : INTEGER\nINPUT Limit\nCurrentNumber ← 1\nREPEAT\n  OUTPUT CurrentNumber\n  CurrentNumber ← CurrentNumber + 1\nUNTIL CurrentNumber > Limit\n","tests":[{"inputs":["4"],"expectLines":["1","2","3","4"]}]},
+  {"id":"repeatuntil-basic-3","topic":"repeatuntil","tier":"basic","title":"Halve a number until 1 or less","scenario":"A knockout tournament halves its number of teams every round due to ties. Starting from CurrentValue teams, work out how many rounds it takes until 1 team or fewer remains.","concept":"The same halving idea as the WHILE version, but written so the halving always happens at least once.","hint":"REPEAT: CurrentValue ← CurrentValue DIV 2, increment Steps. UNTIL CurrentValue <= 1.","starter":"DECLARE CurrentValue : INTEGER\nDECLARE Steps : INTEGER\nINPUT CurrentValue\nSteps ← 0\n// TODO: REPEAT halving CurrentValue with DIV and counting Steps UNTIL CurrentValue is 1 or less; output Steps\n","solution":"DECLARE CurrentValue : INTEGER\nDECLARE Steps : INTEGER\nINPUT CurrentValue\nSteps ← 0\nREPEAT\n  CurrentValue ← CurrentValue DIV 2\n  Steps ← Steps + 1\nUNTIL CurrentValue <= 1\nOUTPUT \"Steps = \", Steps\n","tests":[{"inputs":["20"],"expectLines":["Steps = 4"]}]},
+  {"id":"repeatuntil-basic-4","topic":"repeatuntil","tier":"basic","title":"Sum values until a target is exceeded","scenario":"A cashier keeps scanning item prices and adding them to the till Total until it finally passes a customer's stated spending Target, at which point the till stops (the last item may have pushed them over budget).","concept":"An accumulator built with REPEAT UNTIL rather than WHILE — the total is only checked once it has already changed.","hint":"REPEAT: input Number, add it to Total. UNTIL Total > Target.","starter":"DECLARE Target : INTEGER\nDECLARE Total : INTEGER\nDECLARE Number : INTEGER\nINPUT Target\nTotal ← 0\n// TODO: REPEAT reading Number and adding it to Total UNTIL Total exceeds Target; output Total\n","solution":"DECLARE Target : INTEGER\nDECLARE Total : INTEGER\nDECLARE Number : INTEGER\nINPUT Target\nTotal ← 0\nREPEAT\n  INPUT Number\n  Total ← Total + Number\nUNTIL Total > Target\nOUTPUT \"Total = \", Total\n","tests":[{"inputs":["20","5","8","10"],"expectLines":["Total = 23"]}]},
+  {"id":"repeatuntil-basic-5","topic":"repeatuntil","tier":"basic","title":"Ask for a password until correct","scenario":"A phone lock screen keeps asking for a Password and won't let the user in until they type the correct one.","concept":"Comparing STRING input against a fixed value inside a REPEAT UNTIL loop.","hint":"REPEAT: INPUT Password. UNTIL Password = \"sunshine\".","starter":"DECLARE Password : STRING\n// TODO: REPEAT reading Password UNTIL it equals \"sunshine\", then output \"Access granted\"\n","solution":"DECLARE Password : STRING\nREPEAT\n  INPUT Password\nUNTIL Password = \"sunshine\"\nOUTPUT \"Access granted\"\n","tests":[{"inputs":["test","12345","sunshine"],"expectLines":["Access granted"]}]},
+  {"id":"repeatuntil-medium-1","topic":"repeatuntil","tier":"medium","title":"Validate a menu choice","scenario":"A vending machine menu only accepts choices 1, 2 or 3. Keep asking until a valid Choice is entered, then react to it (\"Start\"/\"Options\"/\"Quit\").","concept":"REPEAT UNTIL used purely for validation, with the actual menu action handled afterwards by IF.","hint":"REPEAT: INPUT Choice. UNTIL Choice >= 1 AND Choice <= 3. Then use IF/ELSE to act on Choice.","starter":"DECLARE Choice : INTEGER\n// TODO: REPEAT reading Choice UNTIL it is between 1 and 3 inclusive\n// then output \"Start\" for 1, \"Options\" for 2, or \"Quit\" for 3\n","solution":"DECLARE Choice : INTEGER\nREPEAT\n  INPUT Choice\nUNTIL Choice >= 1 AND Choice <= 3\nIF Choice = 1 THEN\n  OUTPUT \"Start\"\nELSE\n  IF Choice = 2 THEN\n    OUTPUT \"Options\"\n  ELSE\n    OUTPUT \"Quit\"\n  ENDIF\nENDIF\n","tests":[{"inputs":["5","0","2"],"expectLines":["Options"]}]},
+  {"id":"repeatuntil-medium-2","topic":"repeatuntil","tier":"medium","title":"Reverse the digits of a number","scenario":"A number-plate generator needs to reverse the digits of an ID number — e.g. 4523 should be printed as 3, 2, 5, 4 — one digit at a time from the end.","concept":"REPEAT UNTIL is a natural fit here because a number always has at least one digit to extract.","hint":"REPEAT: Digit ← CurrentNumber MOD 10, output Digit, CurrentNumber ← CurrentNumber DIV 10. UNTIL CurrentNumber = 0.","starter":"DECLARE CurrentNumber : INTEGER\nDECLARE Digit : INTEGER\nINPUT CurrentNumber\n// TODO: REPEAT extracting and outputting the last digit of CurrentNumber with MOD, then removing it with DIV, UNTIL CurrentNumber = 0\n","solution":"DECLARE CurrentNumber : INTEGER\nDECLARE Digit : INTEGER\nINPUT CurrentNumber\nREPEAT\n  Digit ← CurrentNumber MOD 10\n  OUTPUT Digit\n  CurrentNumber ← CurrentNumber DIV 10\nUNTIL CurrentNumber = 0\n","tests":[{"inputs":["4523"],"expectLines":["3","2","5","4"]}]},
+  {"id":"repeatuntil-medium-3","topic":"repeatuntil","tier":"medium","title":"Guess the secret number","scenario":"A simple number-guessing game has a hidden Secret number. Keep accepting guesses (scripted here) and count how many tries it takes until the correct number is guessed.","concept":"A simplified guessing-game loop: scripted guesses stand in for repeated user input.","hint":"REPEAT: INPUT Guess, increment Tries. UNTIL Guess = Secret.","starter":"DECLARE Secret : INTEGER\nDECLARE Guess : INTEGER\nDECLARE Tries : INTEGER\nSecret ← 7\nTries ← 0\n// TODO: REPEAT reading Guess and counting Tries UNTIL Guess equals Secret, then output \"Correct in <Tries> tries\"\n","solution":"DECLARE Secret : INTEGER\nDECLARE Guess : INTEGER\nDECLARE Tries : INTEGER\nSecret ← 7\nTries ← 0\nREPEAT\n  INPUT Guess\n  Tries ← Tries + 1\nUNTIL Guess = Secret\nOUTPUT \"Correct in \", Tries, \" tries\"\n","tests":[{"inputs":["3","9","7"],"expectLines":["Correct in 3 tries"]}]},
+  {"id":"repeatuntil-applied-1","topic":"repeatuntil","tier":"applied","title":"Stop on total OR count, whichever first","scenario":"A supermarket self-checkout stops scanning automatically either once the basket Total reaches $50 (to offer a discount code) or once 5 items have been scanned, whichever happens first.","concept":"Two independent stopping conditions combined with OR — the loop ends as soon as either one becomes true.","hint":"REPEAT: input Number, add to Total, increment Count. UNTIL Total >= 50 OR Count >= 5.","starter":"DECLARE Total : INTEGER\nDECLARE Number : INTEGER\nDECLARE Count : INTEGER\nTotal ← 0\nCount ← 0\n// TODO: REPEAT reading Number, adding it to Total, and counting Count\n// UNTIL Total is at least 50 OR Count reaches 5; output both Total and Count\n","solution":"DECLARE Total : INTEGER\nDECLARE Number : INTEGER\nDECLARE Count : INTEGER\nTotal ← 0\nCount ← 0\nREPEAT\n  INPUT Number\n  Total ← Total + Number\n  Count ← Count + 1\nUNTIL Total >= 50 OR Count >= 5\nOUTPUT \"Total = \", Total\nOUTPUT \"Count = \", Count\n","tests":[{"inputs":["5","5","5","5","5"],"expectLines":["Total = 25","Count = 5"]}]},
+  {"id":"repeatuntil-applied-2","topic":"repeatuntil","tier":"applied","title":"Track the highest score until a sentinel","scenario":"An arcade high-score machine keeps accepting new Scores from players until an operator enters -1 to close it for the night, and needs to report the highest score achieved.","concept":"Combining a sentinel-controlled REPEAT UNTIL loop with a nested IF that both skips the sentinel and tracks a maximum.","hint":"REPEAT: input Score; IF Score <> -1 THEN (IF Score > Max THEN Max ← Score). UNTIL Score = -1.","starter":"DECLARE Score : INTEGER\nDECLARE Max : INTEGER\nMax ← -9999\n// TODO: REPEAT reading Score and updating Max whenever Score is not the sentinel (-1) and is bigger than Max\n// UNTIL Score = -1; then output the final Max\n","solution":"DECLARE Score : INTEGER\nDECLARE Max : INTEGER\nMax ← -9999\nREPEAT\n  INPUT Score\n  IF Score <> -1 THEN\n    IF Score > Max THEN\n      Max ← Score\n    ENDIF\n  ENDIF\nUNTIL Score = -1\nOUTPUT \"Max score = \", Max\n","tests":[{"inputs":["45","82","67","-1"],"expectLines":["Max score = 82"]}]}
+];
+
+function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ── Live syntax highlighting for the editable code boxes ──
+// Same token categories/colors as the rest of the page (.kw/.type/.str/.num/.comment),
+// applied to student-typed code via a transparent-text textarea over a highlighted <pre> overlay.
+const PSEUDO_KEYWORDS=['DECLARE','CONSTANT','INPUT','OUTPUT','RETURN','RETURNS','CALL','IF','THEN','ELSE','ENDIF','CASE','OF','OTHERWISE','ENDCASE','FOR','TO','STEP','NEXT','WHILE','DO','ENDWHILE','REPEAT','UNTIL','PROCEDURE','ENDPROCEDURE','FUNCTION','ENDFUNCTION','BYREF','BYVAL','AND','OR','NOT','MOD','DIV','TRUE','FALSE','ARRAY'];
+const PSEUDO_TYPES=['INTEGER','REAL','STRING','BOOLEAN','CHAR','DATE'];
+function highlightLine(line){
+  let out='',i=0;
+  while(i<line.length){
+    const rest=line.slice(i);
+    if(rest.slice(0,2)==='//'){ out+='<span class="comment">'+escapeHtml(rest)+'</span>'; break; }
+    let m=rest.match(/^"[^"]*"/);
+    if(m){ out+='<span class="str">'+escapeHtml(m[0])+'</span>'; i+=m[0].length; continue; }
+    if(rest[0]==='←'){ out+='<span class="kw">←</span>'; i+=1; continue; }
+    if(rest.slice(0,2)==='<-'){ out+='<span class="kw">&lt;-</span>'; i+=2; continue; }
+    m=rest.match(/^-?\d+(\.\d+)?/);
+    if(m){ out+='<span class="num">'+escapeHtml(m[0])+'</span>'; i+=m[0].length; continue; }
+    m=rest.match(/^[A-Za-z_]\w*/);
+    if(m){
+      const w=m[0],up=w.toUpperCase();
+      if(PSEUDO_KEYWORDS.indexOf(up)!==-1) out+='<span class="kw">'+escapeHtml(w)+'</span>';
+      else if(PSEUDO_TYPES.indexOf(up)!==-1) out+='<span class="type">'+escapeHtml(w)+'</span>';
+      else out+=escapeHtml(w);
+      i+=w.length; continue;
+    }
+    out+=escapeHtml(rest[0]); i+=1;
+  }
+  return out;
+}
+function highlightCode(code){ return code.split('\n').map(highlightLine).join('\n'); }
+
+// ── Autocomplete: suggests pseudocode keywords/types plus any variables the
+// student has already DECLAREd in this box, positioned at the caret via a hidden
+// mirror element (standard textarea-caret-position technique). ──
+const ac={open:false,editorId:null,items:[],active:0,wrapEl:null};
+function getCaretCoordinates(textarea,position){
+  const mirror=document.createElement('div');
+  const style=getComputedStyle(textarea);
+  ['boxSizing','width','paddingTop','paddingRight','paddingBottom','paddingLeft','borderTopWidth','borderRightWidth','borderBottomWidth','borderLeftWidth','fontFamily','fontSize','fontWeight','lineHeight','letterSpacing'].forEach(function(p){ mirror.style[p]=style[p]; });
+  mirror.style.position='absolute';
+  mirror.style.visibility='hidden';
+  mirror.style.whiteSpace='pre';
+  mirror.style.top='0';
+  mirror.style.left='-9999px';
+  document.body.appendChild(mirror);
+  mirror.textContent=textarea.value.substring(0,position);
+  const span=document.createElement('span');
+  span.textContent=textarea.value.substring(position)||'.';
+  mirror.appendChild(span);
+  const coords={top:span.offsetTop,left:span.offsetLeft,height:span.offsetHeight||parseInt(style.lineHeight)||18};
+  document.body.removeChild(mirror);
+  return coords;
+}
+function getWordRangeAtCaret(editor){
+  const pos=editor.selectionStart,val=editor.value;
+  let start=pos;
+  while(start>0 && /[A-Za-z0-9_]/.test(val[start-1])) start--;
+  return {start:start,end:pos,word:val.slice(start,pos)};
+}
+function getDeclaredNames(code){
+  const names=[],seen={};
+  const re=/DECLARE\s+([A-Za-z_]\w*)/gi;
+  let m;
+  while((m=re.exec(code))){ if(!seen[m[1]]){ seen[m[1]]=true; names.push(m[1]); } }
+  return names;
+}
+function updateAutocomplete(id){
+  const editor=document.getElementById('editor-'+id);
+  const range=getWordRangeAtCaret(editor);
+  if(range.word.length<1){ hideAutocomplete(); return; }
+  const upper=range.word.toUpperCase();
+  const kwMatches=PSEUDO_KEYWORDS.concat(PSEUDO_TYPES).filter(function(k){ return k.indexOf(upper)===0; }).map(function(k){ return {text:k,tag:PSEUDO_TYPES.indexOf(k)!==-1?'type':'keyword'}; });
+  const varMatches=getDeclaredNames(editor.value).filter(function(v){ return v.toUpperCase().indexOf(upper)===0 && v.toUpperCase()!==upper; }).map(function(v){ return {text:v,tag:'variable'}; });
+  const items=kwMatches.concat(varMatches).slice(0,8);
+  if(items.length===0 || (items.length===1 && items[0].text.toUpperCase()===upper)){ hideAutocomplete(); return; }
+  ac.open=true; ac.editorId=id; ac.items=items; ac.active=0;
+  renderAutocomplete(editor,range);
+}
+function renderAutocomplete(editor,range){
+  let dropdown=document.getElementById('ac-dropdown');
+  if(!dropdown){ dropdown=document.createElement('div'); dropdown.id='ac-dropdown'; dropdown.className='autocomplete-dropdown'; document.body.appendChild(dropdown); }
+  dropdown.innerHTML=ac.items.map(function(it,i){ return '<div class="autocomplete-item'+(i===ac.active?' active':'')+'" data-idx="'+i+'">'+escapeHtml(it.text)+'<span class="ac-tag">'+it.tag+'</span></div>'; }).join('');
+  const coords=getCaretCoordinates(editor,range.start);
+  const wrapRect=editor.getBoundingClientRect();
+  const top=wrapRect.top+window.scrollY+(coords.top-editor.scrollTop)+coords.height;
+  const left=wrapRect.left+window.scrollX+(coords.left-editor.scrollLeft);
+  dropdown.style.top=top+'px';
+  dropdown.style.left=left+'px';
+  dropdown.style.display='block';
+}
+function hideAutocomplete(){
+  ac.open=false; ac.editorId=null; ac.items=[];
+  const dropdown=document.getElementById('ac-dropdown');
+  if(dropdown) dropdown.style.display='none';
+}
+function applyAutocomplete(idx){
+  if(!ac.open || !ac.editorId) return;
+  const editor=document.getElementById('editor-'+ac.editorId);
+  const range=getWordRangeAtCaret(editor);
+  const chosen=ac.items[idx!==undefined?idx:ac.active];
+  if(!chosen) return;
+  const before=editor.value.slice(0,range.start), after=editor.value.slice(range.end);
+  editor.value=before+chosen.text+after;
+  const newPos=before.length+chosen.text.length;
+  editor.selectionStart=editor.selectionEnd=newPos;
+  editor.dispatchEvent(new Event('input'));
+  hideAutocomplete();
+  editor.focus();
+}
+document.addEventListener('scroll',function(){ if(ac.open) hideAutocomplete(); },true);
+document.addEventListener('click',function(e){ if(ac.open && !e.target.closest('#ac-dropdown') && !e.target.classList.contains('code-editor')) hideAutocomplete(); });
+
+function renderLoopPractice(){
+  const groupEl={forloop:document.getElementById('forloop-practice'),whileloop:document.getElementById('whileloop-practice'),repeatuntil:document.getElementById('repeatuntil-practice')};
+  const counters={forloop:0,whileloop:0,repeatuntil:0};
+  LOOP_PROBLEMS.forEach(function(p){
+    counters[p.topic]++;
+    const card=document.createElement('div');
+    card.className='practice-card';
+    card.innerHTML=
+      '<div class="card-toolbar"><div class="ptitle">'+counters[p.topic]+'. '+escapeHtml(p.title)+' <span class="ptier">'+p.tier+'</span></div>'+
+      '<button class="copy-btn" data-copy="'+p.id+'" type="button">📋 Copy for IDE</button></div>'+
+      '<div class="task">📋 <strong>Question:</strong> '+escapeHtml(p.scenario)+'</div>'+
+      '<p class="pconcept"><strong>Skill:</strong> '+escapeHtml(p.concept)+'</p>'+
+      '<p class="phint">💡 <strong>Hint:</strong> '+escapeHtml(p.hint)+'</p>'+
+      '<div class="editor-wrap"><pre class="code-highlight" id="highlight-'+p.id+'" aria-hidden="true"><code></code></pre><textarea class="code-editor" id="editor-'+p.id+'" spellcheck="false" wrap="off"></textarea></div>'+
+      '<div><button class="run-btn" data-id="'+p.id+'" type="button">▶ Run &amp; Check</button></div>'+
+      '<div class="test-result" id="result-'+p.id+'"></div>'+
+      '<details class="scenario-answer"><summary>Show Sample Solution</summary><pre><code>'+highlightCode(p.solution)+'</code></pre></details>';
+    groupEl[p.topic].appendChild(card);
+    const editor=document.getElementById('editor-'+p.id);
+    const highlightPre=document.getElementById('highlight-'+p.id);
+    const highlightCodeEl=highlightPre.querySelector('code');
+    editor.value=p.starter;
+    function sync(){ highlightCodeEl.innerHTML=highlightCode(editor.value)+'\n'; }
+    sync();
+    editor.addEventListener('input',function(){ sync(); updateAutocomplete(p.id); });
+    editor.addEventListener('scroll',function(){ highlightPre.scrollTop=editor.scrollTop; highlightPre.scrollLeft=editor.scrollLeft; if(ac.open && ac.editorId===p.id) hideAutocomplete(); });
+    editor.addEventListener('blur',function(){ setTimeout(hideAutocomplete,150); });
+    editor.addEventListener('keydown',function(e){
+      if(e.key==='-' && editor.selectionStart===editor.selectionEnd && editor.value[editor.selectionStart-1]==='<'){
+        e.preventDefault();
+        const pos=editor.selectionStart;
+        editor.value=editor.value.slice(0,pos-1)+'←'+editor.value.slice(pos);
+        editor.selectionStart=editor.selectionEnd=pos;
+        editor.dispatchEvent(new Event('input'));
+        return;
+      }
+      if(ac.open && ac.editorId===p.id){
+        if(e.key==='ArrowDown'){ e.preventDefault(); ac.active=(ac.active+1)%ac.items.length; renderAutocomplete(editor,getWordRangeAtCaret(editor)); return; }
+        if(e.key==='ArrowUp'){ e.preventDefault(); ac.active=(ac.active-1+ac.items.length)%ac.items.length; renderAutocomplete(editor,getWordRangeAtCaret(editor)); return; }
+        if(e.key==='Tab' || e.key==='Enter'){ e.preventDefault(); applyAutocomplete(); return; }
+        if(e.key==='Escape'){ hideAutocomplete(); return; }
+      }
+      if(e.key==='Tab' && !ac.open){ e.preventDefault(); const s=editor.selectionStart,en=editor.selectionEnd; editor.value=editor.value.slice(0,s)+'  '+editor.value.slice(en); editor.selectionStart=editor.selectionEnd=s+2; editor.dispatchEvent(new Event('input')); }
+    });
+  });
+}
+document.addEventListener('click',function(e){
+  const item=e.target.closest('.autocomplete-item');
+  if(item){ applyAutocomplete(parseInt(item.getAttribute('data-idx'),10)); }
+});
+function runLoopCheck(id){
+  const problem=LOOP_PROBLEMS.find(function(p){return p.id===id;});
+  const code=document.getElementById('editor-'+id).value;
+  const resultDiv=document.getElementById('result-'+id);
+  let html='',allPass=true;
+  problem.tests.forEach(function(test,i){
+    const interp=new PseudoInterpreter({},{silent:true});
+    interp.inputValues=test.inputs.slice();
+    const out=interp.run(code).output.split('\n');
+    const pass=JSON.stringify(out)===JSON.stringify(test.expectLines);
+    if(!pass)allPass=false;
+    const inputsLabel=test.inputs.length?' — inputs: '+test.inputs.map(escapeHtml).join(', '):'';
+    html+='<div class="output-block">';
+    html+='<div class="output-label">▶ Output — Test '+(i+1)+inputsLabel+'</div>';
+    html+='<pre class="output-box">'+(out.join('\n').trim()?escapeHtml(out.join('\n')):'(no output)')+'</pre>';
+    if(!pass){
+      html+='<div class="output-label">Expected output — Test '+(i+1)+'</div>';
+      html+='<pre class="output-box expected">'+escapeHtml(test.expectLines.join('\n'))+'</pre>';
+    }
+    html+='<div class="test-line '+(pass?'pass':'fail')+'">Test '+(i+1)+': '+(pass?'✅ Correct':'❌ Incorrect — output does not match')+'</div>';
+    html+='</div>';
+  });
+  html+='<div class="overall-msg '+(allPass?'pass':'fail')+'">'+(allPass?'🎉 All tests passed!':'Not quite — compare your Output above to the Expected output and try again.')+'</div>';
+  resultDiv.innerHTML=html;
+}
+function copyLoopCode(id,btn){
+  const code=document.getElementById('editor-'+id).value;
+  const showCopied=function(){
+    const original=btn.textContent;
+    btn.textContent='✅ Copied!'; btn.classList.add('copied');
+    setTimeout(function(){ btn.textContent=original; btn.classList.remove('copied'); },1500);
+  };
+  const fallbackCopy=function(){
+    const ta=document.createElement('textarea');
+    ta.value=code; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.focus(); ta.select();
+    try{ document.execCommand('copy'); }catch(err){}
+    document.body.removeChild(ta);
+    showCopied();
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(showCopied, fallbackCopy);
+  } else { fallbackCopy(); }
+}
+document.addEventListener('click',function(e){
+  if(e.target.matches('.run-btn')) runLoopCheck(e.target.getAttribute('data-id'));
+  if(e.target.matches('.copy-btn')) copyLoopCode(e.target.getAttribute('data-copy'),e.target);
+});
+renderLoopPractice();
 </script>
 </body>
 </html>
