@@ -15,7 +15,7 @@
 </head>
 <body>
 <header><h1>IGCSE 0478 Pseudocode Skills</h1><p><strong>Created by Daichi Yamamoto</strong><br>Colored skill boxes, coding-format answers, and 5 auto-graded MCQs after each section. Click any MCQ answer to get immediate feedback.</p></header>
-<nav><a href="#topic1">1. Assignment</a><a href="#topic2">2. INPUT / OUTPUT</a><a href="#topic3">3. Sequence</a><a href="#topic4">4. IF THEN ELSE</a><a href="#topic5">5. Nested IF</a><a href="#topic6">6. CASE OF</a><a href="#topic7">7. FOR Loop</a><a href="#topic8">8. REPEAT UNTIL</a><a href="#topic9">9. WHILE Loop</a><a href="#topic10">10. Totalling / Counting / Average</a><a href="#topic11">11. Finding the Maximum</a><a href="#topic12">12. Finding the Minimum</a><a href="#topic13">13. Linear Search</a><a href="#topic14">14. Bubble Sort</a><a href="#topic15">15. Range Check</a><a href="#topic16">16. Length / Presence / Double Entry</a><a href="#topic17">17. Test Data</a><a href="#topic18">18. Trace Tables / Errors</a><a href="#topic19">19. Procedures</a><a href="#topic20">20. Functions</a><a href="#looppractice">21. Loop Coding Practice</a><a href="#answers">Answers</a><a href="Answers.pdf" target="_blank" rel="noopener">Answer Key (PDF)</a></nav>
+<nav><a href="#topic1">1. Assignment</a><a href="#topic2">2. INPUT / OUTPUT</a><a href="#topic3">3. Sequence</a><a href="#topic4">4. IF THEN ELSE</a><a href="#topic5">5. Nested IF</a><a href="#topic6">6. CASE OF</a><a href="#topic7">7. FOR Loop</a><a href="#topic8">8. REPEAT UNTIL</a><a href="#topic9">9. WHILE Loop</a><a href="#topic10">10. Totalling / Counting / Average</a><a href="#topic11">11. Finding the Maximum</a><a href="#topic12">12. Finding the Minimum</a><a href="#topic13">13. Linear Search</a><a href="#topic14">14. Bubble Sort</a><a href="#topic15">15. Range Check</a><a href="#topic16">16. Length / Presence / Double Entry</a><a href="#topic17">17. Test Data</a><a href="#topic18">18. Trace Tables / Errors</a><a href="#topic19">19. Procedures</a><a href="#topic20">20. Functions</a><a href="#looppractice">21. Loop Coding Practice</a><a href="#recordclasspractice">22. Record &amp; Class Practice</a><a href="#answers">Answers</a><a href="Answers.pdf" target="_blank" rel="noopener">Answer Key (PDF)</a></nav>
 <main class="container">
 <h2 id="basics" class="section-title">1. Basics</h2>
 <section class="grid">
@@ -900,6 +900,13 @@ Area &lt;- CalculateArea(<span class="num">5</span>, <span class="num">3</span>)
 <h3 style="margin:34px 0 4px">REPEAT UNTIL Practice (10)</h3>
 <div id="repeatuntil-practice" class="practice-group"></div>
 
+<h2 id="recordclasspractice" class="section-title">22. Record &amp; Class Coding Practice (Auto-Checked)</h2>
+<p style="max-width:900px;margin:-6px 0 20px;color:#4b5563">Same live interpreter as above, extended to understand <strong>TYPE...ENDTYPE</strong> (records) and <strong>CLASS...ENDCLASS</strong> (object-oriented programming). <strong>Note:</strong> Records (user-defined data types) are part of the IGCSE 0478 syllabus this site targets; Class/OOP is A-Level 9618 content, included here as extension for students moving on to A-Level.</p>
+<h3 style="margin:30px 0 4px">Record Practice — 0478 syllabus (3)</h3>
+<div id="record-practice" class="practice-group"></div>
+<h3 style="margin:34px 0 4px">Class / OOP Practice — 9618 extension (3)</h3>
+<div id="class-practice" class="practice-group"></div>
+
 <section id="answers" class="answers"><h2>Answer Page — Coding Format</h2><p style="margin:-6px 0 18px"><a href="Answers.pdf" target="_blank" rel="noopener" style="font-weight:900;color:#1d4ed8">Download the full Answer Key (coding answers + MCQ answers) as a PDF →</a></p><details open><summary>Basics Answers</summary><pre><code><span class="kw">DECLARE</span> Amount, TotalPrice, Discount, FinalPrice : <span class="type">REAL</span>
 
 Amount &lt;- <span class="num">100</span>
@@ -1045,6 +1052,7 @@ class PseudoInterpreter {
     this.env = {}; this.types = {};
     for (const [k, v] of Object.entries(shared)) { this.env[k] = v.value; this.types[k] = v.type; }
     this.procedures = {}; this.functions = {}; this.output = []; this.inputValues = []; this.files = {};
+    this.recordTypes = {}; this.classes = {}; this.arrayElemType = {}; this._activeClass = null; this._activeObj = null;
     this.silent = !!opts.silent;
   }
   run(src) {
@@ -1063,10 +1071,11 @@ class PseudoInterpreter {
   execLine(lines, i, to) {
     const s = lines[i].src;
     if (/^DECLARE\s+/i.test(s)) {
-      const m = s.match(/^DECLARE\s+(\w+)\s*(?::\s*(\w+(?:\[.*?\])?))?/i);
+      const m = s.match(/^DECLARE\s+(\w+)\s*(?::\s*(\w+(?:\[.*?\])?)(?:\s+OF\s+(\w+))?)?/i);
       if (m) {
-        const name = m[1], type = (m[2] || '').toUpperCase();
+        const name = m[1], type = (m[2] || '').toUpperCase(), elemType = (m[3] || '').toUpperCase();
         this.types[name] = type || 'UNKNOWN';
+        if (type.startsWith('ARRAY') && elemType) this.arrayElemType[name] = elemType;
         if (!(name in this.env)) {
           if (type === 'INTEGER' || type === 'REAL') this.env[name] = 0;
           else if (type === 'STRING') this.env[name] = '';
@@ -1087,11 +1096,39 @@ class PseudoInterpreter {
     if (/^INPUT\s+/i.test(s)) {
       const name = s.replace(/^INPUT\s+/i, '').trim();
       const raw = this.inputValues.length > 0 ? this.inputValues.shift() : '';
-      const type = this.types[name] || ''; let val = raw;
+      let type = this.types[name] || '';
+      if (!type) {
+        const dm = name.match(/^(\w+)\.(\w+)$/);
+        if (dm) { const baseType = this.types[dm[1]]; const fields = this.recordTypes[baseType]; if (fields) type = fields[dm[2]] || ''; }
+        const adm = name.match(/^(\w+)\[(.+)\]\.(\w+)$/);
+        if (adm) { const elemType = this.arrayElemType[adm[1]]; const fields = this.recordTypes[elemType]; if (fields) type = fields[adm[3]] || ''; }
+      }
+      let val = raw;
       if ((type === 'INTEGER' || type === 'REAL') && raw !== '' && !isNaN(Number(raw))) val = type === 'INTEGER' ? parseInt(raw) : parseFloat(raw);
       else if (type === 'BOOLEAN') val = String(raw).toLowerCase() === 'true';
-      this.env[name] = val;
+      const adm2 = name.match(/^(\w+)\[(.+)\]\.(\w+)$/);
+      if (adm2) { const key = adm2[1] + '[' + this.idxKey(adm2[2]) + '].' + adm2[3]; this.env[key] = val; }
+      else { this.env[name] = val; }
       if (!this.silent) this.output.push('INPUT ' + name + ' → ' + val);
+      return i + 1;
+    }
+    if (/^TYPE\s+/i.test(s)) return this.collectType(lines, i, to);
+    if (/^CLASS\s+/i.test(s)) return this.collectClass(lines, i, to);
+    if (/^CALL\s+SUPER\./i.test(s)) {
+      const m = s.match(/^CALL\s+SUPER\.(\w+)\s*\(([^)]*)\)/i);
+      if (m) {
+        const methodName = m[1], argStr = m[2];
+        const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
+        const parentClass = this.classes[this._activeClass] ? this.classes[this._activeClass].parent : null;
+        if (parentClass) this.invokeMethod(this._activeObj, methodName, argStrs, { fromClass: parentClass });
+      }
+      return i + 1;
+    }
+    if (/^CALL\s+(\w+)\.(\w+)\s*\(/i.test(s)) {
+      const m = s.match(/^CALL\s+(\w+)\.(\w+)\s*\(([^)]*)\)/i);
+      const objName = m[1], methodName = m[2], argStr = m[3];
+      const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
+      this.invokeMethod(objName, methodName, argStrs, { fromClass: this.types[objName] });
       return i + 1;
     }
     if (/^CALL\s+/i.test(s)) { this.callProc(s.replace(/^CALL\s+/i, '').trim()); return i + 1; }
@@ -1103,13 +1140,27 @@ class PseudoInterpreter {
     if (/^CASE\s+OF\s+/i.test(s)) return this.execCase(lines, i, to);
     if (/^PROCEDURE\s+/i.test(s)) return this.collectProc(lines, i, to);
     if (/^FUNCTION\s+/i.test(s)) return this.collectFunc(lines, i, to);
-    if (/^(ENDIF|ENDWHILE|ENDCASE|NEXT|UNTIL|ELSE|THEN|ENDPROCEDURE|ENDFUNCTION|OTHERWISE|RETURNS)(\s|$)/i.test(s)) return i + 1;
+    if (/^(ENDIF|ENDWHILE|ENDCASE|NEXT|UNTIL|ELSE|THEN|ENDPROCEDURE|ENDFUNCTION|OTHERWISE|RETURNS|ENDTYPE|ENDCLASS|PRIVATE|PUBLIC)(\s|$)/i.test(s)) return i + 1;
     const am = s.match(/^([A-Za-z_]\w*(?:\[.+?\])?(?:\.\w+)?)\s*←\s*(.+)$/);
     if (am) { this.assign(am[1].trim(), am[2].trim()); return i + 1; }
     if (/^[A-Za-z_]\w*\s*\(/.test(s)) { this.callProc(s); return i + 1; }
     return i + 1;
   }
   assign(lhs, rhs) {
+    const newM = rhs.match(/^NEW\s+(\w+)\s*\(([^)]*)\)$/i);
+    if (newM && this.classes[newM[1]]) {
+      const argStr = newM[2];
+      const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
+      this.types[lhs] = newM[1];
+      this.env[lhs] = { __class: newM[1] };
+      const ctor = this.findMethod(newM[1], 'NEW', 'procedures');
+      if (ctor) this.invokeMethod(lhs, 'NEW', argStrs, { fromClass: newM[1] });
+      return;
+    }
+    const adm = lhs.match(/^(\w+)\[(.+)\]\.(\w+)$/);
+    if (adm) { const key = adm[1] + '[' + this.idxKey(adm[2]) + '].' + adm[3]; this.env[key] = this.eval(rhs); return; }
+    const dm = lhs.match(/^(\w+)\.(\w+)$/);
+    if (dm) { this.env[lhs] = this.eval(rhs); return; }
     const m = lhs.match(/^(\w+)\[(.+)\]$/);
     if (m) { const name = m[1], idx = this.idxKey(m[2]); if (typeof this.env[name] !== 'object' || this.env[name] === null) this.env[name] = {}; this.env[name][idx] = this.eval(rhs); }
     else this.env[lhs] = this.eval(rhs);
@@ -1232,6 +1283,108 @@ class PseudoInterpreter {
     if (!this.silent) this.output.push('[FUNCTION ' + name + ' defined]');
     return endIdx + 1;
   }
+  collectType(lines, i, to) {
+    const m = lines[i].src.match(/^TYPE\s+(\w+)/i);
+    if (!m) this.err('Invalid TYPE');
+    const name = m[1];
+    let endIdx = -1;
+    for (let j = i + 1; j < to; j++) { if (/^ENDTYPE/i.test(lines[j].src)) { endIdx = j; break; } }
+    if (endIdx < 0) this.err('Missing ENDTYPE');
+    const fields = {};
+    for (let j = i + 1; j < endIdx; j++) {
+      const fm = lines[j].src.match(/^DECLARE\s+(\w+)\s*:\s*(\w+)/i);
+      if (fm) fields[fm[1]] = fm[2].toUpperCase();
+    }
+    this.recordTypes[name.toUpperCase()] = fields;
+    return endIdx + 1;
+  }
+  collectClass(lines, i, to) {
+    const m = lines[i].src.match(/^CLASS\s+(\w+)(?:\s+INHERITS\s+(\w+))?/i);
+    if (!m) this.err('Invalid CLASS');
+    const name = m[1], parent = m[2] || null;
+    let depth = 0, endIdx = -1;
+    for (let j = i; j < to; j++) {
+      if (/^CLASS\s+/i.test(lines[j].src)) depth++;
+      if (/^ENDCLASS/i.test(lines[j].src)) { depth--; if (depth === 0) { endIdx = j; break; } }
+    }
+    if (endIdx < 0) this.err('Missing ENDCLASS');
+    const attrs = [], procedures = {}, functions = {};
+    let j = i + 1;
+    while (j < endIdx) {
+      const s = lines[j].src;
+      const procM = s.match(/^(?:PRIVATE|PUBLIC)\s+PROCEDURE\s+(\w+)\s*(?:\(([^)]*)\))?/i);
+      const funcM = s.match(/^(?:PRIVATE|PUBLIC)\s+FUNCTION\s+(\w+)\s*(?:\(([^)]*)\))?/i);
+      const attrM = s.match(/^(?:PRIVATE|PUBLIC)\s+(\w+)\s*:\s*(\w+)/i);
+      if (procM) {
+        let pd = 0, pEnd = -1;
+        for (let k = j; k < endIdx; k++) { if (/^(?:PRIVATE|PUBLIC)\s+PROCEDURE\s+/i.test(lines[k].src)) pd++; if (/^ENDPROCEDURE/i.test(lines[k].src)) { pd--; if (pd === 0) { pEnd = k; break; } } }
+        procedures[procM[1]] = { params: this.parseParams(procM[2]), body: lines.slice(j + 1, pEnd) };
+        j = pEnd + 1; continue;
+      }
+      if (funcM) {
+        let pd = 0, pEnd = -1;
+        for (let k = j; k < endIdx; k++) { if (/^(?:PRIVATE|PUBLIC)\s+FUNCTION\s+/i.test(lines[k].src)) pd++; if (/^ENDFUNCTION/i.test(lines[k].src)) { pd--; if (pd === 0) { pEnd = k; break; } } }
+        functions[funcM[1]] = { params: this.parseParams(funcM[2]), body: lines.slice(j + 1, pEnd) };
+        j = pEnd + 1; continue;
+      }
+      if (attrM) { attrs.push(attrM[1]); j++; continue; }
+      j++;
+    }
+    this.classes[name] = { parent, attrs, procedures, functions };
+    return endIdx + 1;
+  }
+  findMethod(className, methodName, kind) {
+    let cur = className;
+    while (cur) { const cls = this.classes[cur]; if (!cls) return null; if (cls[kind][methodName]) return cls[kind][methodName]; cur = cls.parent; }
+    return null;
+  }
+  getAllAttributeNames(className) {
+    const names = []; let cur = className;
+    while (cur) { const cls = this.classes[cur]; if (!cls) break; cls.attrs.forEach(a => { if (names.indexOf(a) === -1) names.push(a); }); cur = cls.parent; }
+    return names;
+  }
+  prefixAttrs(src, attrNames, objVar) {
+    if (!attrNames.length) return src;
+    let out = '', i = 0;
+    while (i < src.length) {
+      const ch = src[i];
+      if (ch === '"' || ch === "'") { const q = ch; let j = i + 1; while (j < src.length && src[j] !== q) j++; out += src.slice(i, j + 1); i = j + 1; continue; }
+      const m = src.slice(i).match(/^[A-Za-z_]\w*/);
+      if (m) { const w = m[0]; out += (attrNames.indexOf(w) !== -1 ? objVar + '.' + w : w); i += w.length; continue; }
+      out += ch; i++;
+    }
+    return out;
+  }
+  invokeMethod(objVar, methodName, argStrs, opts) {
+    opts = opts || {};
+    let cur = opts.fromClass || this.types[objVar];
+    let found = null, owner = null;
+    while (cur) {
+      const cls = this.classes[cur];
+      if (!cls) break;
+      if (cls.procedures[methodName]) { found = cls.procedures[methodName]; owner = cur; break; }
+      if (cls.functions[methodName]) { found = cls.functions[methodName]; owner = cur; break; }
+      cur = cls.parent;
+    }
+    if (!found) this.err('Method ' + methodName + ' not found');
+    const leafClass = this.types[objVar];
+    const attrNames = this.getAllAttributeNames(leafClass);
+    const saved = {};
+    found.params.forEach((p, idx) => {
+      saved[p.name] = (p.name in this.env) ? this.env[p.name] : undefined;
+      this.env[p.name] = argStrs[idx] !== undefined ? this.eval(argStrs[idx]) : undefined;
+    });
+    const prevActiveClass = this._activeClass, prevActiveObj = this._activeObj;
+    this._activeClass = owner; this._activeObj = objVar;
+    const prefixedBody = found.body.map(line => ({ raw: line.raw, ln: line.ln, src: this.prefixAttrs(line.src, attrNames, objVar) }));
+    let ret = null, thrown = null;
+    try { this.execBlock(prefixedBody, 0, prefixedBody.length); }
+    catch (e) { if (e.type === 'return') ret = e.value; else thrown = e; }
+    this._activeClass = prevActiveClass; this._activeObj = prevActiveObj;
+    found.params.forEach(p => { if (saved[p.name] === undefined) delete this.env[p.name]; else this.env[p.name] = saved[p.name]; });
+    if (thrown) throw thrown;
+    return ret;
+  }
   parseParams(paramStr) {
     if (!paramStr || !paramStr.trim()) return [];
     let mode = 'BYVAL';
@@ -1269,7 +1422,7 @@ class PseudoInterpreter {
     this.inputValues = child.inputValues;
     return ret;
   }
-  makeChild() { const c = new PseudoInterpreter({}, { silent: this.silent }); c.env = Object.assign({}, this.env); c.types = Object.assign({}, this.types); c.procedures = this.procedures; c.functions = this.functions; c.inputValues = this.inputValues; c.files = this.files; return c; }
+  makeChild() { const c = new PseudoInterpreter({}, { silent: this.silent }); c.env = Object.assign({}, this.env); c.types = Object.assign({}, this.types); c.procedures = this.procedures; c.functions = this.functions; c.inputValues = this.inputValues; c.files = this.files; c.classes = this.classes; c.recordTypes = this.recordTypes; c.arrayElemType = this.arrayElemType; return c; }
   eval(raw) {
     const s = raw.trim();
     if (!s) return '';
@@ -1307,8 +1460,18 @@ class PseudoInterpreter {
     }
     if (s[0] === '-') return -Number(this.eval(s.slice(1)));
     if (/^-?\d+(\.\d+)?$/.test(s)) return Number(s);
+    const methCallM = s.match(/^([A-Za-z_]\w*)\.([A-Za-z_]\w*)\s*\(([^)]*)\)$/);
+    if (methCallM && this.types[methCallM[1]] && this.classes[this.types[methCallM[1]]]) {
+      const argStr = methCallM[3];
+      const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
+      return this.invokeMethod(methCallM[1], methCallM[2], argStrs, { fromClass: this.types[methCallM[1]] });
+    }
+    const arrDotM = s.match(/^(\w+)\[(.+)\]\.(\w+)$/);
+    if (arrDotM) { const key = arrDotM[1] + '[' + this.idxKey(arrDotM[2]) + '].' + arrDotM[3]; return key in this.env ? this.env[key] : 0; }
     const arrm = s.match(/^(\w+)\[(.+)\]$/);
     if (arrm) { const arr = this.env[arrm[1]]; return (arr && typeof arr === 'object') ? (arr[this.idxKey(arrm[2])] ?? 0) : 0; }
+    const dotm = s.match(/^([A-Za-z_]\w*)\.([A-Za-z_]\w*)$/);
+    if (dotm) { return s in this.env ? this.env[s] : 0; }
     if (/^[A-Za-z_]\w*$/.test(s)) return s in this.env ? this.env[s] : 0;
     return s;
   }
@@ -1410,7 +1573,13 @@ const LOOP_PROBLEMS = [
   {"id":"repeatuntil-medium-2","topic":"repeatuntil","tier":"medium","title":"Reverse the digits of a number","scenario":"A number-plate generator needs to reverse the digits of an ID number — e.g. 4523 should be printed as 3, 2, 5, 4 — one digit at a time from the end.","concept":"REPEAT UNTIL is a natural fit here because a number always has at least one digit to extract.","hint":"REPEAT: Digit ← CurrentNumber MOD 10, output Digit, CurrentNumber ← CurrentNumber DIV 10. UNTIL CurrentNumber = 0.","starter":"DECLARE CurrentNumber : INTEGER\nDECLARE Digit : INTEGER\nINPUT CurrentNumber\n// TODO: REPEAT extracting and outputting the last digit of CurrentNumber with MOD, then removing it with DIV, UNTIL CurrentNumber = 0\n","solution":"DECLARE CurrentNumber : INTEGER\nDECLARE Digit : INTEGER\nINPUT CurrentNumber\nREPEAT\n  Digit ← CurrentNumber MOD 10\n  OUTPUT Digit\n  CurrentNumber ← CurrentNumber DIV 10\nUNTIL CurrentNumber = 0\n","tests":[{"inputs":["4523"],"expectLines":["3","2","5","4"]}]},
   {"id":"repeatuntil-medium-3","topic":"repeatuntil","tier":"medium","title":"Guess the secret number","scenario":"A simple number-guessing game has a hidden Secret number. Keep accepting guesses (scripted here) and count how many tries it takes until the correct number is guessed.","concept":"A simplified guessing-game loop: scripted guesses stand in for repeated user input.","hint":"REPEAT: INPUT Guess, increment Tries. UNTIL Guess = Secret.","starter":"DECLARE Secret : INTEGER\nDECLARE Guess : INTEGER\nDECLARE Tries : INTEGER\nSecret ← 7\nTries ← 0\n// TODO: REPEAT reading Guess and counting Tries UNTIL Guess equals Secret, then output \"Correct in <Tries> tries\"\n","solution":"DECLARE Secret : INTEGER\nDECLARE Guess : INTEGER\nDECLARE Tries : INTEGER\nSecret ← 7\nTries ← 0\nREPEAT\n  INPUT Guess\n  Tries ← Tries + 1\nUNTIL Guess = Secret\nOUTPUT \"Correct in \", Tries, \" tries\"\n","tests":[{"inputs":["3","9","7"],"expectLines":["Correct in 3 tries"]}]},
   {"id":"repeatuntil-applied-1","topic":"repeatuntil","tier":"applied","title":"Stop on total OR count, whichever first","scenario":"A supermarket self-checkout stops scanning automatically either once the basket Total reaches $50 (to offer a discount code) or once 5 items have been scanned, whichever happens first.","concept":"Two independent stopping conditions combined with OR — the loop ends as soon as either one becomes true.","hint":"REPEAT: input Number, add to Total, increment Count. UNTIL Total >= 50 OR Count >= 5.","starter":"DECLARE Total : INTEGER\nDECLARE Number : INTEGER\nDECLARE Count : INTEGER\nTotal ← 0\nCount ← 0\n// TODO: REPEAT reading Number, adding it to Total, and counting Count\n// UNTIL Total is at least 50 OR Count reaches 5; output both Total and Count\n","solution":"DECLARE Total : INTEGER\nDECLARE Number : INTEGER\nDECLARE Count : INTEGER\nTotal ← 0\nCount ← 0\nREPEAT\n  INPUT Number\n  Total ← Total + Number\n  Count ← Count + 1\nUNTIL Total >= 50 OR Count >= 5\nOUTPUT \"Total = \", Total\nOUTPUT \"Count = \", Count\n","tests":[{"inputs":["5","5","5","5","5"],"expectLines":["Total = 25","Count = 5"]}]},
-  {"id":"repeatuntil-applied-2","topic":"repeatuntil","tier":"applied","title":"Track the highest score until a sentinel","scenario":"An arcade high-score machine keeps accepting new Scores from players until an operator enters -1 to close it for the night, and needs to report the highest score achieved.","concept":"Combining a sentinel-controlled REPEAT UNTIL loop with a nested IF that both skips the sentinel and tracks a maximum.","hint":"REPEAT: input Score; IF Score <> -1 THEN (IF Score > Max THEN Max ← Score). UNTIL Score = -1.","starter":"DECLARE Score : INTEGER\nDECLARE Max : INTEGER\nMax ← -9999\n// TODO: REPEAT reading Score and updating Max whenever Score is not the sentinel (-1) and is bigger than Max\n// UNTIL Score = -1; then output the final Max\n","solution":"DECLARE Score : INTEGER\nDECLARE Max : INTEGER\nMax ← -9999\nREPEAT\n  INPUT Score\n  IF Score <> -1 THEN\n    IF Score > Max THEN\n      Max ← Score\n    ENDIF\n  ENDIF\nUNTIL Score = -1\nOUTPUT \"Max score = \", Max\n","tests":[{"inputs":["45","82","67","-1"],"expectLines":["Max score = 82"]}]}
+  {"id":"repeatuntil-applied-2","topic":"repeatuntil","tier":"applied","title":"Track the highest score until a sentinel","scenario":"An arcade high-score machine keeps accepting new Scores from players until an operator enters -1 to close it for the night, and needs to report the highest score achieved.","concept":"Combining a sentinel-controlled REPEAT UNTIL loop with a nested IF that both skips the sentinel and tracks a maximum.","hint":"REPEAT: input Score; IF Score <> -1 THEN (IF Score > Max THEN Max ← Score). UNTIL Score = -1.","starter":"DECLARE Score : INTEGER\nDECLARE Max : INTEGER\nMax ← -9999\n// TODO: REPEAT reading Score and updating Max whenever Score is not the sentinel (-1) and is bigger than Max\n// UNTIL Score = -1; then output the final Max\n","solution":"DECLARE Score : INTEGER\nDECLARE Max : INTEGER\nMax ← -9999\nREPEAT\n  INPUT Score\n  IF Score <> -1 THEN\n    IF Score > Max THEN\n      Max ← Score\n    ENDIF\n  ENDIF\nUNTIL Score = -1\nOUTPUT \"Max score = \", Max\n","tests":[{"inputs":["45","82","67","-1"],"expectLines":["Max score = 82"]}]},
+  {"id":"record-basic-1","topic":"record","tier":"basic","title":"Store and print one book record","scenario":"A library system stores details about one book using a record. Input the Title (STRING), Writer (STRING) and Pages (INTEGER) for one book, then output them as \"<Title> by <Writer>, <Pages> pages\".","concept":"TYPE...ENDTYPE defines a record; DECLARE a variable of that type, then access each field with dot notation (Variable.Field).","hint":"DECLARE MyBook : Book, then INPUT MyBook.Title, INPUT MyBook.Writer, INPUT MyBook.Pages, then OUTPUT the fields.","starter":"TYPE Book\n  DECLARE Title : STRING\n  DECLARE Writer : STRING\n  DECLARE Pages : INTEGER\nENDTYPE\n\nDECLARE MyBook : Book\n\n// TODO: input MyBook's Title, Writer and Pages, then output \"<Title> by <Writer>, <Pages> pages\"\n","solution":"TYPE Book\n  DECLARE Title : STRING\n  DECLARE Writer : STRING\n  DECLARE Pages : INTEGER\nENDTYPE\n\nDECLARE MyBook : Book\n\nINPUT MyBook.Title\nINPUT MyBook.Writer\nINPUT MyBook.Pages\nOUTPUT MyBook.Title, \" by \", MyBook.Writer, \", \", MyBook.Pages, \" pages\"\n","tests":[{"inputs":["Pseudocode Basics","Daichi","120"],"expectLines":["Pseudocode Basics by Daichi, 120 pages"]}]},
+  {"id":"record-basic-2","topic":"record","tier":"basic","title":"Update one field of a record","scenario":"A student record stores Name (STRING) and Mark (INTEGER). Input the Name and Mark, then give the student 5 bonus marks and output the new Mark.","concept":"A record's field can be read, changed with arithmetic, and written back using the same dot notation.","hint":"S1.Mark ← S1.Mark + 5","starter":"TYPE Student\n  DECLARE Name : STRING\n  DECLARE Mark : INTEGER\nENDTYPE\n\nDECLARE S1 : Student\n\nINPUT S1.Name\nINPUT S1.Mark\n// TODO: add 5 bonus marks to S1.Mark, then output \"New mark: <Mark>\"\n","solution":"TYPE Student\n  DECLARE Name : STRING\n  DECLARE Mark : INTEGER\nENDTYPE\n\nDECLARE S1 : Student\n\nINPUT S1.Name\nINPUT S1.Mark\nS1.Mark ← S1.Mark + 5\nOUTPUT \"New mark: \", S1.Mark\n","tests":[{"inputs":["Amy","78"],"expectLines":["New mark: 83"]}]},
+  {"id":"record-medium-1","topic":"record","tier":"medium","title":"Array of records — class average","scenario":"A teacher stores 3 students' Name (STRING) and Mark (INTEGER) using a Student record type, held in an array Students[1:3]. Input each student's Name and Mark, output each as \"Name: Mark\", then output the average mark.","concept":"Arrays of records combine ARRAY[1:n] OF <RecordType> with dot notation: Students[Counter].Mark.","hint":"FOR Counter ← 1 TO 3, INPUT Students[Counter].Name and Students[Counter].Mark, adding each Mark to a Total.","starter":"TYPE Student\n  DECLARE Name : STRING\n  DECLARE Mark : INTEGER\nENDTYPE\n\nDECLARE Students : ARRAY[1:3] OF Student\nDECLARE Counter : INTEGER\nDECLARE Total : INTEGER\n\nTotal ← 0\n// TODO: FOR Counter 1 to 3, input each student's Name and Mark, adding Mark to Total\n// TODO: FOR Counter 1 to 3 again, output \"Name: Mark\" for each student\n// TODO: output the average: \"Average: <Total/3>\"\n","solution":"TYPE Student\n  DECLARE Name : STRING\n  DECLARE Mark : INTEGER\nENDTYPE\n\nDECLARE Students : ARRAY[1:3] OF Student\nDECLARE Counter : INTEGER\nDECLARE Total : INTEGER\n\nTotal ← 0\nFOR Counter ← 1 TO 3\n  INPUT Students[Counter].Name\n  INPUT Students[Counter].Mark\n  Total ← Total + Students[Counter].Mark\nNEXT Counter\n\nFOR Counter ← 1 TO 3\n  OUTPUT Students[Counter].Name, \": \", Students[Counter].Mark\nNEXT Counter\n\nOUTPUT \"Average: \", Total / 3\n","tests":[{"inputs":["Amy","70","Ben","80","Cara","90"],"expectLines":["Amy: 70","Ben: 80","Cara: 90","Average: 80"]}]},
+  {"id":"class-basic-1","topic":"class","tier":"basic","title":"Create a class and call a method","scenario":"Model a simple Robot with a Name attribute set when it is created, and a PROCEDURE Greet that outputs \"<Name> says hello!\". Create a Robot called MyRobot with Name \"Wall-E\" and make it greet.","concept":"CLASS...ENDCLASS defines a template. PUBLIC PROCEDURE NEW(...) is the constructor, run automatically by NEW ClassName(args). CALL Object.Method() runs a method.","hint":"Inside NEW, store the parameter into Name. Then CALL MyRobot.Greet().","starter":"CLASS Robot\n  PRIVATE Name : STRING\n\n  PUBLIC PROCEDURE NEW(RobotName : STRING)\n    // TODO: store RobotName into Name\n  ENDPROCEDURE\n\n  PUBLIC PROCEDURE Greet()\n    // TODO: output Name, \" says hello!\"\n  ENDPROCEDURE\nENDCLASS\n\nDECLARE MyRobot : Robot\nMyRobot ← NEW Robot(\"Wall-E\")\n// TODO: call MyRobot's Greet procedure\n","solution":"CLASS Robot\n  PRIVATE Name : STRING\n\n  PUBLIC PROCEDURE NEW(RobotName : STRING)\n    Name ← RobotName\n  ENDPROCEDURE\n\n  PUBLIC PROCEDURE Greet()\n    OUTPUT Name, \" says hello!\"\n  ENDPROCEDURE\nENDCLASS\n\nDECLARE MyRobot : Robot\nMyRobot ← NEW Robot(\"Wall-E\")\nCALL MyRobot.Greet()\n","tests":[{"inputs":[],"expectLines":["Wall-E says hello!"]}]},
+  {"id":"class-medium-1","topic":"class","tier":"medium","title":"A FUNCTION method that returns a value","scenario":"Model a Circle with a Radius attribute set when created, and a PUBLIC FUNCTION GetArea() RETURNS REAL that calculates the area (use 3.142 for pi). Create a Circle with Radius 5 and output its area.","concept":"A FUNCTION defined inside a CLASS works like any other function — it RETURNS a value which can be used directly in an expression, e.g. Object.Method().","hint":"RETURN 3.142 * Radius * Radius. Then OUTPUT MyCircle.GetArea().","starter":"CLASS Circle\n  PRIVATE Radius : REAL\n\n  PUBLIC PROCEDURE NEW(R : REAL)\n    // TODO: store R into Radius\n  ENDPROCEDURE\n\n  PUBLIC FUNCTION GetArea() RETURNS REAL\n    // TODO: return 3.142 * Radius * Radius\n  ENDFUNCTION\nENDCLASS\n\nDECLARE MyCircle : Circle\nMyCircle ← NEW Circle(5)\n// TODO: output MyCircle's area\n","solution":"CLASS Circle\n  PRIVATE Radius : REAL\n\n  PUBLIC PROCEDURE NEW(R : REAL)\n    Radius ← R\n  ENDPROCEDURE\n\n  PUBLIC FUNCTION GetArea() RETURNS REAL\n    RETURN 3.142 * Radius * Radius\n  ENDFUNCTION\nENDCLASS\n\nDECLARE MyCircle : Circle\nMyCircle ← NEW Circle(5)\nOUTPUT MyCircle.GetArea()\n","tests":[{"inputs":[],"expectLines":["78.55"]}]},
+  {"id":"class-applied-1","topic":"class","tier":"applied","title":"Inheritance with SUPER","scenario":"Create a base CLASS Vehicle with a PRIVATE Speed attribute set when created, and a PUBLIC FUNCTION GetSpeed() RETURNS INTEGER. Then create CLASS Car INHERITS Vehicle, whose constructor calls the parent's constructor with CALL SUPER.NEW(...), and which adds a PUBLIC PROCEDURE Accelerate() that increases Speed by 10.","concept":"INHERITS lets a subclass reuse a parent class's attributes and methods. CALL SUPER.NEW(args) runs the parent's constructor from inside the subclass's own constructor.","hint":"Car's NEW should just CALL SUPER.NEW(StartSpeed). Accelerate should do Speed ← Speed + 10, even though Speed belongs to Vehicle.","starter":"CLASS Vehicle\n  PRIVATE Speed : INTEGER\n\n  PUBLIC PROCEDURE NEW(StartSpeed : INTEGER)\n    // TODO: store StartSpeed into Speed\n  ENDPROCEDURE\n\n  PUBLIC FUNCTION GetSpeed() RETURNS INTEGER\n    // TODO: return Speed\n  ENDFUNCTION\nENDCLASS\n\nCLASS Car INHERITS Vehicle\n  PUBLIC PROCEDURE NEW(StartSpeed : INTEGER)\n    // TODO: call the parent constructor with StartSpeed\n  ENDPROCEDURE\n\n  PUBLIC PROCEDURE Accelerate()\n    // TODO: increase Speed by 10\n  ENDPROCEDURE\nENDCLASS\n\nDECLARE MyCar : Car\nMyCar ← NEW Car(30)\nCALL MyCar.Accelerate()\n// TODO: output MyCar's speed\n","solution":"CLASS Vehicle\n  PRIVATE Speed : INTEGER\n\n  PUBLIC PROCEDURE NEW(StartSpeed : INTEGER)\n    Speed ← StartSpeed\n  ENDPROCEDURE\n\n  PUBLIC FUNCTION GetSpeed() RETURNS INTEGER\n    RETURN Speed\n  ENDFUNCTION\nENDCLASS\n\nCLASS Car INHERITS Vehicle\n  PUBLIC PROCEDURE NEW(StartSpeed : INTEGER)\n    CALL SUPER.NEW(StartSpeed)\n  ENDPROCEDURE\n\n  PUBLIC PROCEDURE Accelerate()\n    Speed ← Speed + 10\n  ENDPROCEDURE\nENDCLASS\n\nDECLARE MyCar : Car\nMyCar ← NEW Car(30)\nCALL MyCar.Accelerate()\nOUTPUT MyCar.GetSpeed()\n","tests":[{"inputs":[],"expectLines":["40"]}]}
 ];
 
 function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
@@ -1418,7 +1587,7 @@ function escapeHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;
 // ── Live syntax highlighting for the editable code boxes ──
 // Same token categories/colors as the rest of the page (.kw/.type/.str/.num/.comment),
 // applied to student-typed code via a transparent-text textarea over a highlighted <pre> overlay.
-const PSEUDO_KEYWORDS=['DECLARE','CONSTANT','INPUT','OUTPUT','RETURN','RETURNS','CALL','IF','THEN','ELSE','ENDIF','CASE','OF','OTHERWISE','ENDCASE','FOR','TO','STEP','NEXT','WHILE','DO','ENDWHILE','REPEAT','UNTIL','PROCEDURE','ENDPROCEDURE','FUNCTION','ENDFUNCTION','BYREF','BYVAL','AND','OR','NOT','MOD','DIV','TRUE','FALSE','ARRAY'];
+const PSEUDO_KEYWORDS=['DECLARE','CONSTANT','INPUT','OUTPUT','RETURN','RETURNS','CALL','IF','THEN','ELSE','ENDIF','CASE','OF','OTHERWISE','ENDCASE','FOR','TO','STEP','NEXT','WHILE','DO','ENDWHILE','REPEAT','UNTIL','PROCEDURE','ENDPROCEDURE','FUNCTION','ENDFUNCTION','BYREF','BYVAL','AND','OR','NOT','MOD','DIV','TRUE','FALSE','ARRAY','TYPE','ENDTYPE','CLASS','ENDCLASS','INHERITS','PRIVATE','PUBLIC','NEW','SUPER'];
 const PSEUDO_TYPES=['INTEGER','REAL','STRING','BOOLEAN','CHAR','DATE'];
 function highlightLine(line){
   let out='',i=0;
@@ -1527,8 +1696,8 @@ document.addEventListener('scroll',function(){ if(ac.open) hideAutocomplete(); }
 document.addEventListener('click',function(e){ if(ac.open && !e.target.closest('#ac-dropdown') && !e.target.classList.contains('code-editor')) hideAutocomplete(); });
 
 function renderLoopPractice(){
-  const groupEl={forloop:document.getElementById('forloop-practice'),whileloop:document.getElementById('whileloop-practice'),repeatuntil:document.getElementById('repeatuntil-practice')};
-  const counters={forloop:0,whileloop:0,repeatuntil:0};
+  const groupEl={forloop:document.getElementById('forloop-practice'),whileloop:document.getElementById('whileloop-practice'),repeatuntil:document.getElementById('repeatuntil-practice'),record:document.getElementById('record-practice'),class:document.getElementById('class-practice')};
+  const counters={forloop:0,whileloop:0,repeatuntil:0,record:0,class:0};
   LOOP_PROBLEMS.forEach(function(p){
     counters[p.topic]++;
     const card=document.createElement('div');
