@@ -14,6 +14,60 @@
 <nav><a class="back" href="index.html">← Main site</a><a href="loop-practice.html">← Loop Practice</a><a href="#record-heading">Record</a><a href="#class-heading">Class / OOP</a></nav>
 <main class="container">
 <p class="intro">20 problems total (10 Record, 10 Class), each set going from basic → medium → applied.</p>
+
+<article class="card purple"><div class="head">Record — TYPE...ENDTYPE</div><div class="body">
+<div class="task"><strong>Key idea:</strong> A record groups several related fields into one named type — plain data only, no behaviour. Once you <span class="kw" style="color:#6d28d9">DECLARE</span> a variable of that type, each field is reached with dot notation: <code>Variable.Field</code>.</div>
+<div class="step"><span>1</span>Sample Reference</div>
+<pre><code><span class="kw">TYPE</span> Book
+  <span class="kw">DECLARE</span> Title : <span class="type">STRING</span>
+  <span class="kw">DECLARE</span> Pages : <span class="type">INTEGER</span>
+<span class="kw">ENDTYPE</span>
+
+<span class="kw">DECLARE</span> MyBook : Book
+
+<span class="kw">INPUT</span> MyBook.Title
+<span class="kw">INPUT</span> MyBook.Pages
+<span class="kw">OUTPUT</span> MyBook.Title, <span class="str">" has "</span>, MyBook.Pages, <span class="str">" pages"</span></code></pre>
+<div class="step"><span>2</span>Arrays of Records</div>
+<pre><code><span class="kw">DECLARE</span> Students : <span class="kw">ARRAY</span>[<span class="num">1</span>:<span class="num">3</span>] <span class="kw">OF</span> Book
+<span class="kw">FOR</span> Counter ← <span class="num">1</span> <span class="kw">TO</span> <span class="num">3</span>
+  <span class="kw">INPUT</span> Students[Counter].Title
+<span class="kw">NEXT</span> Counter</code></pre>
+</div></article>
+
+<article class="card teal"><div class="head">Class — CLASS...ENDCLASS (A-Level 9618 extension)</div><div class="body">
+<div class="task"><strong>Key idea:</strong> A class bundles data (<span class="kw" style="color:#0f766e">PRIVATE</span>/<span class="kw" style="color:#0f766e">PUBLIC</span> attributes) together with behaviour (PROCEDUREs and FUNCTIONs as methods). <span class="kw" style="color:#0f766e">NEW</span> creates an object and runs its constructor; <span class="kw" style="color:#0f766e">INHERITS</span> lets a subclass reuse a parent's attributes and methods, with <span class="kw" style="color:#0f766e">CALL SUPER</span> reaching the parent's version.</div>
+<div class="step"><span>1</span>Sample Reference</div>
+<pre><code><span class="kw">CLASS</span> Robot
+  <span class="kw">PRIVATE</span> Name : <span class="type">STRING</span>
+
+  <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> NEW(RobotName : <span class="type">STRING</span>)
+    Name ← RobotName
+  <span class="kw">ENDPROCEDURE</span>
+
+  <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> Greet()
+    <span class="kw">OUTPUT</span> Name, <span class="str">" says hello!"</span>
+  <span class="kw">ENDPROCEDURE</span>
+<span class="kw">ENDCLASS</span>
+
+<span class="kw">DECLARE</span> MyRobot : Robot
+MyRobot ← <span class="kw">NEW</span> Robot(<span class="str">"Wall-E"</span>)
+<span class="kw">CALL</span> MyRobot.Greet()</code></pre>
+<div class="step"><span>2</span>Inheritance with SUPER</div>
+<pre><code><span class="kw">CLASS</span> Vehicle
+  <span class="kw">PRIVATE</span> Speed : <span class="type">INTEGER</span>
+  <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> NEW(StartSpeed : <span class="type">INTEGER</span>)
+    Speed ← StartSpeed
+  <span class="kw">ENDPROCEDURE</span>
+<span class="kw">ENDCLASS</span>
+
+<span class="kw">CLASS</span> Car <span class="kw">INHERITS</span> Vehicle
+  <span class="kw">PUBLIC</span> <span class="kw">PROCEDURE</span> NEW(StartSpeed : <span class="type">INTEGER</span>)
+    <span class="kw">CALL</span> <span class="kw">SUPER</span>.NEW(StartSpeed)
+  <span class="kw">ENDPROCEDURE</span>
+<span class="kw">ENDCLASS</span></code></pre>
+</div></article>
+
 <h3 id="record-heading" style="margin:30px 0 4px">Record Practice — 0478 syllabus (10)</h3>
 <div id="record-practice" class="practice-group"></div>
 <h3 id="class-heading" style="margin:34px 0 4px">Class / OOP Practice — 9618 extension (10)</h3>
