@@ -1,9 +1,9 @@
 :root{--bg:#f6f8fb;--text:#1f2937;--line:#e5e7eb;--dark:#101827;--top:#1f2740;--kw:#4da3ff;--type:#ff9f3f;--str:#bf5cff;--num:#9cdcfe}
 *{box-sizing:border-box}
 body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}
-header{background:linear-gradient(135deg,#1d4ed8,#6d28d9);color:white;text-align:center;padding:42px 20px}
-header h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3.2rem)}
-header p{max-width:950px;margin:auto;color:#e0e7ff}
+header{background:linear-gradient(135deg,#1d4ed8,#6d28d9);color:white;text-align:center;padding:22px 20px}
+header h1{margin:0 0 6px;font-size:clamp(1.3rem,2.4vw,1.9rem)}
+header p{max-width:950px;margin:auto;color:#e0e7ff;font-size:.88rem}
 nav{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:10px 14px;z-index:10;display:flex;flex-wrap:wrap;gap:6px 8px}
 nav a{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3;text-decoration:none;font-weight:800;font-size:.82rem;white-space:nowrap}
 nav a.back{background:#111827;color:white}
