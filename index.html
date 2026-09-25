@@ -1050,7 +1050,7 @@ function normalizeArrows(src){
 class PseudoInterpreter {
   constructor(shared = {}, opts = {}) {
     this.env = {}; this.types = {};
-    for (const [k, v] of Object.entries(shared)) { this.env[k] = v.value; this.types[k] = v.type; }
+    for (const [k, v] of Object.entries(shared)) { this.env[k.toUpperCase()] = v.value; this.types[k.toUpperCase()] = v.type; }
     this.procedures = {}; this.functions = {}; this.output = []; this.inputValues = []; this.files = {};
     this.recordTypes = {}; this.classes = {}; this.arrayElemType = {}; this._activeClass = null; this._activeObj = null;
     this.silent = !!opts.silent;
@@ -1073,7 +1073,7 @@ class PseudoInterpreter {
     if (/^DECLARE\s+/i.test(s)) {
       const m = s.match(/^DECLARE\s+(\w+)\s*(?::\s*(\w+(?:\[.*?\])?)(?:\s+OF\s+(\w+))?)?/i);
       if (m) {
-        const name = m[1], type = (m[2] || '').toUpperCase(), elemType = (m[3] || '').toUpperCase();
+        const name = m[1].toUpperCase(), type = (m[2] || '').toUpperCase(), elemType = (m[3] || '').toUpperCase();
         this.types[name] = type || 'UNKNOWN';
         if (type.startsWith('ARRAY') && elemType) this.arrayElemType[name] = elemType;
         if (!(name in this.env)) {
@@ -1086,7 +1086,7 @@ class PseudoInterpreter {
       }
       return i + 1;
     }
-    if (/^CONSTANT\s+/i.test(s)) { const m = s.match(/^CONSTANT\s+(\w+)\s*[=←]\s*(.+)/i); if (m) this.env[m[1]] = this.eval(m[2].trim()); return i + 1; }
+    if (/^CONSTANT\s+/i.test(s)) { const m = s.match(/^CONSTANT\s+(\w+)\s*[=←]\s*(.+)/i); if (m) this.env[m[1].toUpperCase()] = this.eval(m[2].trim()); return i + 1; }
     if (/^OUTPUT\s+/i.test(s)) {
       const rest = s.replace(/^OUTPUT\s+/i, '').trim();
       const parts = this.splitTop(rest, ',');
@@ -1094,22 +1094,33 @@ class PseudoInterpreter {
       return i + 1;
     }
     if (/^INPUT\s+/i.test(s)) {
-      const name = s.replace(/^INPUT\s+/i, '').trim();
+      const rawName = s.replace(/^INPUT\s+/i, '').trim();
       const raw = this.inputValues.length > 0 ? this.inputValues.shift() : '';
-      let type = this.types[name] || '';
-      if (!type) {
-        const dm = name.match(/^(\w+)\.(\w+)$/);
-        if (dm) { const baseType = this.types[dm[1]]; const fields = this.recordTypes[baseType]; if (fields) type = fields[dm[2]] || ''; }
-        const adm = name.match(/^(\w+)\[(.+)\]\.(\w+)$/);
-        if (adm) { const elemType = this.arrayElemType[adm[1]]; const fields = this.recordTypes[elemType]; if (fields) type = fields[adm[3]] || ''; }
+      const adm = rawName.match(/^(\w+)\[(.+)\]\.(\w+)$/);
+      const dm = !adm ? rawName.match(/^(\w+)\.(\w+)$/) : null;
+      let type = '', storeKey;
+      if (adm) {
+        const arrNameRaw = adm[1], fieldRaw = adm[3];
+        const elemType = this.arrayElemType[arrNameRaw.toUpperCase()];
+        const fields = this.recordTypes[elemType];
+        if (fields) type = fields[fieldRaw.toUpperCase()] || '';
+        storeKey = (arrNameRaw + '[' + this.idxKey(adm[2]) + '].' + fieldRaw).toUpperCase();
+      } else if (dm) {
+        const baseRaw = dm[1], fieldRaw = dm[2];
+        const baseType = this.types[baseRaw.toUpperCase()];
+        const fields = this.recordTypes[baseType];
+        if (fields) type = fields[fieldRaw.toUpperCase()] || '';
+        storeKey = rawName.toUpperCase();
+      } else {
+        const name = rawName.toUpperCase();
+        type = this.types[name] || '';
+        storeKey = name;
       }
       let val = raw;
       if ((type === 'INTEGER' || type === 'REAL') && raw !== '' && !isNaN(Number(raw))) val = type === 'INTEGER' ? parseInt(raw) : parseFloat(raw);
       else if (type === 'BOOLEAN') val = String(raw).toLowerCase() === 'true';
-      const adm2 = name.match(/^(\w+)\[(.+)\]\.(\w+)$/);
-      if (adm2) { const key = adm2[1] + '[' + this.idxKey(adm2[2]) + '].' + adm2[3]; this.env[key] = val; }
-      else { this.env[name] = val; }
-      if (!this.silent) this.output.push('INPUT ' + name + ' → ' + val);
+      this.env[storeKey] = val;
+      if (!this.silent) this.output.push('INPUT ' + rawName + ' → ' + val);
       return i + 1;
     }
     if (/^TYPE\s+/i.test(s)) return this.collectType(lines, i, to);
@@ -1117,7 +1128,7 @@ class PseudoInterpreter {
     if (/^CALL\s+SUPER\./i.test(s)) {
       const m = s.match(/^CALL\s+SUPER\.(\w+)\s*\(([^)]*)\)/i);
       if (m) {
-        const methodName = m[1], argStr = m[2];
+        const methodName = m[1].toUpperCase(), argStr = m[2];
         const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
         const parentClass = this.classes[this._activeClass] ? this.classes[this._activeClass].parent : null;
         if (parentClass) this.invokeMethod(this._activeObj, methodName, argStrs, { fromClass: parentClass });
@@ -1126,7 +1137,7 @@ class PseudoInterpreter {
     }
     if (/^CALL\s+(\w+)\.(\w+)\s*\(/i.test(s)) {
       const m = s.match(/^CALL\s+(\w+)\.(\w+)\s*\(([^)]*)\)/i);
-      const objName = m[1], methodName = m[2], argStr = m[3];
+      const objName = m[1].toUpperCase(), methodName = m[2].toUpperCase(), argStr = m[3];
       const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
       this.invokeMethod(objName, methodName, argStrs, { fromClass: this.types[objName] });
       return i + 1;
@@ -1148,22 +1159,26 @@ class PseudoInterpreter {
   }
   assign(lhs, rhs) {
     const newM = rhs.match(/^NEW\s+(\w+)\s*\(([^)]*)\)$/i);
-    if (newM && this.classes[newM[1]]) {
-      const argStr = newM[2];
-      const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
-      this.types[lhs] = newM[1];
-      this.env[lhs] = { __class: newM[1] };
-      const ctor = this.findMethod(newM[1], 'NEW', 'procedures');
-      if (ctor) this.invokeMethod(lhs, 'NEW', argStrs, { fromClass: newM[1] });
-      return;
+    if (newM) {
+      const className = newM[1].toUpperCase();
+      if (this.classes[className]) {
+        const argStr = newM[2];
+        const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
+        const lhsKey = lhs.toUpperCase();
+        this.types[lhsKey] = className;
+        this.env[lhsKey] = { __class: className };
+        const ctor = this.findMethod(className, 'NEW', 'procedures');
+        if (ctor) this.invokeMethod(lhsKey, 'NEW', argStrs, { fromClass: className });
+        return;
+      }
     }
     const adm = lhs.match(/^(\w+)\[(.+)\]\.(\w+)$/);
-    if (adm) { const key = adm[1] + '[' + this.idxKey(adm[2]) + '].' + adm[3]; this.env[key] = this.eval(rhs); return; }
+    if (adm) { const key = (adm[1] + '[' + this.idxKey(adm[2]) + '].' + adm[3]).toUpperCase(); this.env[key] = this.eval(rhs); return; }
     const dm = lhs.match(/^(\w+)\.(\w+)$/);
-    if (dm) { this.env[lhs] = this.eval(rhs); return; }
+    if (dm) { this.env[lhs.toUpperCase()] = this.eval(rhs); return; }
     const m = lhs.match(/^(\w+)\[(.+)\]$/);
-    if (m) { const name = m[1], idx = this.idxKey(m[2]); if (typeof this.env[name] !== 'object' || this.env[name] === null) this.env[name] = {}; this.env[name][idx] = this.eval(rhs); }
-    else this.env[lhs] = this.eval(rhs);
+    if (m) { const name = m[1].toUpperCase(), idx = this.idxKey(m[2]); if (typeof this.env[name] !== 'object' || this.env[name] === null) this.env[name] = {}; this.env[name][idx] = this.eval(rhs); }
+    else this.env[lhs.toUpperCase()] = this.eval(rhs);
   }
   idxKey(s) { return this.splitTop(s, ',').map(p => this.eval(p.trim())).join(','); }
   execIf(lines, i, to) {
@@ -1185,7 +1200,7 @@ class PseudoInterpreter {
   execFor(lines, i, to) {
     const m = lines[i].src.match(/^FOR\s+(\w+)\s*←\s*(.+?)\s+TO\s+(.+?)(?:\s+STEP\s+(.+))?$/i);
     if (!m) this.err('Invalid FOR');
-    const vn = m[1], stop = Number(this.eval(m[3])), step = m[4] ? Number(this.eval(m[4])) : 1;
+    const vn = m[1].toUpperCase(), stop = Number(this.eval(m[3])), step = m[4] ? Number(this.eval(m[4])) : 1;
     let depth = 0, nextIdx = -1;
     for (let j = i; j < to; j++) {
       if (/^FOR\s+/i.test(lines[j].src)) depth++;
@@ -1264,7 +1279,7 @@ class PseudoInterpreter {
   collectProc(lines, i, to) {
     const m = lines[i].src.match(/^PROCEDURE\s+(\w+)\s*(?:\(([^)]*)\))?/i);
     if (!m) this.err('Invalid PROCEDURE');
-    const name = m[1], params = this.parseParams(m[2]);
+    const name = m[1].toUpperCase(), params = this.parseParams(m[2]);
     let depth = 0, endIdx = -1;
     for (let j = i; j < to; j++) { if (/^PROCEDURE\s+/i.test(lines[j].src)) depth++; if (/^ENDPROCEDURE/i.test(lines[j].src)) { depth--; if (depth === 0) { endIdx = j; break; } } }
     if (endIdx < 0) this.err('Missing ENDPROCEDURE');
@@ -1275,7 +1290,7 @@ class PseudoInterpreter {
   collectFunc(lines, i, to) {
     const m = lines[i].src.match(/^FUNCTION\s+(\w+)\s*(?:\(([^)]*)\))?/i);
     if (!m) this.err('Invalid FUNCTION');
-    const name = m[1], params = this.parseParams(m[2]).map(p => ({ ...p, mode: 'BYVAL' }));
+    const name = m[1].toUpperCase(), params = this.parseParams(m[2]).map(p => ({ ...p, mode: 'BYVAL' }));
     let depth = 0, endIdx = -1;
     for (let j = i; j < to; j++) { if (/^FUNCTION\s+/i.test(lines[j].src)) depth++; if (/^ENDFUNCTION/i.test(lines[j].src)) { depth--; if (depth === 0) { endIdx = j; break; } } }
     if (endIdx < 0) this.err('Missing ENDFUNCTION');
@@ -1286,22 +1301,22 @@ class PseudoInterpreter {
   collectType(lines, i, to) {
     const m = lines[i].src.match(/^TYPE\s+(\w+)/i);
     if (!m) this.err('Invalid TYPE');
-    const name = m[1];
+    const name = m[1].toUpperCase();
     let endIdx = -1;
     for (let j = i + 1; j < to; j++) { if (/^ENDTYPE/i.test(lines[j].src)) { endIdx = j; break; } }
     if (endIdx < 0) this.err('Missing ENDTYPE');
     const fields = {};
     for (let j = i + 1; j < endIdx; j++) {
       const fm = lines[j].src.match(/^DECLARE\s+(\w+)\s*:\s*(\w+)/i);
-      if (fm) fields[fm[1]] = fm[2].toUpperCase();
+      if (fm) fields[fm[1].toUpperCase()] = fm[2].toUpperCase();
     }
-    this.recordTypes[name.toUpperCase()] = fields;
+    this.recordTypes[name] = fields;
     return endIdx + 1;
   }
   collectClass(lines, i, to) {
     const m = lines[i].src.match(/^CLASS\s+(\w+)(?:\s+INHERITS\s+(\w+))?/i);
     if (!m) this.err('Invalid CLASS');
-    const name = m[1], parent = m[2] || null;
+    const name = m[1].toUpperCase(), parent = m[2] ? m[2].toUpperCase() : null;
     let depth = 0, endIdx = -1;
     for (let j = i; j < to; j++) {
       if (/^CLASS\s+/i.test(lines[j].src)) depth++;
@@ -1318,16 +1333,16 @@ class PseudoInterpreter {
       if (procM) {
         let pd = 0, pEnd = -1;
         for (let k = j; k < endIdx; k++) { if (/^(?:PRIVATE|PUBLIC)\s+PROCEDURE\s+/i.test(lines[k].src)) pd++; if (/^ENDPROCEDURE/i.test(lines[k].src)) { pd--; if (pd === 0) { pEnd = k; break; } } }
-        procedures[procM[1]] = { params: this.parseParams(procM[2]), body: lines.slice(j + 1, pEnd) };
+        procedures[procM[1].toUpperCase()] = { params: this.parseParams(procM[2]), body: lines.slice(j + 1, pEnd) };
         j = pEnd + 1; continue;
       }
       if (funcM) {
         let pd = 0, pEnd = -1;
         for (let k = j; k < endIdx; k++) { if (/^(?:PRIVATE|PUBLIC)\s+FUNCTION\s+/i.test(lines[k].src)) pd++; if (/^ENDFUNCTION/i.test(lines[k].src)) { pd--; if (pd === 0) { pEnd = k; break; } } }
-        functions[funcM[1]] = { params: this.parseParams(funcM[2]), body: lines.slice(j + 1, pEnd) };
+        functions[funcM[1].toUpperCase()] = { params: this.parseParams(funcM[2]), body: lines.slice(j + 1, pEnd) };
         j = pEnd + 1; continue;
       }
-      if (attrM) { attrs.push(attrM[1]); j++; continue; }
+      if (attrM) { attrs.push(attrM[1].toUpperCase()); j++; continue; }
       j++;
     }
     this.classes[name] = { parent, attrs, procedures, functions };
@@ -1350,7 +1365,7 @@ class PseudoInterpreter {
       const ch = src[i];
       if (ch === '"' || ch === "'") { const q = ch; let j = i + 1; while (j < src.length && src[j] !== q) j++; out += src.slice(i, j + 1); i = j + 1; continue; }
       const m = src.slice(i).match(/^[A-Za-z_]\w*/);
-      if (m) { const w = m[0]; out += (attrNames.indexOf(w) !== -1 ? objVar + '.' + w : w); i += w.length; continue; }
+      if (m) { const w = m[0]; out += (attrNames.indexOf(w.toUpperCase()) !== -1 ? objVar + '.' + w : w); i += w.length; continue; }
       out += ch; i++;
     }
     return out;
@@ -1392,16 +1407,16 @@ class PseudoInterpreter {
       let p = raw.trim();
       const modeM = p.match(/^(BYREF|BYVAL)\s+(.+)$/i);
       if (modeM) { mode = modeM[1].toUpperCase(); p = modeM[2].trim(); }
-      const name = p.split(/\s*:\s*/)[0].trim();
+      const name = p.split(/\s*:\s*/)[0].trim().toUpperCase();
       return { name, mode };
     });
   }
   callProc(callStr) {
     const m = callStr.match(/^(\w+)\s*(?:\(([^)]*)\))?/);
     if (!m) return;
-    const name = m[1], argStrs = m[2] ? this.splitTop(m[2], ',').map(s => s.trim()) : [];
+    const name = m[1].toUpperCase(), argStrs = m[2] ? this.splitTop(m[2], ',').map(s => s.trim()) : [];
     const proc = this.procedures[name];
-    if (!proc) { this.output.push('[CALL ' + name + ' — not defined]'); return; }
+    if (!proc) { this.output.push('[CALL ' + m[1] + ' — not defined]'); return; }
     const outerKeys = new Set(Object.keys(this.env));
     const child = this.makeChild();
     proc.params.forEach((p, idx) => { if (argStrs[idx] !== undefined) child.env[p.name] = this.eval(argStrs[idx]); });
@@ -1409,10 +1424,11 @@ class PseudoInterpreter {
     this.output.push(...child.output);
     this.inputValues = child.inputValues;
     for (const k of outerKeys) if (k in child.env) this.env[k] = child.env[k];
-    proc.params.forEach((p, idx) => { if (p.mode !== 'BYREF') return; const argName = argStrs[idx]; if (argName && /^[A-Za-z_]\w*$/.test(argName)) this.env[argName] = child.env[p.name]; });
+    proc.params.forEach((p, idx) => { if (p.mode !== 'BYREF') return; const argName = argStrs[idx]; if (argName && /^[A-Za-z_]\w*$/.test(argName)) this.env[argName.toUpperCase()] = child.env[p.name]; });
   }
   callFunc(name, argStrs) {
-    const fn = this.functions[name];
+    const key = name.toUpperCase();
+    const fn = this.functions[key];
     if (!fn) this.err('Function ' + name + ' not defined');
     const child = this.makeChild();
     fn.params.forEach((p, idx) => { if (argStrs[idx] !== undefined) child.env[p.name] = this.eval(argStrs[idx]); });
@@ -1461,18 +1477,22 @@ class PseudoInterpreter {
     if (s[0] === '-') return -Number(this.eval(s.slice(1)));
     if (/^-?\d+(\.\d+)?$/.test(s)) return Number(s);
     const methCallM = s.match(/^([A-Za-z_]\w*)\.([A-Za-z_]\w*)\s*\(([^)]*)\)$/);
-    if (methCallM && this.types[methCallM[1]] && this.classes[this.types[methCallM[1]]]) {
-      const argStr = methCallM[3];
-      const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
-      return this.invokeMethod(methCallM[1], methCallM[2], argStrs, { fromClass: this.types[methCallM[1]] });
+    if (methCallM) {
+      const objName = methCallM[1].toUpperCase();
+      const cls = this.types[objName];
+      if (cls && this.classes[cls]) {
+        const argStr = methCallM[3];
+        const argStrs = argStr.trim() ? this.splitTop(argStr, ',').map(a => a.trim()) : [];
+        return this.invokeMethod(objName, methCallM[2].toUpperCase(), argStrs, { fromClass: cls });
+      }
     }
     const arrDotM = s.match(/^(\w+)\[(.+)\]\.(\w+)$/);
-    if (arrDotM) { const key = arrDotM[1] + '[' + this.idxKey(arrDotM[2]) + '].' + arrDotM[3]; return key in this.env ? this.env[key] : 0; }
+    if (arrDotM) { const key = (arrDotM[1] + '[' + this.idxKey(arrDotM[2]) + '].' + arrDotM[3]).toUpperCase(); return key in this.env ? this.env[key] : 0; }
     const arrm = s.match(/^(\w+)\[(.+)\]$/);
-    if (arrm) { const arr = this.env[arrm[1]]; return (arr && typeof arr === 'object') ? (arr[this.idxKey(arrm[2])] ?? 0) : 0; }
+    if (arrm) { const arrKey = arrm[1].toUpperCase(); const arr = this.env[arrKey]; return (arr && typeof arr === 'object') ? (arr[this.idxKey(arrm[2])] ?? 0) : 0; }
     const dotm = s.match(/^([A-Za-z_]\w*)\.([A-Za-z_]\w*)$/);
-    if (dotm) { return s in this.env ? this.env[s] : 0; }
-    if (/^[A-Za-z_]\w*$/.test(s)) return s in this.env ? this.env[s] : 0;
+    if (dotm) { const key = s.toUpperCase(); return key in this.env ? this.env[key] : 0; }
+    if (/^[A-Za-z_]\w*$/.test(s)) { const key = s.toUpperCase(); return key in this.env ? this.env[key] : 0; }
     return s;
   }
   matchParen(s) { let d = 0; for (let i = 0; i < s.length; i++) { if (s[i] === '(') d++; if (s[i] === ')') d--; if (d === 0) return i; } return -1; }
