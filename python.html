@@ -1,0 +1,1258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Daichi Yamamoto">
+<meta name="copyright" content="© 2026 Daichi Yamamoto. All rights reserved.">
+<meta name="description" content="IGCSE 0478 Python Programming Skills Practice Website created by Daichi Yamamoto.">
+<title>IGCSE 0478 Python Programming Skills — Daichi Yamamoto</title>
+<style>
+:root{--bg:#f6f8fb;--text:#1f2937;--line:#e5e7eb;--blue:#dbeafe;--green:#dcfce7;--yellow:#fef3c7;--purple:#ede9fe;--red:#fee2e2;--orange:#ffedd5;--teal:#99f6e4;--dark:#101827;--top:#1f2740;--kw:#4da3ff;--type:#ff9f3f;--str:#bf5cff;--num:#9cdcfe}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text);line-height:1.6}header{background:linear-gradient(135deg,#065f46,#0f766e 55%,#0e7490);color:white;text-align:center;padding:22px 20px}header h1{margin:0 0 6px;font-size:clamp(1.3rem,2.4vw,1.9rem)}header p{max-width:950px;margin:auto;color:#d1fae5;font-size:.88rem}nav{position:sticky;top:0;background:white;border-bottom:1px solid var(--line);padding:10px 14px;z-index:10;display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px}nav a{display:inline-block;padding:6px 10px;border-radius:999px;background:#eef2ff;color:#3730a3;text-decoration:none;font-weight:800;font-size:.82rem;white-space:nowrap}@media (max-width:600px){nav a{font-size:.72rem;padding:5px 8px}}
+.nav-toggle{display:inline-flex;align-items:center;gap:6px;font-family:inherit;font-size:.85rem;font-weight:800;color:#3730a3;background:#eef2ff;border:1.5px solid transparent;border-radius:999px;padding:7px 14px;cursor:pointer;white-space:nowrap;transition:all .2s}
+.nav-toggle:hover,.nav-toggle.open{border-color:#3730a3}
+.nav-toggle .nav-caret{display:inline-block;transition:transform .25s ease;font-size:.75rem}
+.nav-toggle.open .nav-caret{transform:rotate(180deg)}
+.nav-groups{flex-basis:100%;width:100%;overflow:hidden;max-height:0;opacity:0;margin-top:0;transition:max-height .2s ease,opacity .15s ease,margin-top .2s ease;column-count:4;column-gap:16px;column-rule:1px solid var(--line)}
+.nav-groups.open{max-height:340px;opacity:1;margin-top:6px;padding-top:6px;border-top:1px solid var(--line)}
+.nav-row{display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;break-inside:avoid;padding-bottom:6px;margin-bottom:6px;line-height:1.3}
+.nav-row a{background:#f9fafb;border:1px solid var(--line);padding:3px 8px;border-radius:8px;color:#4b5563;font-weight:700;font-size:.76rem;text-decoration:none}.nav-row a .tnum{font-weight:900;margin-right:1px}
+.nav-row a:hover{color:#3730a3;border-color:#3730a3;background:#eef2ff}
+.nav-mod{font-size:.7rem;font-weight:900;letter-spacing:.02em;white-space:nowrap;flex-basis:100%;margin-bottom:0}
+@media (max-width:900px){.nav-groups{column-count:2}.nav-groups.open{max-height:450px}}
+@media (max-width:500px){.nav-groups{column-count:1}.nav-groups.open{max-height:700px}}.card{scroll-margin-top:76px;margin-bottom:24px}.card:last-child{margin-bottom:0}.card:target{box-shadow:0 0 0 4px #6d28d9}.container{max-width:1180px;margin:auto;padding:26px 18px 60px}.section-title{font-size:1.85rem;margin:42px 0 16px}.grid{display:grid;grid-template-columns:1fr}.card,.quiz,.answers,.project{background:white;border:1px solid var(--line);border-radius:22px;box-shadow:0 12px 30px rgba(15,23,42,.07);overflow:hidden}.head{padding:16px 18px;font-weight:900;font-size:1.12rem}.blue .head{background:var(--blue);color:#1d4ed8}.green .head{background:var(--green);color:#15803d}.yellow .head{background:var(--yellow);color:#b45309}.purple .head{background:var(--purple);color:#6d28d9}.red .head{background:var(--red);color:#b91c1c}.orange .head{background:var(--orange);color:#c2410c}.teal .head{background:var(--teal);color:#0f766e}.body{padding:18px}.step{display:flex;align-items:center;gap:8px;margin:16px 0 7px;font-weight:900}.step:first-child{margin-top:0}.step span{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:#111827;color:white;font-size:.85rem}pre{margin:0;background:var(--dark);color:white;border-top:8px solid var(--top);border-radius:16px;padding:16px;overflow-x:visible;font-size:.95rem;line-height:1.55;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}code{font-family:Consolas,Monaco,'Courier New',monospace;white-space:pre-wrap;word-break:normal;overflow-wrap:anywhere}.kw{color:var(--kw);font-weight:900}.type{color:var(--type);font-weight:900}.str{color:var(--str);font-weight:800}.num{color:var(--num)}.comment{color:#7f9a72;font-style:italic}.task{border:1px dashed #cbd5e1;background:#f9fafb;border-radius:14px;padding:12px 14px}.quiz{padding:24px;margin:28px 0 36px}.quiz h2{margin-top:0}.quiz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px}.q{border:1px solid var(--line);border-radius:18px;background:#f9fafb;padding:14px}.q p{margin:0 0 10px;font-weight:900}.q label{display:block;margin:7px 0;padding:9px 10px;border:1px solid #e5e7eb;background:white;border-radius:10px;cursor:pointer}.q.correct{border-color:#86efac;background:#f0fdf4}.q.wrong{border-color:#fecaca;background:#fff1f2}.feedback{font-weight:900;margin-top:8px}.good{color:#15803d}.bad{color:#b91c1c}.score{margin-top:14px;padding:12px 14px;background:#eef2ff;color:#3730a3;border-radius:14px;font-weight:900}.answers,.project{padding:24px;margin-top:34px}details{border:1px solid var(--line);border-radius:14px;background:#f9fafb;padding:12px 14px;margin:12px 0}summary{font-weight:900;cursor:pointer}.answer-space{min-height:110px;border:2px dashed #cbd5e1;border-radius:16px;padding:14px;color:#6b7280;background:white}.scenario-answer,.own-answer{border:none;background:none;padding:0;margin:10px 0 0}.scenario-answer summary,.own-answer summary{list-style:none;display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;font-weight:800;cursor:pointer;font-size:.88rem}.scenario-answer summary::-webkit-details-marker,.own-answer summary::-webkit-details-marker{display:none}.scenario-answer summary{background:#111827;color:white}.scenario-answer summary::before{content:"💡"}.scenario-answer[open] summary{background:#4338ca}.scenario-answer[open] summary::before{content:"✅"}.own-answer summary{background:#374151;color:white}.own-answer summary::before{content:"📝"}.own-answer[open] summary{background:#0f766e}.own-answer[open] summary::before{content:"✅"}.scenario-answer .task,.own-answer .task{margin-top:10px}.scenario-answer pre,.own-answer pre{margin-top:10px}footer{text-align:center;color:#6b7280;padding:32px}
+.lang-switch{display:inline-flex;background:rgba(255,255,255,.18);border-radius:999px;padding:3px;margin-bottom:10px}.lang-switch a{color:#fff;text-decoration:none;font-weight:800;font-size:.85rem;padding:6px 18px;border-radius:999px}.lang-switch a.on{background:#fff;color:#1f2937}.lang-switch a:not(.on):hover{background:rgba(255,255,255,.25)}.sky .head{background:#e0f2fe;color:#0369a1}.lime .head{background:#ecfccb;color:#4d7c0f}.rose .head{background:#ffe4e6;color:#be123c}.fuchsia .head{background:#fae8ff;color:#a21caf}.cyan .head{background:#cffafe;color:#0e7490}.gold .head{background:#fef9c3;color:#854d0e}.slate .head{background:#e2e8f0;color:#334155}.emerald .head{background:#d1fae5;color:#047857}.lang-switch{display:inline-flex;background:rgba(255,255,255,.18);border-radius:999px;padding:3px;margin-bottom:10px}.lang-switch a{color:#fff;text-decoration:none;font-weight:800;font-size:.85rem;padding:6px 18px;border-radius:999px}.lang-switch a.on{background:#fff;color:#1f2937}.lang-switch a:not(.on):hover{background:rgba(255,255,255,.25)}</style>
+</head>
+<body>
+<header><div class="lang-switch"><a href="index.html">Pseudocode</a><a href="python.html" class="on">Python</a></div><br><h1>IGCSE 0478 Python Programming Skills</h1><p><strong>Created by Daichi Yamamoto</strong><br>Based on Chapter 8 Programming. Colored skill boxes, Python code samples, fill-in-the-space tasks and 5 auto-graded MCQs after each section. Type each program into IDLE and run it.</p></header>
+<nav>
+<button type="button" class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navGroups">📚 All Topics <span class="nav-caret">▾</span></button>
+<div class="nav-groups" id="navGroups">
+  <div class="nav-row"><span class="nav-mod" style="color:#0369a1">Basics</span><a href="#topic1"><span class="tnum" style="color:#0369a1">1.</span> Variables &amp; Constants</a><a href="#topic2"><span class="tnum" style="color:#0369a1">2.</span> Data Types &amp; Casting</a><a href="#topic3"><span class="tnum" style="color:#0369a1">3.</span> Input &amp; Output</a><a href="#topic4"><span class="tnum" style="color:#0369a1">4.</span> Sequence</a></div>
+  <div class="nav-row"><span class="nav-mod" style="color:#4d7c0f">Selection</span><a href="#topic5"><span class="tnum" style="color:#4d7c0f">5.</span> if / else</a><a href="#topic6"><span class="tnum" style="color:#4d7c0f">6.</span> Nested if</a><a href="#topic7"><span class="tnum" style="color:#4d7c0f">7.</span> elif (CASE OF)</a></div>
+  <div class="nav-row"><span class="nav-mod" style="color:#be123c">Iteration (Loops)</span><a href="#topic8"><span class="tnum" style="color:#be123c">8.</span> for Loop (count-controlled)</a><a href="#topic9"><span class="tnum" style="color:#be123c">9.</span> while Loop (pre-condition)</a><a href="#topic10"><span class="tnum" style="color:#be123c">10.</span> REPEAT UNTIL in Python</a><a href="#topic11"><span class="tnum" style="color:#be123c">11.</span> Nested Loops</a></div>
+  <div class="nav-row"><span class="nav-mod" style="color:#a21caf">Operators, Counting &amp; Strings</span><a href="#topic12"><span class="tnum" style="color:#a21caf">12.</span> Totalling &amp; Counting</a><a href="#topic13"><span class="tnum" style="color:#a21caf">13.</span> Arithmetic Operators (MOD &amp; DIV)</a><a href="#topic14"><span class="tnum" style="color:#a21caf">14.</span> Comparison &amp; Boolean Operators</a><a href="#topic15"><span class="tnum" style="color:#a21caf">15.</span> String Handling</a></div>
+  <div class="nav-row"><span class="nav-mod" style="color:#0e7490">Library Routines &amp; Maintainable Code</span><a href="#topic16"><span class="tnum" style="color:#0e7490">16.</span> Library Routines</a><a href="#topic17"><span class="tnum" style="color:#0e7490">17.</span> Comments &amp; Maintainable Code</a></div>
+  <div class="nav-row"><span class="nav-mod" style="color:#854d0e">Procedures &amp; Functions</span><a href="#topic18"><span class="tnum" style="color:#854d0e">18.</span> Procedures</a><a href="#topic19"><span class="tnum" style="color:#854d0e">19.</span> Functions</a><a href="#topic20"><span class="tnum" style="color:#854d0e">20.</span> Local &amp; Global Variables</a></div>
+  <div class="nav-row"><span class="nav-mod" style="color:#334155">Arrays (Lists)</span><a href="#topic21"><span class="tnum" style="color:#334155">21.</span> One-dimensional Lists</a><a href="#topic22"><span class="tnum" style="color:#334155">22.</span> Lists &amp; Iteration</a><a href="#topic23"><span class="tnum" style="color:#334155">23.</span> Two-dimensional Lists</a></div>
+  <div class="nav-row"><span class="nav-mod" style="color:#047857">File Handling</span><a href="#topic24"><span class="tnum" style="color:#047857">24.</span> Writing to a File</a><a href="#topic25"><span class="tnum" style="color:#047857">25.</span> Reading from a File</a><a href="#topic26"><span class="tnum" style="color:#047857">26.</span> Appending &amp; Complete File Programs</a></div>
+</div>
+<a href="#answers">Answers</a>
+</nav>
+<main class="container">
+<h2 id="basics" class="section-title">1. Basics</h2>
+<section class="grid">
+<article id="topic1" class="card sky"><div class="head">1. Variables &amp; Constants</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># Python has no DECLARE: a variable is created when you first assign a value to it</span>
+<span class="comment"># Constants are written in CAPITALS to show they must not change</span>
+PI = <span class="num">3.142</span>
+radius = <span class="num">5</span>
+
+<span class="comment"># Meaningful names make the program easier to understand</span>
+area = PI * radius * radius
+
+print(<span class="str">"Area of circle is"</span>, area)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>VAT_RATE = ____              <span class="comment"># constant: 20% written as a decimal</span>
+price = <span class="num">50</span>
+tax = price * ____
+total = price ____ tax
+
+print(<span class="str">"Total to pay is"</span>, ____)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Create a constant for the number of days in a week and a variable for the number of weeks (4). Calculate the total number of days and print it.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>DAYS_IN_WEEK = <span class="num">7</span>
+weeks = <span class="num">4</span>
+total_days = DAYS_IN_WEEK * weeks
+
+print(<span class="str">"Total days:"</span>, total_days)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">A pen costs $1.50. Store the price in a constant and the quantity (12) in a variable. Calculate and print the total cost.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>PEN_PRICE = <span class="num">1.50</span>
+quantity = <span class="num">12</span>
+total_cost = PEN_PRICE * quantity
+
+print(<span class="str">"Total cost is"</span>, total_cost)</code></pre></details></div></article>
+<article id="topic2" class="card sky"><div class="head">2. Data Types &amp; Casting</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>age = <span class="num">15</span>              <span class="comment"># int     (whole number)</span>
+height = <span class="num">1.72</span>         <span class="comment"># float   (decimal number)</span>
+initial = <span class="str">"D"</span>         <span class="comment"># str     (a single character is still a str)</span>
+name = <span class="str">"Emma"</span>         <span class="comment"># str     (text)</span>
+is_student = <span class="kw">True</span>     <span class="comment"># bool    (True or False)</span>
+
+<span class="comment"># type() shows the data type of a value</span>
+print(type(age))
+print(type(height))
+
+<span class="comment"># Changing the data type is called casting</span>
+text = <span class="str">"25"</span>
+number = <span class="type">int</span>(text)            <span class="comment"># str -&gt; int</span>
+print(number + <span class="num">5</span>)             <span class="comment"># 30</span>
+print(<span class="type">str</span>(number) + <span class="str">" years"</span>) <span class="comment"># int -&gt; str</span></code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>mark = ____(<span class="str">"78"</span>)             <span class="comment"># text -&gt; whole number</span>
+average = ____(<span class="str">"81.5"</span>)      <span class="comment"># text -&gt; decimal number</span>
+label = ____(mark)            <span class="comment"># number -&gt; text</span>
+passed = ____                <span class="comment"># a bool value</span>
+
+print(mark + <span class="num">2</span>)
+print(type(passed))</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Create four variables: a student's name (str), age (int), GPA 3.8 (float) and whether they are in the school team (bool). Print the type of each one.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>student_name = <span class="str">"Mei"</span>
+age = <span class="num">15</span>
+gpa = <span class="num">3.8</span>
+in_team = <span class="kw">True</span>
+
+print(type(student_name))
+print(type(age))
+print(type(gpa))
+print(type(in_team))</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">A user's age is stored as the text "12". Convert it to a whole number, add 8 to it, and print "In 8 years you will be" followed by the result.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>age_text = <span class="str">"12"</span>
+age = <span class="type">int</span>(age_text)
+future_age = age + <span class="num">8</span>
+
+print(<span class="str">"In 8 years you will be"</span>, future_age)</code></pre></details></div></article>
+<article id="topic3" class="card sky"><div class="head">3. Input &amp; Output</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># input() always gives back a string - use int() or float() for numbers</span>
+name = input(<span class="str">"Enter your name: "</span>)
+radius = <span class="type">float</span>(input(<span class="str">"Enter the radius of the cylinder: "</span>))
+length = <span class="type">float</span>(input(<span class="str">"Enter the length of the cylinder: "</span>))
+
+PI = <span class="num">3.142</span>
+volume = PI * radius * radius * length
+
+<span class="comment"># print() separates items with commas and puts a space between them</span>
+print(<span class="str">"Hello"</span>, name)
+print(<span class="str">"Volume of the cylinder is"</span>, volume)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>name = ____(<span class="str">"Enter your name: "</span>)
+age = ____(input(<span class="str">"Enter your age: "</span>))
+next_year = age ____ <span class="num">1</span>
+
+print(<span class="str">"Hello"</span>, ____)
+print(<span class="str">"Next year you will be"</span>, ____)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Ask the user for two whole numbers. Print their product with a suitable message.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>first = <span class="type">int</span>(input(<span class="str">"Enter the first whole number: "</span>))
+second = <span class="type">int</span>(input(<span class="str">"Enter the second whole number: "</span>))
+product = first * second
+
+print(<span class="str">"The product is"</span>, product)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Ask for the width and height of a rectangle (decimals allowed). Calculate and print the area with a message.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>width = <span class="type">float</span>(input(<span class="str">"Enter the width: "</span>))
+height = <span class="type">float</span>(input(<span class="str">"Enter the height: "</span>))
+area = width * height
+
+print(<span class="str">"The area of the rectangle is"</span>, area)</code></pre></details></div></article>
+<article id="topic4" class="card sky"><div class="head">4. Sequence</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># The order of the lines matters: every line can only use values set ABOVE it</span>
+celsius = <span class="type">float</span>(input(<span class="str">"Enter the temperature in Celsius: "</span>))     <span class="comment"># 1. get the input first</span>
+fahrenheit = celsius * <span class="num">9</span> / <span class="num">5</span> + <span class="num">32</span>                                <span class="comment"># 2. then calculate</span>
+print(<span class="str">"Temperature in Fahrenheit is"</span>, fahrenheit)                <span class="comment"># 3. then output</span>
+
+<span class="comment"># If line 2 came before line 1, Python would stop with a NameError</span></code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>length = <span class="num">10</span>
+width = <span class="num">4</span>
+area = ____                   <span class="comment"># area of a rectangle</span>
+____ = <span class="num">2</span> * (length + width)       <span class="comment"># perimeter of a rectangle</span>
+
+print(<span class="str">"Area:"</span>, area)
+print(<span class="str">"Perimeter:"</span>, ____)</code></pre>
+<div class="step"><span>3</span>Rearrange &amp; Write</div><div class="task">These lines are in the wrong order. Rewrite them in an order that works:<br><code>print("Total:", total)</code><br><code>total = a + b</code><br><code>b = int(input("Second number: "))</code><br><code>a = int(input("First number: "))</code></div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>a = <span class="type">int</span>(input(<span class="str">"First number: "</span>))
+b = <span class="type">int</span>(input(<span class="str">"Second number: "</span>))
+total = a + b
+print(<span class="str">"Total:"</span>, total)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Input three test marks. Calculate and print the total and the average (total divided by 3).</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>mark1 = <span class="type">int</span>(input(<span class="str">"Enter mark 1: "</span>))
+mark2 = <span class="type">int</span>(input(<span class="str">"Enter mark 2: "</span>))
+mark3 = <span class="type">int</span>(input(<span class="str">"Enter mark 3: "</span>))
+
+total = mark1 + mark2 + mark3
+average = total / <span class="num">3</span>
+
+print(<span class="str">"Total mark is"</span>, total)
+print(<span class="str">"Average mark is"</span>, average)</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="basics"><h2>Basics MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="selection" class="section-title">2. Selection</h2>
+<section class="grid">
+<article id="topic5" class="card lime"><div class="head">5. if / else</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>age = <span class="type">int</span>(input(<span class="str">"Enter your age: "</span>))
+
+<span class="comment"># Python uses a colon : and indentation instead of THEN and ENDIF</span>
+<span class="kw">if</span> age &gt;= <span class="num">18</span>:
+    print(<span class="str">"You are an adult"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"You are a child"</span>)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>mark = <span class="type">int</span>(input(<span class="str">"Enter your mark: "</span>))
+
+<span class="kw">if</span> mark ____ 50____
+    print(<span class="str">"Pass"</span>)
+____:
+    print(<span class="str">"Fail"</span>)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Input a number. Print whether it is greater than or equal to 100, or less than 100.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>number = <span class="type">int</span>(input(<span class="str">"Enter a number: "</span>))
+
+<span class="kw">if</span> number &gt;= <span class="num">100</span>:
+    print(<span class="str">"The number is 100 or more"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"The number is less than 100"</span>)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">A cinema ticket costs $5 for children under 12 and $8 for everyone else. Input the age and print the ticket price.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>age = <span class="type">int</span>(input(<span class="str">"Enter your age: "</span>))
+
+<span class="kw">if</span> age &lt; <span class="num">12</span>:
+    price = <span class="num">5</span>
+<span class="kw">else</span>:
+    price = <span class="num">8</span>
+
+print(<span class="str">"Your ticket costs $"</span>, price)</code></pre></details></div></article>
+<article id="topic6" class="card lime"><div class="head">6. Nested if</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>mark = <span class="type">int</span>(input(<span class="str">"Enter a mark (0-100): "</span>))
+
+<span class="kw">if</span> mark &gt;= <span class="num">0</span> <span class="kw">and</span> mark &lt;= <span class="num">100</span>:          <span class="comment"># outer if: is the mark valid?</span>
+    <span class="kw">if</span> mark &gt;= <span class="num">80</span>:                     <span class="comment"># inner if: which grade?</span>
+        print(<span class="str">"Distinction"</span>)
+    <span class="kw">else</span>:
+        print(<span class="str">"Merit or below"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Invalid mark"</span>)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>username = input(<span class="str">"Username: "</span>)
+password = input(<span class="str">"Password: "</span>)
+
+<span class="kw">if</span> username ____ <span class="str">"admin"</span>:
+    <span class="kw">if</span> password == <span class="str">"1234"</span>:
+        print(<span class="str">"Welcome"</span>)
+    ____:
+        print(<span class="str">"Wrong password"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Unknown user"</span>)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Input a number. If it is positive, print whether it is even or odd. If it is not positive, print "Not a positive number".</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>number = <span class="type">int</span>(input(<span class="str">"Enter a number: "</span>))
+
+<span class="kw">if</span> number &gt; <span class="num">0</span>:
+    <span class="kw">if</span> number % <span class="num">2</span> == <span class="num">0</span>:
+        print(<span class="str">"Even"</span>)
+    <span class="kw">else</span>:
+        print(<span class="str">"Odd"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Not a positive number"</span>)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">A ride needs age 8 or over AND height of 1.2 m or over. Use a nested if to print "You can ride", "Too short" or "Too young".</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>age = <span class="type">int</span>(input(<span class="str">"Enter your age: "</span>))
+height = <span class="type">float</span>(input(<span class="str">"Enter your height in metres: "</span>))
+
+<span class="kw">if</span> age &gt;= <span class="num">8</span>:
+    <span class="kw">if</span> height &gt;= <span class="num">1.2</span>:
+        print(<span class="str">"You can ride"</span>)
+    <span class="kw">else</span>:
+        print(<span class="str">"Too short"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Too young"</span>)</code></pre></details></div></article>
+<article id="topic7" class="card lime"><div class="head">7. elif (CASE OF)</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>number1 = <span class="type">float</span>(input(<span class="str">"Enter the first number: "</span>))
+number2 = <span class="type">float</span>(input(<span class="str">"Enter the second number: "</span>))
+op_value = input(<span class="str">"Enter an operator (+ - * /): "</span>)
+
+<span class="comment"># Python has no CASE OF: chain the choices with elif</span>
+<span class="kw">if</span> op_value == <span class="str">"+"</span>:
+    answer = number1 + number2
+<span class="kw">elif</span> op_value == <span class="str">"-"</span>:
+    answer = number1 - number2
+<span class="kw">elif</span> op_value == <span class="str">"*"</span>:
+    answer = number1 * number2
+<span class="kw">elif</span> op_value == <span class="str">"/"</span>:
+    answer = number1 / number2
+<span class="kw">else</span>:
+    answer = <span class="str">"invalid operator"</span>       <span class="comment"># like OTHERWISE</span>
+
+print(answer)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>choice = input(<span class="str">"Enter 1, 2 or 3: "</span>)
+
+<span class="kw">if</span> choice == <span class="str">"1"</span>:
+    print(<span class="str">"Start game"</span>)
+____ choice == <span class="str">"2"</span>:
+    print(<span class="str">"Load game"</span>)
+<span class="kw">elif</span> choice == ____:
+    print(<span class="str">"Quit"</span>)
+____:
+    print(<span class="str">"Invalid choice"</span>)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Input a traffic light colour. Print "Stop" for red, "Get ready" for amber, "Go" for green and "Invalid colour" for anything else.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>colour = input(<span class="str">"Enter the colour: "</span>)
+
+<span class="kw">if</span> colour == <span class="str">"red"</span>:
+    print(<span class="str">"Stop"</span>)
+<span class="kw">elif</span> colour == <span class="str">"amber"</span>:
+    print(<span class="str">"Get ready"</span>)
+<span class="kw">elif</span> colour == <span class="str">"green"</span>:
+    print(<span class="str">"Go"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Invalid colour"</span>)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">A shop uses discount codes: "A" gives 10%, "B" gives 20%, "C" gives 30%. Any other code gives 0%. Input the code and the price, then print the final price.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>code = input(<span class="str">"Enter the discount code: "</span>)
+price = <span class="type">float</span>(input(<span class="str">"Enter the price: "</span>))
+
+<span class="kw">if</span> code == <span class="str">"A"</span>:
+    discount = <span class="num">0.1</span>
+<span class="kw">elif</span> code == <span class="str">"B"</span>:
+    discount = <span class="num">0.2</span>
+<span class="kw">elif</span> code == <span class="str">"C"</span>:
+    discount = <span class="num">0.3</span>
+<span class="kw">else</span>:
+    discount = <span class="num">0</span>
+
+final_price = price - price * discount
+print(<span class="str">"Final price is"</span>, final_price)</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="selection"><h2>Selection MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="loops" class="section-title">3. Iteration (Loops)</h2>
+<section class="grid">
+<article id="topic8" class="card rose"><div class="head">8. for Loop (count-controlled)</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># range(start, stop, step): the stop value is NOT included</span>
+<span class="kw">for</span> counter <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">11</span>, <span class="num">2</span>):
+    print(counter)                 <span class="comment"># 1 3 5 7 9</span>
+
+<span class="comment"># range(5) is the same as range(0, 5): it runs 5 times</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>):
+    print(<span class="str">"Hello"</span>)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="comment"># Print the 5 times table from 1 x 5 to 12 x 5</span>
+<span class="kw">for</span> number <span class="kw">in</span> range(____, ____):
+    answer = number * ____
+    print(number, <span class="str">"x 5 ="</span>, answer)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Print the numbers from 10 down to 1 (counting down).</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">for</span> number <span class="kw">in</span> range(<span class="num">10</span>, <span class="num">0</span>, -<span class="num">1</span>):
+    print(number)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Input 5 marks using a loop. Total them and print the total.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>total = <span class="num">0</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>):
+    mark = <span class="type">int</span>(input(<span class="str">"Enter a mark: "</span>))
+    total = total + mark
+
+print(<span class="str">"Total is"</span>, total)</code></pre></details></div></article>
+<article id="topic9" class="card rose"><div class="head">9. while Loop (pre-condition)</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>total_weight = <span class="num">0</span>
+
+<span class="comment"># The condition is tested BEFORE each pass - the loop can run zero times</span>
+<span class="kw">while</span> total_weight &lt; <span class="num">100</span>:
+    weight = <span class="type">float</span>(input(<span class="str">"Enter the weight of a sack: "</span>))
+    total_weight = total_weight + weight
+
+print(<span class="str">"Total weight is"</span>, total_weight)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>password = input(<span class="str">"Enter the password: "</span>)
+
+<span class="kw">while</span> password ____ <span class="str">"python123"</span>____
+    print(<span class="str">"Incorrect"</span>)
+    password = ____(<span class="str">"Enter the password: "</span>)
+
+print(<span class="str">"Access granted"</span>)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Keep asking the user for numbers until they type 0. Print the total of all the numbers entered.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>total = <span class="num">0</span>
+number = <span class="type">int</span>(input(<span class="str">"Enter a number (0 to stop): "</span>))
+
+<span class="kw">while</span> number != <span class="num">0</span>:
+    total = total + number
+    number = <span class="type">int</span>(input(<span class="str">"Enter a number (0 to stop): "</span>))
+
+print(<span class="str">"Total is"</span>, total)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Sacks of rice are weighed. The user types -1 to stop. Count the sacks and total the weights, then print both.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>count = <span class="num">0</span>
+total_weight = <span class="num">0</span>
+weight = <span class="type">float</span>(input(<span class="str">"Enter the weight (-1 to stop): "</span>))
+
+<span class="kw">while</span> weight != -<span class="num">1</span>:
+    count = count + <span class="num">1</span>
+    total_weight = total_weight + weight
+    weight = <span class="type">float</span>(input(<span class="str">"Enter the weight (-1 to stop): "</span>))
+
+print(<span class="str">"Number of sacks:"</span>, count)
+print(<span class="str">"Total weight:"</span>, total_weight)</code></pre></details></div></article>
+<article id="topic10" class="card rose"><div class="head">10. REPEAT UNTIL in Python</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># Python has no REPEAT...UNTIL. Use  while True  and  break  instead.</span>
+<span class="comment"># Pseudocode:  REPEAT  INPUT Number  UNTIL Number &gt;= 1 AND Number &lt;= 10</span>
+
+<span class="kw">while</span> <span class="kw">True</span>:
+    number = <span class="type">int</span>(input(<span class="str">"Enter a number from 1 to 10: "</span>))
+    <span class="kw">if</span> number &gt;= <span class="num">1</span> <span class="kw">and</span> number &lt;= <span class="num">10</span>:
+        <span class="kw">break</span>                       <span class="comment"># the UNTIL condition is true - leave the loop</span>
+    print(<span class="str">"Invalid - try again"</span>)
+
+print(<span class="str">"You entered"</span>, number)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">while</span> ____:
+    pin = input(<span class="str">"Enter a 4-digit PIN: "</span>)
+    <span class="kw">if</span> len(pin) == ____:
+        ____
+    print(<span class="str">"The PIN must be 4 digits"</span>)
+
+print(<span class="str">"PIN accepted"</span>)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Keep asking for a mark until the user enters a valid one (0 to 100). Then print the mark.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">while</span> <span class="kw">True</span>:
+    mark = <span class="type">int</span>(input(<span class="str">"Enter a mark (0-100): "</span>))
+    <span class="kw">if</span> mark &gt;= <span class="num">0</span> <span class="kw">and</span> mark &lt;= <span class="num">100</span>:
+        <span class="kw">break</span>
+    print(<span class="str">"Invalid mark"</span>)
+
+print(<span class="str">"Mark accepted:"</span>, mark)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">The secret number is 7. Keep asking the user to guess until they get it right, count the guesses, then print how many guesses were needed.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>SECRET = <span class="num">7</span>
+guesses = <span class="num">0</span>
+
+<span class="kw">while</span> <span class="kw">True</span>:
+    guess = <span class="type">int</span>(input(<span class="str">"Guess the number: "</span>))
+    guesses = guesses + <span class="num">1</span>
+    <span class="kw">if</span> guess == SECRET:
+        <span class="kw">break</span>
+
+print(<span class="str">"Correct! It took"</span>, guesses, <span class="str">"guesses"</span>)</code></pre></details></div></article>
+<article id="topic11" class="card rose"><div class="head">11. Nested Loops</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># A loop inside a loop: the inner loop finishes fully for every pass of the outer loop</span>
+<span class="kw">for</span> student <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">4</span>):                 <span class="comment"># 3 students</span>
+    total = <span class="num">0</span>
+    <span class="kw">for</span> test <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">3</span>):                <span class="comment"># 2 tests each</span>
+        mark = <span class="type">int</span>(input(<span class="str">"Student "</span> + <span class="type">str</span>(student) + <span class="str">", test "</span> + <span class="type">str</span>(test) + <span class="str">": "</span>))
+        total = total + mark
+    print(<span class="str">"Student"</span>, student, <span class="str">"total is"</span>, total)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="comment"># Draw a triangle of stars (4 rows)</span>
+<span class="kw">for</span> row <span class="kw">in</span> range(<span class="num">1</span>, ____):
+    <span class="kw">for</span> star <span class="kw">in</span> range(____):
+        print(<span class="str">"*"</span>, end=<span class="str">""</span>)
+    ____                  <span class="comment"># move to the next line</span></code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Use nested loops to print 3 rows of 5 hash symbols (#).</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">for</span> row <span class="kw">in</span> range(<span class="num">3</span>):
+    <span class="kw">for</span> column <span class="kw">in</span> range(<span class="num">5</span>):
+        print(<span class="str">"#"</span>, end=<span class="str">""</span>)
+    print()</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">There are 4 students with 3 subject marks each. Input the marks and print each student's average.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">for</span> student <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">5</span>):
+    total = <span class="num">0</span>
+    <span class="kw">for</span> subject <span class="kw">in</span> range(<span class="num">3</span>):
+        mark = <span class="type">int</span>(input(<span class="str">"Enter a mark: "</span>))
+        total = total + mark
+    average = total / <span class="num">3</span>
+    print(<span class="str">"Student"</span>, student, <span class="str">"average is"</span>, average)</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="loops"><h2>Iteration (Loops) MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="operators" class="section-title">4. Operators, Counting &amp; Strings</h2>
+<section class="grid">
+<article id="topic12" class="card fuchsia"><div class="head">12. Totalling &amp; Counting</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>total = <span class="num">0</span>                         <span class="comment"># totalling starts at 0</span>
+count = <span class="num">0</span>                         <span class="comment"># counting starts at 0</span>
+
+number = <span class="type">int</span>(input(<span class="str">"Enter a number (-1 to stop): "</span>))
+<span class="kw">while</span> number != -<span class="num">1</span>:
+    total = total + number        <span class="comment"># add the value to the total</span>
+    count += <span class="num">1</span>                    <span class="comment"># same as  count = count + 1</span>
+    number = <span class="type">int</span>(input(<span class="str">"Enter a number (-1 to stop): "</span>))
+
+print(<span class="str">"Total:"</span>, total)
+print(<span class="str">"Count:"</span>, count)
+<span class="kw">if</span> count &gt; <span class="num">0</span>:
+    print(<span class="str">"Average:"</span>, total / count)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>passes = ____
+total = <span class="num">0</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>):
+    mark = <span class="type">int</span>(input(<span class="str">"Enter a mark: "</span>))
+    total ____ mark
+    <span class="kw">if</span> mark &gt;= <span class="num">50</span>:
+        passes = passes ____ <span class="num">1</span>
+
+print(<span class="str">"Total marks:"</span>, total)
+print(<span class="str">"Number of passes:"</span>, passes)
+print(<span class="str">"Average:"</span>, ____ / <span class="num">5</span>)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Input 10 numbers. Count how many of them are greater than 100 and print the count.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>count = <span class="num">0</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">10</span>):
+    number = <span class="type">int</span>(input(<span class="str">"Enter a number: "</span>))
+    <span class="kw">if</span> number &gt; <span class="num">100</span>:
+        count = count + <span class="num">1</span>
+
+print(<span class="str">"Numbers over 100:"</span>, count)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Input the prices of 6 items. Print the total cost and the average price.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>total = <span class="num">0</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">6</span>):
+    price = <span class="type">float</span>(input(<span class="str">"Enter a price: "</span>))
+    total = total + price
+
+average = total / <span class="num">6</span>
+print(<span class="str">"Total cost is"</span>, total)
+print(<span class="str">"Average price is"</span>, average)</code></pre></details></div></article>
+<article id="topic13" class="card fuchsia"><div class="head">13. Arithmetic Operators (MOD &amp; DIV)</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>a = <span class="num">17</span>
+b = <span class="num">5</span>
+
+print(a + b)          <span class="comment"># 22   add</span>
+print(a - b)          <span class="comment"># 12   subtract</span>
+print(a * b)          <span class="comment"># 85   multiply</span>
+print(a / b)          <span class="comment"># 3.4  divide</span>
+print(a ** <span class="num">2</span>)         <span class="comment"># 289  power (a to the power of 2)</span>
+print(a // b)         <span class="comment"># 3    DIV: whole-number part of the division</span>
+print(a % b)          <span class="comment"># 2    MOD: the remainder</span>
+print(divmod(a, b))   <span class="comment"># (3, 2)  both answers together</span></code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>total_minutes = <span class="num">135</span>
+hours = total_minutes ____ <span class="num">60</span>          <span class="comment"># DIV</span>
+minutes = total_minutes ____ <span class="num">60</span>         <span class="comment"># MOD</span>
+print(hours, <span class="str">"hours"</span>, minutes, <span class="str">"minutes"</span>)
+
+squared = <span class="num">7</span> ____ <span class="num">2</span>                     <span class="comment"># 7 to the power of 2</span>
+print(squared)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Input a whole number. Use MOD to print "Even" or "Odd".</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>number = <span class="type">int</span>(input(<span class="str">"Enter a whole number: "</span>))
+
+<span class="kw">if</span> number % <span class="num">2</span> == <span class="num">0</span>:
+    print(<span class="str">"Even"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Odd"</span>)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">47 sweets are shared equally among 6 children. Print how many each child gets and how many are left over.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>sweets = <span class="num">47</span>
+children = <span class="num">6</span>
+
+each = sweets // children
+left_over = sweets % children
+
+print(<span class="str">"Each child gets"</span>, each)
+print(<span class="str">"Sweets left over:"</span>, left_over)</code></pre></details></div></article>
+<article id="topic14" class="card fuchsia"><div class="head">14. Comparison &amp; Boolean Operators</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># Comparison:  ==  !=  &gt;  &lt;  &gt;=  &lt;=        Boolean:  and  or  not</span>
+number1 = <span class="type">int</span>(input(<span class="str">"Enter the first number: "</span>))
+number2 = <span class="type">int</span>(input(<span class="str">"Enter the second number: "</span>))
+
+<span class="kw">if</span> number1 != number2:
+    print(<span class="str">"The numbers are not equal"</span>)
+    <span class="kw">if</span> number1 &gt; number2:
+        print(<span class="str">"The first number is larger"</span>)
+    <span class="kw">else</span>:
+        print(<span class="str">"The second number is larger"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"The numbers are equal"</span>)
+
+age = <span class="type">int</span>(input(<span class="str">"Enter your age: "</span>))
+<span class="kw">if</span> age &gt;= <span class="num">13</span> <span class="kw">and</span> age &lt;= <span class="num">19</span>:
+    print(<span class="str">"You are a teenager"</span>)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>temperature = <span class="num">25</span>
+raining = <span class="kw">False</span>
+
+<span class="kw">if</span> temperature &gt;= <span class="num">20</span> ____ ____ raining:
+    print(<span class="str">"Go to the park"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Stay inside"</span>)
+
+<span class="kw">if</span> temperature &lt; <span class="num">0</span> ____ temperature &gt; <span class="num">40</span>:
+    print(<span class="str">"Extreme weather"</span>)
+
+<span class="kw">if</span> temperature ____ <span class="num">25</span>:              <span class="comment"># equal to</span>
+    print(<span class="str">"Perfect"</span>)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Input two numbers. Print which one is the largest, or print that they are equal.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>number1 = <span class="type">int</span>(input(<span class="str">"Enter the first number: "</span>))
+number2 = <span class="type">int</span>(input(<span class="str">"Enter the second number: "</span>))
+
+<span class="kw">if</span> number1 &gt; number2:
+    print(<span class="str">"The first number is the largest"</span>)
+<span class="kw">elif</span> number2 &gt; number1:
+    print(<span class="str">"The second number is the largest"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"The numbers are equal"</span>)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Entry needs age 5 or over AND a ticket ("yes"). Input both and print "Enter" or "No entry".</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>age = <span class="type">int</span>(input(<span class="str">"Enter your age: "</span>))
+has_ticket = input(<span class="str">"Do you have a ticket (yes/no)? "</span>)
+
+<span class="kw">if</span> age &gt;= <span class="num">5</span> <span class="kw">and</span> has_ticket == <span class="str">"yes"</span>:
+    print(<span class="str">"Enter"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"No entry"</span>)</code></pre></details></div></article>
+<article id="topic15" class="card fuchsia"><div class="head">15. String Handling</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>my_name = input(<span class="str">"Enter your full name: "</span>)
+
+print(len(my_name))          <span class="comment"># LENGTH: number of characters</span>
+print(my_name[<span class="num">0</span>:<span class="num">3</span>])          <span class="comment"># first 3 characters (positions 0, 1, 2)</span>
+print(my_name.upper())       <span class="comment"># UCASE</span>
+print(my_name.lower())       <span class="comment"># LCASE</span>
+
+<span class="comment"># Python positions start at 0 (pseudocode starts at 1)</span>
+<span class="comment"># SUBSTRING("Computer Science", 10, 7)  becomes:</span>
+word = <span class="str">"Computer Science"</span>
+print(word[<span class="num">9</span>:<span class="num">16</span>])            <span class="comment"># Science  (start 9, stop 16 - stop is NOT included)</span></code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>word = <span class="str">"Programming"</span>
+
+print(____(word))              <span class="comment"># 11</span>
+print(word[____:____])              <span class="comment"># Prog</span>
+print(word.____())           <span class="comment"># PROGRAMMING</span>
+print(word.____())           <span class="comment"># programming</span></code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Input a word. Print its length, its first character and the word in upper case.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>word = input(<span class="str">"Enter a word: "</span>)
+
+print(<span class="str">"Length:"</span>, len(word))
+print(<span class="str">"First character:"</span>, word[<span class="num">0</span>])
+print(<span class="str">"Upper case:"</span>, word.upper())</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Make a username from the first 3 letters of a surname (lower case) followed by the birth year. For "Smith" and 2010 the username is "smi2010".</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>surname = input(<span class="str">"Enter your surname: "</span>)
+year = <span class="type">int</span>(input(<span class="str">"Enter your birth year: "</span>))
+
+username = surname[<span class="num">0</span>:<span class="num">3</span>].lower() + <span class="type">str</span>(year)
+
+print(<span class="str">"Your username is"</span>, username)</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="operators"><h2>Operators, Counting &amp; Strings MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="library" class="section-title">5. Library Routines &amp; Maintainable Code</h2>
+<section class="grid">
+<article id="topic16" class="card cyan"><div class="head">16. Library Routines</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="kw">import</span> math                       <span class="comment"># library routines must be imported before use</span>
+<span class="kw">import</span> random
+
+print(round(<span class="num">6.97354</span>, <span class="num">2</span>))            <span class="comment"># 6.97   ROUND to 2 decimal places</span>
+print(random.random())              <span class="comment"># RANDOM: a decimal from 0 up to (not including) 1</span>
+print(random.randint(<span class="num">1</span>, <span class="num">6</span>))         <span class="comment"># a random whole number from 1 to 6 (inclusive)</span>
+print(math.sqrt(<span class="num">49</span>))                <span class="comment"># 7.0    square root</span>
+print(math.pi)                      <span class="comment"># 3.14159...</span></code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>____ random
+
+dice = random.____(<span class="num">1</span>, <span class="num">6</span>)
+print(<span class="str">"You rolled"</span>, dice)
+
+price = <span class="num">12.3456</span>
+print(____(price, ____))</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Simulate rolling two dice. Print each roll and the total.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">import</span> random
+
+dice1 = random.randint(<span class="num">1</span>, <span class="num">6</span>)
+dice2 = random.randint(<span class="num">1</span>, <span class="num">6</span>)
+total = dice1 + dice2
+
+print(<span class="str">"Dice 1:"</span>, dice1)
+print(<span class="str">"Dice 2:"</span>, dice2)
+print(<span class="str">"Total:"</span>, total)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Simulate a coin toss using random.random(): print "Heads" if the value is below 0.5, otherwise "Tails".</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">import</span> random
+
+value = random.random()
+
+<span class="kw">if</span> value &lt; <span class="num">0.5</span>:
+    print(<span class="str">"Heads"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Tails"</span>)</code></pre></details></div></article>
+<article id="topic17" class="card cyan"><div class="head">17. Comments &amp; Maintainable Code</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># Program: Cylinder volume calculator</span>
+<span class="comment"># Purpose: asks for the radius and length, then displays the volume</span>
+
+PI = <span class="num">3.142</span>                                         <span class="comment"># constant, named in CAPITALS</span>
+
+<span class="comment"># --- inputs ---</span>
+radius = <span class="type">float</span>(input(<span class="str">"Enter the radius: "</span>))
+length = <span class="type">float</span>(input(<span class="str">"Enter the length: "</span>))
+
+<span class="comment"># --- process ---</span>
+volume = PI * radius * radius * length
+
+<span class="comment"># --- output ---</span>
+print(<span class="str">"Volume of the cylinder is"</span>, volume)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>____ Taxi fare calculator
+BASE_FARE = <span class="num">3</span>         ____ fixed charge <span class="kw">in</span> dollars
+COST_PER_KM = <span class="num">1.5</span>
+
+distance = <span class="type">float</span>(input(<span class="str">"Enter the distance in km: "</span>))
+cost = BASE_FARE + distance ____ COST_PER_KM
+
+print(<span class="str">"Journey cost is"</span>, cost)</code></pre>
+<div class="step"><span>3</span>Improve the Code</div><div class="task">Rewrite this hard-to-read code so another programmer could maintain it (meaningful names, a constant, comments):<br><code>x = float(input())</code><br><code>y = x * 3.142 * x</code><br><code>print(y)</code></div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="comment"># Calculate the area of a circle</span>
+PI = <span class="num">3.142</span>
+
+radius = <span class="type">float</span>(input(<span class="str">"Enter the radius: "</span>))
+area = PI * radius * radius
+
+print(<span class="str">"The area of the circle is"</span>, area)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Write a short, well-commented program that asks for a length in centimetres and prints it in metres (divide by 100). Use a constant, a header comment and meaningful names.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="comment"># Convert centimetres to metres</span>
+CM_IN_METRE = <span class="num">100</span>
+
+centimetres = <span class="type">float</span>(input(<span class="str">"Enter the length in cm: "</span>))
+metres = centimetres / CM_IN_METRE
+
+print(<span class="str">"The length in metres is"</span>, metres)</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="library"><h2>Library Routines &amp; Maintainable Code MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="functions" class="section-title">6. Procedures &amp; Functions</h2>
+<section class="grid">
+<article id="topic18" class="card gold"><div class="head">18. Procedures</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># A procedure does a job but does not return a value</span>
+<span class="kw">def</span> draw_stars(number):                 <span class="comment"># number is a parameter</span>
+    <span class="kw">for</span> counter <span class="kw">in</span> range(number):
+        print(<span class="str">"*"</span>, end=<span class="str">""</span>)
+    print()
+
+draw_stars(<span class="num">7</span>)                           <span class="comment"># 7 is the argument</span>
+draw_stars(<span class="num">3</span>)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>____ greet(name):
+    print(<span class="str">"Hello"</span>, name)
+
+greet(<span class="str">"Ali"</span>)
+____(<span class="str">"Mei"</span>)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Write a procedure with no parameters that displays three lines of stars (************). Then call it.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">def</span> three_lines():
+    print(<span class="str">"************"</span>)
+    print(<span class="str">"************"</span>)
+    print(<span class="str">"************"</span>)
+
+three_lines()</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Write a procedure <code>show_menu()</code> that prints three options (1. Play, 2. Scores, 3. Quit). Call it twice.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">def</span> show_menu():
+    print(<span class="str">"1. Play"</span>)
+    print(<span class="str">"2. Scores"</span>)
+    print(<span class="str">"3. Quit"</span>)
+
+show_menu()
+show_menu()</code></pre></details></div></article>
+<article id="topic19" class="card gold"><div class="head">19. Functions</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># A function RETURNS a value back to the main program</span>
+<span class="kw">def</span> celsius(temperature):
+    <span class="kw">return</span> (temperature - <span class="num">32</span>) / <span class="num">1.8</span>
+
+<span class="comment"># The call is used on the right-hand side of an expression</span>
+result = celsius(<span class="num">212</span>)
+print(<span class="str">"212F is"</span>, result, <span class="str">"C"</span>)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code><span class="kw">def</span> area_of_circle(radius):
+    ____ <span class="num">3.142</span> * ____ * radius
+
+answer = ____(<span class="num">4</span>)
+print(<span class="str">"Area is"</span>, answer)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Write a function <code>is_even(n)</code> that returns True if n is even, otherwise False. Use it to test the number 10.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="kw">def</span> is_even(n):
+    <span class="kw">if</span> n % <span class="num">2</span> == <span class="num">0</span>:
+        <span class="kw">return</span> <span class="kw">True</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="kw">False</span>
+
+print(is_even(<span class="num">10</span>))</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Write a function <code>larger(a, b)</code> that returns the larger of two numbers. Input two numbers and print the larger one.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code><span class="kw">def</span> larger(a, b):
+    <span class="kw">if</span> a &gt; b:
+        <span class="kw">return</span> a
+    <span class="kw">else</span>:
+        <span class="kw">return</span> b
+
+first = <span class="type">int</span>(input(<span class="str">"Enter the first number: "</span>))
+second = <span class="type">int</span>(input(<span class="str">"Enter the second number: "</span>))
+print(<span class="str">"The larger number is"</span>, larger(first, second))</code></pre></details></div></article>
+<article id="topic20" class="card gold"><div class="head">20. Local &amp; Global Variables</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>score = <span class="num">0</span>                          <span class="comment"># GLOBAL: created outside any function</span>
+
+<span class="kw">def</span> add_points(points):
+    <span class="kw">global</span> score                   <span class="comment"># needed to CHANGE a global variable</span>
+    score = score + points
+
+<span class="kw">def</span> double(number):
+    result = number * <span class="num">2</span>            <span class="comment"># LOCAL: exists only inside this function</span>
+    <span class="kw">return</span> result
+
+add_points(<span class="num">10</span>)
+print(score)                       <span class="comment"># 10</span>
+print(double(<span class="num">4</span>))                   <span class="comment"># 8</span>
+<span class="comment"># print(result) would cause a NameError - result is local to double()</span></code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>score = <span class="num">0</span>
+
+<span class="kw">def</span> add_points(points):
+    ____ score
+    score = score ____ points
+
+add_points(<span class="num">10</span>)
+add_points(<span class="num">5</span>)
+print(score)                        <span class="comment"># 15</span></code></pre>
+<div class="step"><span>3</span>Trace &amp; Explain</div><div class="task">What does this program print? Write down the two outputs and explain why.<br><code>x = 5</code><br><code>def change():</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;x = 10</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;print(x)</code><br><code>change()</code><br><code>print(x)</code></div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code><span class="num">10</span>
+<span class="num">5</span>
+
+<span class="comment"># Inside change(), x = 10 creates a NEW local variable, so the global x is unchanged.</span>
+<span class="comment"># The first print shows the local x (10); the last print shows the global x (5).</span></code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Use a global variable <code>visitors</code> starting at 0. Write a procedure <code>new_visitor()</code> that adds 1 to it. Call it 3 times and print the result.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>visitors = <span class="num">0</span>
+
+<span class="kw">def</span> new_visitor():
+    <span class="kw">global</span> visitors
+    visitors = visitors + <span class="num">1</span>
+
+new_visitor()
+new_visitor()
+new_visitor()
+
+print(<span class="str">"Visitors:"</span>, visitors)</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="functions"><h2>Procedures &amp; Functions MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="lists" class="section-title">7. Arrays (Lists)</h2>
+<section class="grid">
+<article id="topic21" class="card slate"><div class="head">21. One-dimensional Lists</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># Python uses a list instead of an array. The first index is 0.</span>
+my_list = [<span class="num">27</span>, <span class="num">19</span>, <span class="num">36</span>, <span class="num">42</span>, <span class="num">16</span>, <span class="num">89</span>, <span class="num">21</span>, <span class="num">16</span>, <span class="num">55</span>, <span class="num">72</span>]
+
+print(my_list[<span class="num">0</span>])          <span class="comment"># 27   first element</span>
+print(my_list[<span class="num">9</span>])          <span class="comment"># 72   last element (10 items: indexes 0 to 9)</span>
+my_list[<span class="num">2</span>] = <span class="num">40</span>            <span class="comment"># change the third element</span>
+print(len(my_list))        <span class="comment"># 10   number of elements</span>
+my_list.append(<span class="num">99</span>)         <span class="comment"># add a new element at the end</span>
+print(my_list)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>names = [<span class="str">"Ali"</span>, <span class="str">"Mei"</span>, <span class="str">"Sam"</span>, <span class="str">"Zoe"</span>]
+
+print(names[____])                 <span class="comment"># Ali</span>
+print(names[____])                 <span class="comment"># Zoe</span>
+names[<span class="num">1</span>] = ____                <span class="comment"># replace Mei with Lin</span>
+print(____(names))               <span class="comment"># 4</span></code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Create a list of 5 temperatures. Print the first and last values, then change the third value to 20 and print the whole list.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>temperatures = [<span class="num">12</span>, <span class="num">15</span>, <span class="num">9</span>, <span class="num">18</span>, <span class="num">21</span>]
+
+print(temperatures[<span class="num">0</span>])
+print(temperatures[<span class="num">4</span>])
+
+temperatures[<span class="num">2</span>] = <span class="num">20</span>
+print(temperatures)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">A list holds the scores <code>[45, 62, 78]</code>. Print how many scores there are, add a new score of 90 and print the list again.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>scores = [<span class="num">45</span>, <span class="num">62</span>, <span class="num">78</span>]
+
+print(<span class="str">"Number of scores:"</span>, len(scores))
+scores.append(<span class="num">90</span>)
+print(scores)</code></pre></details></div></article>
+<article id="topic22" class="card slate"><div class="head">22. Lists &amp; Iteration</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code>marks = []                               <span class="comment"># start with an empty list</span>
+
+<span class="comment"># Populate the list using a loop</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>):
+    mark = <span class="type">int</span>(input(<span class="str">"Enter mark "</span> + <span class="type">str</span>(i + <span class="num">1</span>) + <span class="str">": "</span>))
+    marks.append(mark)
+
+<span class="comment"># Read the list using a loop over the indexes</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(len(marks)):
+    print(<span class="str">"Mark"</span>, i + <span class="num">1</span>, <span class="str">"is"</span>, marks[i])</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>prices = [<span class="num">4.5</span>, <span class="num">2.0</span>, <span class="num">7.25</span>, <span class="num">3.0</span>]
+
+total = <span class="num">0</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(____(prices)):
+    total = total + prices[____]
+print(<span class="str">"Total:"</span>, total)
+
+highest = prices[<span class="num">0</span>]
+<span class="kw">for</span> price <span class="kw">in</span> prices:
+    <span class="kw">if</span> price ____ highest:
+        highest = price
+print(<span class="str">"Highest:"</span>, highest)</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Input 5 names into a list, then print them in reverse order.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>names = []
+
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>):
+    name = input(<span class="str">"Enter a name: "</span>)
+    names.append(name)
+
+<span class="kw">for</span> i <span class="kw">in</span> range(len(names) - <span class="num">1</span>, -<span class="num">1</span>, -<span class="num">1</span>):
+    print(names[i])</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Linear search: the list is <code>[8, 15, 23, 4, 16]</code>. Input a number and print its position in the list, or "Not found".</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>numbers = [<span class="num">8</span>, <span class="num">15</span>, <span class="num">23</span>, <span class="num">4</span>, <span class="num">16</span>]
+search = <span class="type">int</span>(input(<span class="str">"Enter the number to find: "</span>))
+
+found = <span class="kw">False</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(len(numbers)):
+    <span class="kw">if</span> numbers[i] == search:
+        print(<span class="str">"Found at position"</span>, i)
+        found = <span class="kw">True</span>
+
+<span class="kw">if</span> found == <span class="kw">False</span>:
+    print(<span class="str">"Not found"</span>)</code></pre></details></div></article>
+<article id="topic23" class="card slate"><div class="head">23. Two-dimensional Lists</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># A 2D list is a list of lists: my_table[row][column]</span>
+my_table = [[<span class="num">27</span>, <span class="num">31</span>, <span class="num">17</span>],
+            [<span class="num">19</span>, <span class="num">67</span>, <span class="num">48</span>],
+            [<span class="num">36</span>, <span class="num">98</span>, <span class="num">29</span>]]
+
+print(my_table[<span class="num">0</span>][<span class="num">0</span>])              <span class="comment"># 27   row 0, column 0</span>
+print(my_table[<span class="num">1</span>][<span class="num">2</span>])              <span class="comment"># 48   row 1, column 2</span>
+
+<span class="comment"># Use nested loops to read every element</span>
+<span class="kw">for</span> row <span class="kw">in</span> range(len(my_table)):
+    <span class="kw">for</span> column <span class="kw">in</span> range(len(my_table[row])):
+        print(my_table[row][column], end=<span class="str">" "</span>)
+    print()</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>grid = [[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>], [<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>], [<span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>]]
+
+print(grid[____][____])            <span class="comment"># 7</span>
+grid[<span class="num">1</span>][<span class="num">1</span>] = ____                   <span class="comment"># set the middle value to 0</span>
+
+total = <span class="num">0</span>
+<span class="kw">for</span> row <span class="kw">in</span> range(<span class="num">3</span>):
+    <span class="kw">for</span> col <span class="kw">in</span> range(____):
+        total = total + grid[row][col]
+print(total)                         <span class="comment"># 40</span></code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Create a 2D list holding 3 marks for each of 3 students. Use nested loops to print the total for each student (each row).</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>marks = [[<span class="num">70</span>, <span class="num">65</span>, <span class="num">80</span>], [<span class="num">55</span>, <span class="num">60</span>, <span class="num">45</span>], [<span class="num">90</span>, <span class="num">85</span>, <span class="num">95</span>]]
+
+<span class="kw">for</span> student <span class="kw">in</span> range(<span class="num">3</span>):
+    total = <span class="num">0</span>
+    <span class="kw">for</span> test <span class="kw">in</span> range(<span class="num">3</span>):
+        total = total + marks[student][test]
+    print(<span class="str">"Student"</span>, student + <span class="num">1</span>, <span class="str">"total:"</span>, total)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Sales figures for 3 shops over 4 quarters: <code>[[10, 12, 9, 14], [7, 8, 11, 6], [15, 14, 16, 18]]</code>. Print the total sales for shop 2 (index 1).</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>sales = [[<span class="num">10</span>, <span class="num">12</span>, <span class="num">9</span>, <span class="num">14</span>], [<span class="num">7</span>, <span class="num">8</span>, <span class="num">11</span>, <span class="num">6</span>], [<span class="num">15</span>, <span class="num">14</span>, <span class="num">16</span>, <span class="num">18</span>]]
+
+total = <span class="num">0</span>
+<span class="kw">for</span> quarter <span class="kw">in</span> range(<span class="num">4</span>):
+    total = total + sales[<span class="num">1</span>][quarter]
+
+print(<span class="str">"Total sales for shop 2:"</span>, total)</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="lists"><h2>Arrays (Lists) MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<h2 id="files" class="section-title">8. File Handling</h2>
+<section class="grid">
+<article id="topic24" class="card emerald"><div class="head">24. Writing to a File</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># "w" = write. This creates the file, or ERASES it if it already exists.</span>
+my_file = open(<span class="str">"MyText.txt"</span>, <span class="str">"w"</span>)
+
+text_line = input(<span class="str">"Please enter a line of text: "</span>)
+my_file.write(text_line)
+
+my_file.close()                    <span class="comment"># always close the file when finished</span></code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>file = ____(<span class="str">"scores.txt"</span>, ____)
+file.write(<span class="str">"Ali,85"</span> + <span class="str">"____"</span>)         <span class="comment"># \n starts a new line</span>
+file.____()</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Ask for 3 names. Write each name on its own line in a file called <code>names.txt</code>.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>file = open(<span class="str">"names.txt"</span>, <span class="str">"w"</span>)
+
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">3</span>):
+    name = input(<span class="str">"Enter a name: "</span>)
+    file.write(name + <span class="str">"\n"</span>)
+
+file.close()</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Ask for a player's high score and save it in the file <code>highscore.txt</code>.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>score = input(<span class="str">"Enter the high score: "</span>)
+
+file = open(<span class="str">"highscore.txt"</span>, <span class="str">"w"</span>)
+file.write(score)
+file.close()</code></pre></details></div></article>
+<article id="topic25" class="card emerald"><div class="head">25. Reading from a File</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># "r" = read</span>
+my_file = open(<span class="str">"MyText.txt"</span>, <span class="str">"r"</span>)
+
+text_line = my_file.read()         <span class="comment"># read the whole file into one string</span>
+my_file.close()
+
+print(<span class="str">"The file contains this line of text"</span>)
+print(text_line)</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>file = open(<span class="str">"names.txt"</span>, ____)
+
+first_line = file.____()     <span class="comment"># reads ONE line</span>
+print(first_line)
+
+<span class="kw">for</span> line <span class="kw">in</span> file:                    <span class="comment"># then loop over the rest</span>
+    print(line.____())          <span class="comment"># strip() removes the \n at the end</span>
+
+file.close()</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Read <code>names.txt</code> line by line and count how many lines it has. Print the count.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>file = open(<span class="str">"names.txt"</span>, <span class="str">"r"</span>)
+
+count = <span class="num">0</span>
+<span class="kw">for</span> line <span class="kw">in</span> file:
+    count = count + <span class="num">1</span>
+
+file.close()
+print(<span class="str">"The file has"</span>, count, <span class="str">"lines"</span>)</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">The file <code>numbers.txt</code> holds one whole number per line. Read the file, total the numbers and print the total.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>file = open(<span class="str">"numbers.txt"</span>, <span class="str">"r"</span>)
+
+total = <span class="num">0</span>
+<span class="kw">for</span> line <span class="kw">in</span> file:
+    total = total + <span class="type">int</span>(line)
+
+file.close()
+print(<span class="str">"Total is"</span>, total)</code></pre></details></div></article>
+<article id="topic26" class="card emerald"><div class="head">26. Appending &amp; Complete File Programs</div><div class="body">
+<div class="step"><span>1</span>Sample Reference</div><pre><code><span class="comment"># File modes:   "r" read    "w" write (erases old content)    "a" append (adds to the end)</span>
+file = open(<span class="str">"log.txt"</span>, <span class="str">"a"</span>)
+file.write(<span class="str">"New entry\n"</span>)
+file.close()
+
+<span class="comment"># Read the whole file back as a list of lines</span>
+file = open(<span class="str">"log.txt"</span>, <span class="str">"r"</span>)
+lines = file.readlines()
+file.close()
+
+print(<span class="str">"Number of entries:"</span>, len(lines))</code></pre>
+<div class="step"><span>2</span>Fill in the Space</div><pre><code>file = open(<span class="str">"marks.txt"</span>, ____)          <span class="comment"># add to the end, keep old data</span>
+file.write(<span class="str">"72\n"</span>)
+file.close()
+
+file = open(<span class="str">"marks.txt"</span>, <span class="str">"r"</span>)
+lines = file.____()
+file.close()
+print(<span class="str">"Lines in file:"</span>, ____(lines))</code></pre>
+<div class="step"><span>3</span>Own Python</div><div class="task">Append a name entered by the user to <code>names.txt</code>, then read the file and print every name.</div>
+<details class="own-answer"><summary>Show Sample Answer</summary><pre><code>name = input(<span class="str">"Enter a name to add: "</span>)
+
+file = open(<span class="str">"names.txt"</span>, <span class="str">"a"</span>)
+file.write(name + <span class="str">"\n"</span>)
+file.close()
+
+file = open(<span class="str">"names.txt"</span>, <span class="str">"r"</span>)
+<span class="kw">for</span> line <span class="kw">in</span> file:
+    print(line.strip())
+file.close()</code></pre></details>
+<div class="step"><span>4</span>Scenario Question</div><div class="task">Input 3 scores and write them to <code>scores.txt</code>, one per line. Then read the file back, total the scores and print the total.</div>
+<details class="scenario-answer"><summary>Show Answer</summary><pre><code>file = open(<span class="str">"scores.txt"</span>, <span class="str">"w"</span>)
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">3</span>):
+    score = input(<span class="str">"Enter a score: "</span>)
+    file.write(score + <span class="str">"\n"</span>)
+file.close()
+
+file = open(<span class="str">"scores.txt"</span>, <span class="str">"r"</span>)
+total = <span class="num">0</span>
+<span class="kw">for</span> line <span class="kw">in</span> file:
+    total = total + <span class="type">int</span>(line)
+file.close()
+
+print(<span class="str">"Total is"</span>, total)</code></pre></details></div></article>
+</section>
+<section class="quiz" data-quiz="files"><h2>File Handling MCQ — Auto-graded</h2><div class="quiz-grid"></div><div class="score">Score: 0 / 5</div></section>
+
+<section id="answers" class="answers"><h2>Answer Page — Fill in the Space</h2><p style="margin:-6px 0 18px">Complete code for every <em>Fill in the Space</em> box. Sample answers for the other tasks are under each “Show Answer” button.</p>
+<details open><summary>Basics Answers</summary>
+<p style="margin:12px 0 6px;font-weight:900">1. Variables &amp; Constants</p><pre><code>VAT_RATE = <span class="num">0.2</span>              <span class="comment"># constant: 20% written as a decimal</span>
+price = <span class="num">50</span>
+tax = price * VAT_RATE
+total = price + tax
+
+print(<span class="str">"Total to pay is"</span>, total)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">2. Data Types &amp; Casting</p><pre><code>mark = <span class="type">int</span>(<span class="str">"78"</span>)             <span class="comment"># text -&gt; whole number</span>
+average = <span class="type">float</span>(<span class="str">"81.5"</span>)      <span class="comment"># text -&gt; decimal number</span>
+label = <span class="type">str</span>(mark)            <span class="comment"># number -&gt; text</span>
+passed = <span class="kw">True</span>                <span class="comment"># a bool value</span>
+
+print(mark + <span class="num">2</span>)
+print(type(passed))</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">3. Input &amp; Output</p><pre><code>name = input(<span class="str">"Enter your name: "</span>)
+age = <span class="type">int</span>(input(<span class="str">"Enter your age: "</span>))
+next_year = age + <span class="num">1</span>
+
+print(<span class="str">"Hello"</span>, name)
+print(<span class="str">"Next year you will be"</span>, next_year)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">4. Sequence</p><pre><code>length = <span class="num">10</span>
+width = <span class="num">4</span>
+area = length * width                   <span class="comment"># area of a rectangle</span>
+perimeter = <span class="num">2</span> * (length + width)       <span class="comment"># perimeter of a rectangle</span>
+
+print(<span class="str">"Area:"</span>, area)
+print(<span class="str">"Perimeter:"</span>, perimeter)</code></pre>
+</details>
+<details><summary>Selection Answers</summary>
+<p style="margin:12px 0 6px;font-weight:900">5. if / else</p><pre><code>mark = <span class="type">int</span>(input(<span class="str">"Enter your mark: "</span>))
+
+<span class="kw">if</span> mark &gt;= <span class="num">50</span>:
+    print(<span class="str">"Pass"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Fail"</span>)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">6. Nested if</p><pre><code>username = input(<span class="str">"Username: "</span>)
+password = input(<span class="str">"Password: "</span>)
+
+<span class="kw">if</span> username == <span class="str">"admin"</span>:
+    <span class="kw">if</span> password == <span class="str">"1234"</span>:
+        print(<span class="str">"Welcome"</span>)
+    <span class="kw">else</span>:
+        print(<span class="str">"Wrong password"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Unknown user"</span>)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">7. elif (CASE OF)</p><pre><code>choice = input(<span class="str">"Enter 1, 2 or 3: "</span>)
+
+<span class="kw">if</span> choice == <span class="str">"1"</span>:
+    print(<span class="str">"Start game"</span>)
+<span class="kw">elif</span> choice == <span class="str">"2"</span>:
+    print(<span class="str">"Load game"</span>)
+<span class="kw">elif</span> choice == <span class="str">"3"</span>:
+    print(<span class="str">"Quit"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Invalid choice"</span>)</code></pre>
+</details>
+<details><summary>Iteration (Loops) Answers</summary>
+<p style="margin:12px 0 6px;font-weight:900">8. for Loop (count-controlled)</p><pre><code><span class="comment"># Print the 5 times table from 1 x 5 to 12 x 5</span>
+<span class="kw">for</span> number <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">13</span>):
+    answer = number * <span class="num">5</span>
+    print(number, <span class="str">"x 5 ="</span>, answer)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">9. while Loop (pre-condition)</p><pre><code>password = input(<span class="str">"Enter the password: "</span>)
+
+<span class="kw">while</span> password != <span class="str">"python123"</span>:
+    print(<span class="str">"Incorrect"</span>)
+    password = input(<span class="str">"Enter the password: "</span>)
+
+print(<span class="str">"Access granted"</span>)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">10. REPEAT UNTIL in Python</p><pre><code><span class="kw">while</span> <span class="kw">True</span>:
+    pin = input(<span class="str">"Enter a 4-digit PIN: "</span>)
+    <span class="kw">if</span> len(pin) == <span class="num">4</span>:
+        <span class="kw">break</span>
+    print(<span class="str">"The PIN must be 4 digits"</span>)
+
+print(<span class="str">"PIN accepted"</span>)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">11. Nested Loops</p><pre><code><span class="comment"># Draw a triangle of stars (4 rows)</span>
+<span class="kw">for</span> row <span class="kw">in</span> range(<span class="num">1</span>, <span class="num">5</span>):
+    <span class="kw">for</span> star <span class="kw">in</span> range(row):
+        print(<span class="str">"*"</span>, end=<span class="str">""</span>)
+    print()                  <span class="comment"># move to the next line</span></code></pre>
+</details>
+<details><summary>Operators, Counting &amp; Strings Answers</summary>
+<p style="margin:12px 0 6px;font-weight:900">12. Totalling &amp; Counting</p><pre><code>passes = <span class="num">0</span>
+total = <span class="num">0</span>
+
+<span class="kw">for</span> i <span class="kw">in</span> range(<span class="num">5</span>):
+    mark = <span class="type">int</span>(input(<span class="str">"Enter a mark: "</span>))
+    total += mark
+    <span class="kw">if</span> mark &gt;= <span class="num">50</span>:
+        passes = passes + <span class="num">1</span>
+
+print(<span class="str">"Total marks:"</span>, total)
+print(<span class="str">"Number of passes:"</span>, passes)
+print(<span class="str">"Average:"</span>, total / <span class="num">5</span>)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">13. Arithmetic Operators (MOD &amp; DIV)</p><pre><code>total_minutes = <span class="num">135</span>
+hours = total_minutes // <span class="num">60</span>          <span class="comment"># DIV</span>
+minutes = total_minutes % <span class="num">60</span>         <span class="comment"># MOD</span>
+print(hours, <span class="str">"hours"</span>, minutes, <span class="str">"minutes"</span>)
+
+squared = <span class="num">7</span> ** <span class="num">2</span>                     <span class="comment"># 7 to the power of 2</span>
+print(squared)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">14. Comparison &amp; Boolean Operators</p><pre><code>temperature = <span class="num">25</span>
+raining = <span class="kw">False</span>
+
+<span class="kw">if</span> temperature &gt;= <span class="num">20</span> <span class="kw">and</span> <span class="kw">not</span> raining:
+    print(<span class="str">"Go to the park"</span>)
+<span class="kw">else</span>:
+    print(<span class="str">"Stay inside"</span>)
+
+<span class="kw">if</span> temperature &lt; <span class="num">0</span> <span class="kw">or</span> temperature &gt; <span class="num">40</span>:
+    print(<span class="str">"Extreme weather"</span>)
+
+<span class="kw">if</span> temperature == <span class="num">25</span>:              <span class="comment"># equal to</span>
+    print(<span class="str">"Perfect"</span>)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">15. String Handling</p><pre><code>word = <span class="str">"Programming"</span>
+
+print(len(word))              <span class="comment"># 11</span>
+print(word[<span class="num">0</span>:<span class="num">4</span>])              <span class="comment"># Prog</span>
+print(word.upper())           <span class="comment"># PROGRAMMING</span>
+print(word.lower())           <span class="comment"># programming</span></code></pre>
+</details>
+<details><summary>Library Routines &amp; Maintainable Code Answers</summary>
+<p style="margin:12px 0 6px;font-weight:900">16. Library Routines</p><pre><code><span class="kw">import</span> random
+
+dice = random.randint(<span class="num">1</span>, <span class="num">6</span>)
+print(<span class="str">"You rolled"</span>, dice)
+
+price = <span class="num">12.3456</span>
+print(round(price, <span class="num">2</span>))</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">17. Comments &amp; Maintainable Code</p><pre><code><span class="comment"># Taxi fare calculator</span>
+BASE_FARE = <span class="num">3</span>         <span class="comment"># fixed charge in dollars</span>
+COST_PER_KM = <span class="num">1.5</span>
+
+distance = <span class="type">float</span>(input(<span class="str">"Enter the distance in km: "</span>))
+cost = BASE_FARE + distance * COST_PER_KM
+
+print(<span class="str">"Journey cost is"</span>, cost)</code></pre>
+</details>
+<details><summary>Procedures &amp; Functions Answers</summary>
+<p style="margin:12px 0 6px;font-weight:900">18. Procedures</p><pre><code><span class="kw">def</span> greet(name):
+    print(<span class="str">"Hello"</span>, name)
+
+greet(<span class="str">"Ali"</span>)
+greet(<span class="str">"Mei"</span>)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">19. Functions</p><pre><code><span class="kw">def</span> area_of_circle(radius):
+    <span class="kw">return</span> <span class="num">3.142</span> * radius * radius
+
+answer = area_of_circle(<span class="num">4</span>)
+print(<span class="str">"Area is"</span>, answer)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">20. Local &amp; Global Variables</p><pre><code>score = <span class="num">0</span>
+
+<span class="kw">def</span> add_points(points):
+    <span class="kw">global</span> score
+    score = score + points
+
+add_points(<span class="num">10</span>)
+add_points(<span class="num">5</span>)
+print(score)                        <span class="comment"># 15</span></code></pre>
+</details>
+<details><summary>Arrays (Lists) Answers</summary>
+<p style="margin:12px 0 6px;font-weight:900">21. One-dimensional Lists</p><pre><code>names = [<span class="str">"Ali"</span>, <span class="str">"Mei"</span>, <span class="str">"Sam"</span>, <span class="str">"Zoe"</span>]
+
+print(names[<span class="num">0</span>])                 <span class="comment"># Ali</span>
+print(names[<span class="num">3</span>])                 <span class="comment"># Zoe</span>
+names[<span class="num">1</span>] = <span class="str">"Lin"</span>                <span class="comment"># replace Mei with Lin</span>
+print(len(names))               <span class="comment"># 4</span></code></pre>
+<p style="margin:12px 0 6px;font-weight:900">22. Lists &amp; Iteration</p><pre><code>prices = [<span class="num">4.5</span>, <span class="num">2.0</span>, <span class="num">7.25</span>, <span class="num">3.0</span>]
+
+total = <span class="num">0</span>
+<span class="kw">for</span> i <span class="kw">in</span> range(len(prices)):
+    total = total + prices[i]
+print(<span class="str">"Total:"</span>, total)
+
+highest = prices[<span class="num">0</span>]
+<span class="kw">for</span> price <span class="kw">in</span> prices:
+    <span class="kw">if</span> price &gt; highest:
+        highest = price
+print(<span class="str">"Highest:"</span>, highest)</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">23. Two-dimensional Lists</p><pre><code>grid = [[<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>], [<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>], [<span class="num">7</span>, <span class="num">8</span>, <span class="num">9</span>]]
+
+print(grid[<span class="num">2</span>][<span class="num">0</span>])            <span class="comment"># 7</span>
+grid[<span class="num">1</span>][<span class="num">1</span>] = <span class="num">0</span>                   <span class="comment"># set the middle value to 0</span>
+
+total = <span class="num">0</span>
+<span class="kw">for</span> row <span class="kw">in</span> range(<span class="num">3</span>):
+    <span class="kw">for</span> col <span class="kw">in</span> range(<span class="num">3</span>):
+        total = total + grid[row][col]
+print(total)                         <span class="comment"># 40</span></code></pre>
+</details>
+<details><summary>File Handling Answers</summary>
+<p style="margin:12px 0 6px;font-weight:900">24. Writing to a File</p><pre><code>file = open(<span class="str">"scores.txt"</span>, <span class="str">"w"</span>)
+file.write(<span class="str">"Ali,85"</span> + <span class="str">"\n"</span>)         <span class="comment"># \n starts a new line</span>
+file.close()</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">25. Reading from a File</p><pre><code>file = open(<span class="str">"names.txt"</span>, <span class="str">"r"</span>)
+
+first_line = file.readline()     <span class="comment"># reads ONE line</span>
+print(first_line)
+
+<span class="kw">for</span> line <span class="kw">in</span> file:                    <span class="comment"># then loop over the rest</span>
+    print(line.strip())          <span class="comment"># strip() removes the \n at the end</span>
+
+file.close()</code></pre>
+<p style="margin:12px 0 6px;font-weight:900">26. Appending &amp; Complete File Programs</p><pre><code>file = open(<span class="str">"marks.txt"</span>, <span class="str">"a"</span>)          <span class="comment"># add to the end, keep old data</span>
+file.write(<span class="str">"72\n"</span>)
+file.close()
+
+file = open(<span class="str">"marks.txt"</span>, <span class="str">"r"</span>)
+lines = file.readlines()
+file.close()
+print(<span class="str">"Lines in file:"</span>, len(lines))</code></pre>
+</details>
+</section>
+</main>
+<footer>© 2026 Daichi Yamamoto. All rights reserved.</footer>
+<script>
+const quizData={"basics": [["How is a variable created in Python?", ["By using the keyword var before the name", "By importing it from the variables module", "By writing DECLARE score : INTEGER first", "By assigning it a value, e.g. score = 10"], 3, "Python needs no separate declaration - the first assignment creates the variable."], ["What data type does input() always return?", ["A string (str)", "A Boolean (bool)", "A decimal (float)", "An integer (int)"], 0, "input() gives text, so use int() or float() for numbers."], ["What is the value of int(\"25\") + 5?", ["30", "255", "\"255\"", "an error"], 0, "int() turns the text into the number 25, then 25 + 5 = 30."], ["Which name follows the convention for a constant?", ["Max score = 100", "maxScore = 100", "MAX_SCORE = 100", "max_score = 100"], 2, "Python has no real constants, so CAPITALS show a value must not be changed."], ["A line uses a variable that has not been assigned yet. What happens?", ["Python uses an empty string", "Python skips that line quietly", "Python uses 0 automatically", "Python stops with a NameError"], 3, "Sequence matters: values must be set above the line that uses them."]], "selection": [["What must be at the end of an if line in Python?", ["A semicolon ;", "The word THEN", "A colon :", "The word ENDIF"], 2, "Python uses a colon plus indentation instead of THEN and ENDIF."], ["Which keyword gives 'else if' in Python?", ["case", "elseif", "elif", "else if"], 2, "elif chains several tests and replaces CASE OF."], ["Which operator tests whether two values are equal?", ["==", "=>", "=", "<>"], 0, "A single = assigns; == compares."], ["What is printed?<br><code>x = 7</code><br><code>if x &gt; 5 and x &lt; 10:</code> print(\"A\") <code>else:</code> print(\"B\")", ["B", "A", "AB", "Nothing"], 1, "Both conditions are true, so the AND is true and A is printed."], ["How does Python show which lines belong inside an if?", ["By writing them in capitals", "By putting them in brackets { }", "By indenting them", "By ending them with ENDIF"], 2, "Indentation is part of the Python syntax."]], "loops": [["Which values does range(1, 6) produce?", ["2, 3, 4, 5, 6", "1, 2, 3, 4, 5", "1, 2, 3, 4, 5, 6", "0, 1, 2, 3, 4, 5"], 1, "The stop value is not included."], ["Which loop may run zero times?", ["A loop with no condition", "for i in range(1)", "while", "while True with break"], 2, "A while condition is tested before the first pass."], ["How do you write a REPEAT...UNTIL loop in Python?", ["while True with a break", "for ... until loop", "repeat ... until loop", "do ... while loop"], 0, "Python only has pre-condition loops, so break leaves the loop when the UNTIL condition is met."], ["How many times is Hello printed?<br><code>for i in range(3):</code> print(\"Hello\")", ["0", "4", "2", "3"], 3, "range(3) gives 0, 1, 2 - three passes."], ["Which values does range(2, 10, 2) produce?", ["2, 3, 4, 5", "4, 6, 8, 10", "2, 4, 6, 8, 10", "2, 4, 6, 8"], 3, "Start 2, step 2, stop before 10."]], "operators": [["What is 17 % 5?", ["2", "3", "3.4", "12"], 0, "% is MOD, the remainder after division."], ["What is 17 // 5?", ["3", "2", "3.4", "5"], 0, "// is DIV, the whole-number part of the division."], ["What does \"Computer\"[0:3] give?", ["\"Comp\"", "\"Computer\"", "\"omp\"", "\"Com\""], 3, "Positions start at 0 and the stop position is not included."], ["Which statement is the same as count = count + 1?", ["count == 1", "count ++", "count += 1", "count =+ 1"], 2, "+= adds to the variable."], ["What is 2 ** 3?", ["5", "8", "6", "9"], 1, "** is 'to the power of', so 2 x 2 x 2 = 8."]], "library": [["Which statement gives a random whole number from 1 to 6?", ["random.random(1, 6)", "random.number(1, 6)", "random.randint(1, 6)", "randint.random(6)"], 2, "randint(a, b) includes both ends. import random first."], ["What is the result of round(6.97354, 2)?", ["6.97", "6.9", "7", "6.98"], 0, "round() rounds to the given number of decimal places."], ["Which symbol starts a comment in Python?", ["#", "//", "/*", "'"], 0, "Everything after # on that line is ignored."], ["Why should variables have meaningful names?", ["So others can understand the code", "So the program runs faster", "So comments are not needed", "So the program uses less memory"], 0, "Meaningful names, comments and constants make code maintainable."], ["Which line makes math.sqrt() available?", ["using math", "import math", "include math", "from sqrt import math"], 1, "Library routines must be imported before use."]], "functions": [["Which keyword starts a procedure or function definition?", ["sub", "def", "function", "procedure"], 1, "Python uses def for both."], ["What is the main difference between a function and a procedure?", ["A procedure must be called twice", "A function has no parameters", "A procedure returns a value", "A function returns a value"], 3, "A function sends a value back with return; a procedure just does a task."], ["A variable is created inside a function. What kind of variable is it?", ["Constant", "Local", "Global", "Library"], 1, "Local variables exist only while the function runs."], ["Which keyword lets a function change a global variable?", ["global", "public", "shared", "static"], 0, "Write global score inside the function before changing score."], ["In <code>def greet(name):</code> what is <code>name</code>?", ["A parameter", "A return value", "A library routine", "An argument"], 0, "The parameter is in the definition; the value passed in the call is the argument."]], "lists": [["What is the index of the first item in a Python list?", ["1", "0", "-1", "It depends on the list"], 1, "Python indexes start at 0."], ["What does len(my_list) return?", ["The number of items in it", "The index of the last item", "The last item in the list", "The largest item in the list"], 0, "len() counts the elements."], ["Which item is my_table[1][2]?", ["Row 2, column 2", "Row 1, column 1", "Row 2, column 1", "Row 1, column 2"], 3, "The first index is the row, the second is the column, both starting at 0."], ["Which method adds a new item to the end of a list?", ["insert_end()", "add()", "append()", "push()"], 2, "my_list.append(99) adds 99 at the end."], ["How is a Python list different from an array?", ["A list can only hold numbers", "A list has a fixed size", "A list can mix data types", "A list cannot be looped through"], 2, "Arrays hold one data type; Python lists can mix them."]], "files": [["Which mode opens a file for writing new data (erasing old data)?", ["\"a\"", "\"w\"", "\"r\"", "\"rb\""], 1, "\"w\" creates or overwrites the file."], ["Why should a program close a file?", ["To save the data and free the file", "To make the file read only", "To delete the file afterwards", "To make the file bigger in size"], 0, "Closing finishes writing and frees the file for other programs."], ["What does mode \"a\" do?", ["Reads the first line only", "Adds data to the end", "Creates a backup copy", "Erases the file and starts again"], 1, "Append keeps the existing content."], ["Why store data in a file?", ["It stops other programs using it", "It makes the program run faster", "It is stored in RAM only", "It is kept after the program ends"], 3, "Files are permanent storage; variables in RAM are lost."], ["What happens with open(\"missing.txt\", \"r\") if the file does not exist?", ["An empty file is created", "The file is created on close", "The program prints None", "A FileNotFoundError occurs"], 3, "Read mode does not create files."]]};
+function renderQuizzes(){document.querySelectorAll('[data-quiz]').forEach(function(sec){var key=sec.getAttribute('data-quiz');var grid=sec.querySelector('.quiz-grid');grid.innerHTML=quizData[key].map(function(q,i){return '<div class="q" data-correct="'+q[2]+'" data-explain="'+q[3]+'"><p>'+(i+1)+'. '+q[0]+'</p>'+q[1].map(function(a,j){return '<label><input type="radio" name="'+key+i+'" value="'+j+'"> '+a+'</label>';}).join('')+'<div class="feedback"></div></div>';}).join('');sec.querySelector('.score').textContent='Score: 0 / '+quizData[key].length;});}
+function updateScore(sec){var qs=sec.querySelectorAll('.q');var score=0;qs.forEach(function(q){if(q.classList.contains('correct'))score++;});sec.querySelector('.score').textContent='Score: '+score+' / '+qs.length;}
+document.addEventListener('change',function(e){if(!e.target.matches('.q input'))return;var q=e.target.closest('.q');var sec=e.target.closest('.quiz');var correct=q.getAttribute('data-correct');var fb=q.querySelector('.feedback');q.classList.remove('correct','wrong');if(e.target.value===correct){q.classList.add('correct');fb.innerHTML='<span class="good">Correct.</span> '+q.getAttribute('data-explain');}else{q.classList.add('wrong');var right=q.querySelector('input[value="'+correct+'"]').parentElement.textContent.trim();fb.innerHTML='<span class="bad">Incorrect.</span> Correct answer: <strong>'+right+'</strong>. '+q.getAttribute('data-explain');}updateScore(sec);});
+renderQuizzes();
+
+// ── Foldable topic nav: collapses the 26-topic list behind a toggle button,
+// remembered across visits via localStorage. ──
+(function(){
+  var btn=document.getElementById('navToggle');
+  var grp=document.getElementById('navGroups');
+  if(!btn||!grp) return;
+  var KEY='pythonNavOpen';
+  function set(v){
+    grp.classList.toggle('open',v);
+    btn.classList.toggle('open',v);
+    btn.setAttribute('aria-expanded',v?'true':'false');
+    try{ localStorage.setItem(KEY,v?'1':'0'); }catch(e){}
+  }
+  var open=false;
+  try{ open=localStorage.getItem(KEY)==='1'; }catch(e){}
+  set(open);
+  btn.addEventListener('click',function(){ set(!grp.classList.contains('open')); });
+  grp.addEventListener('click',function(e){ if(e.target.tagName==='A') set(false); });
+})();
+
+
+</script>
+</body>
+</html>
